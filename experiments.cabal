@@ -11,7 +11,7 @@ cabal-version: >=1.10
 
 executable brackets
   main-is: Brackets.hs
-  build-depends: base, algebraic-graphs, containers, transformers, joint
+  build-depends: base, joint, lens
   default-extensions:
     DataKinds,
     ExplicitNamespaces,
