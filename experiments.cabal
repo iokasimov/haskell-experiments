@@ -9,8 +9,8 @@ build-type: Simple
 extra-source-files: README.md
 cabal-version: >=1.10
 
-executable brackets
-  main-is: Brackets.hs
+executable joint-brackets
+  main-is: joint/Brackets.hs
   build-depends: base, joint, lens
   default-extensions:
     DataKinds,
