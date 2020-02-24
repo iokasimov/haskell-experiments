@@ -26,3 +26,23 @@ executable joint-brackets
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
+
+executable pandora-brackets
+  main-is: pandora/Brackets.hs
+  build-depends: base, pandora
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
