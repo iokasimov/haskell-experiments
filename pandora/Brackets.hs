@@ -46,19 +46,16 @@ type Open = Style :*: Index
 hold :: Style -> (Bindable t, Stateful Index t, Stateful Openings t) => t ()
 hold style = current >>= modify . push @Open . (style :*:)
 
-recall :: (Bindable t, Stateful Openings t) => t r -> (Index -> Style -> t r) -> t r
-recall on_empty f = top @Open <$> current >>= maybe on_empty (|- f)
-
-conjoined :: (Covariant t, Stateful Openings t) => t ()
-conjoined = modify $ pop @Open
+previous :: (Bindable t, Stateful Openings t) => t r -> (Index -> Style -> t r) -> t r
+previous on_empty f = view (top @Open) <$> current >>= maybe on_empty (|- f)
 
 match :: (Bindable t, Stateful Index t, Stateful Openings t, Failable Stumble t) => Style -> Index -> Style -> t ()
-match closed oix opened = closed == opened ? conjoined $ mismatch closed opened oix
+match closed oix opened = closed == opened ? modify (pop @Open) $ mismatch closed opened oix
 
 inspect :: Symbol -> State Index :> State Openings :> Conclusion Stumble := ()
 inspect Nevermind = pass
 inspect (Bracket opened Opened) = hold opened
-inspect (Bracket closed Closed) = recall (deadend closed) (match closed)
+inspect (Bracket closed Closed) = previous (deadend closed) (match closed)
 
 deriving instance Base.Show Shape
 deriving instance Base.Show Style
@@ -66,8 +63,8 @@ deriving instance Base.Show Symbol
 deriving instance Base.Show Stumble
 
 check :: Traversable s => s Symbol -> Base.IO ()
-check code = traverse (\s -> indexate *> inspect s) code *> recall pass logjam
-	& unwrap % 1 & unwrap % empty & conclusion Base.print ((Base.print "OK") !)
+check code = traverse (\s -> indexate *> inspect s) code *> previous pass logjam
+	& run % 1 & run % empty & conclusion Base.print ((Base.print "OK") !)
 
 example_ok, example_mismatch, example_deadend, example_logjam :: Stack Symbol
 example_ok = push (Bracket Curly Opened) $ push Nevermind $ push (Bracket Curly Closed) $ empty  -- {x}
@@ -75,4 +72,8 @@ example_mismatch = push (Bracket Curly Opened) $ push (Bracket Square Closed) $ 
 example_deadend = push (Bracket Round Closed) empty -- )
 example_logjam = push (Bracket Angle Opened) empty -- <
 
-main = check example_mismatch
+main = do
+    check example_ok
+    check example_mismatch
+    check example_deadend
+    check example_logjam
