@@ -4,6 +4,10 @@ module Main where
 
 import Prelude hiding (Either (Left, Right))
 import Control.Comonad.Cofree (Cofree ((:<)))
+import Control.Comonad
+import Control.Monad.Trans.Class
+import Control.Monad.Trans.Maybe
+import Control.Monad.Trans.State
 
 data Wye a = End | Left a | Right a | Both a a
 
@@ -78,16 +82,28 @@ dictionary = ' ' :< Both
 		)
 	)
 
-left :: Binary a -> Maybe (Binary a)
-left (_ :< End) = Nothing
-left (_ :< Left x) = Just x
-left (_ :< Right _) = Nothing
-left (_ :< Both x _) = Just x
+left :: Monad t => Binary a -> MaybeT t (Binary a)
+left (_ :< End) = MaybeT $ pure Nothing
+left (_ :< Left x) = MaybeT . pure . Just $ x
+left (_ :< Right _) = MaybeT $ pure Nothing
+left (_ :< Both x _) = MaybeT . pure . Just $ x
 
-right :: Binary a -> Maybe (Binary a)
-right (_ :< End) = Nothing
-right (_ :< Right x) = Just x
-right (_ :< Left _) = Nothing
-right (_ :< Both _ x) = Just x
+right :: Monad t => Binary a -> MaybeT t (Binary a)
+right (_ :< End) = MaybeT $ pure Nothing
+right (_ :< Right x) = MaybeT . pure . Just $ x
+right (_ :< Left _) = MaybeT $ pure Nothing
+right (_ :< Both _ x) = MaybeT . pure . Just $ x
 
-main = print "typechecked"
+data Morse = Dot | Dash
+
+decode :: Morse -> StateT (Binary Char) (MaybeT IO) ()
+decode Dot = get >>= lift . left >>= \t -> (lift . lift . print . extract $ t) *> put t
+decode Dash = get >>= lift . right >>= \t -> (lift . lift . print . extract $ t) *> put t
+
+a :: [Morse]
+a = [Dot, Dash]
+
+digit4 :: [Morse]
+digit4 = [Dot, Dot, Dot, Dot, Dash]
+
+main = runMaybeT $ execStateT (traverse decode digit4) dictionary
