@@ -71,16 +71,8 @@ data Morse = Dot | Dash
 type Dictionary = Nonempty Binary Char
 
 cut :: (Pointable t, Optional t) => Morse -> Dictionary -> t Dictionary
-cut Dot t = case untwist t of
-	Both ls _ -> point ls
-	Left ls -> point ls
-	Right _ -> nothing
-	End -> nothing
-cut Dash t = case untwist t of
-	Both _ rs -> point rs
-	Left _ -> nothing
-	Right rs -> point rs
-	End -> nothing
+cut Dot = adapt . left . untwist
+cut Dash = adapt . right . untwist
 
 decode :: (Monad t, Optional t, Stateful Dictionary t) => Morse -> t ()
 decode x = current @Dictionary >>= cut x >>= replace
