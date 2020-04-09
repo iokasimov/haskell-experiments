@@ -2,26 +2,20 @@ module Main where
 
 -- Source: https://chrisdone.com/posts/twitter-problem-loeb/
 
-import Data.Functor
+import Data.Traversable
 import Control.Applicative.Backwards
 import Control.Monad.Trans.State
 
+type Current = Int
+type Max = Int
+
+walls :: [Current]
 walls = [2,5,1,2,3,4,7,7,6]
 
-type Current = Int
-type LeftMax = Int
-type RightMax = Int
-
-leftmax :: Current -> State LeftMax (LeftMax, Current)
-leftmax current = get >>= \previous_lm -> case compare previous_lm current of
-	EQ -> put current $> (current, current)
-	LT -> put current $> (current, current)
-	GT -> pure (previous_lm, current)
-
-rightmax :: (LeftMax, Current) -> State RightMax RightMax
-rightmax (lm, current) = get >>= \previous_rm -> put (min lm previous_rm) $> min lm previous_rm
+themax :: Current -> State Max Max
+themax x = modify (max x) *> get
 
 main = do
-	let (lms, last_value) = runState (traverse leftmax walls) 0
-	let (rms, _) = runState (forwards $ traverse (Backwards . rightmax) lms) last_value
-	print $ zipWith (\(ml, x) mr -> min ml mr - x) lms rms
+	let lms = evalState (for walls themax) 0
+	let rms = evalState (forwards . for walls $ Backwards . themax) 0
+	print . sum $ zipWith3 (\l x r -> min l r - x) lms walls rms
