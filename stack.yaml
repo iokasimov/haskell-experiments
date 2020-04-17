@@ -44,7 +44,9 @@ extra-deps:
 - github: iokasimov/joint
   commit: 4d6c71c4544f55ff894b83bef931f2ec611061bc
 - github: iokasimov/pandora
-  commit: 50e11e060e83384561c70e38eb4e293e3d03bbf0
+  commit: 30f29df59d06dbca3ccb0d65b1f9e78612e4d6dc
+- github: iokasimov/pandora-io
+  commit: 6747de926e9c3cf8bbf398e1d6e49f2c07080f49
 
 # Override default flag values for local packages and extra-deps
 flags: {}
