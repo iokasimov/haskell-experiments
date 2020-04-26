@@ -27,6 +27,24 @@ executable joint-brackets
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable joint-waterflow
+  main-is: joint/waterflow.hs
+  build-depends: base, joint, transformers
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable pandora-brackets
   main-is: pandora/Brackets.hs
   build-depends: base, pandora

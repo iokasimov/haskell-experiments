@@ -10,7 +10,7 @@ getmax x = modify (x \/) *> current
 
 type Peaksearch t u a = (Traversable t, Applicative u, Pointable u, Stateful a u, Supremum a)
 
-themax:: Peaksearch t u a => t a -> u :. t := a
+themax:: Peaksearch t u a => t a |-> u
 themax xs = xs ->> getmax
 
 evaluate :: (Traversable t, Monoid a) => State a (t a) -> t a

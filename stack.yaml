@@ -42,7 +42,7 @@ packages:
 # (e.g., acme-missiles-0.3)
 extra-deps:
 - github: iokasimov/joint
-  commit: 4d6c71c4544f55ff894b83bef931f2ec611061bc
+  commit: 435a3fb77d4b454753728f6a512a31e7085995f9
 - github: iokasimov/pandora
   commit: a5e30c461d8bff3e497efac7f22689b6059260f9
 - github: iokasimov/pandora-io
