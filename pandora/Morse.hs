@@ -5,63 +5,63 @@ import "pandora" Pandora.Pattern
 import Prelude (Char, print)
 
 dictionary :: Nonempty Binary Char
-dictionary = Twister ' ' $ Both
-	(Twister 'E' $ Both
-		(Twister 'I' $ Both
-			(Twister 'S' $ Both
-				(Twister 'H' $ Both
-					(Twister '5' $ End)
-					(Twister '4' $ End)
+dictionary = Construct ' ' $ Both
+	(Construct 'E' $ Both
+		(Construct 'I' $ Both
+			(Construct 'S' $ Both
+				(Construct 'H' $ Both
+					(Construct '5' $ End)
+					(Construct '4' $ End)
 				)
-				(Twister 'V' $ Both
-					(Twister ' ' $ End)
-					(Twister '3' $ End)
+				(Construct 'V' $ Both
+					(Construct ' ' $ End)
+					(Construct '3' $ End)
 				)
 			)
-			(Twister 'U' $ Both
-				(Twister 'F' $ End)
-				(Twister ' ' $ Right
-					(Twister '2' $ End)
+			(Construct 'U' $ Both
+				(Construct 'F' $ End)
+				(Construct ' ' $ Right
+					(Construct '2' $ End)
 				)
 			)
 		)
-		(Twister 'A' $ Both
-			(Twister 'R' $ Both
-				(Twister 'L' $ End)
-				(Twister ' ' $ Left
-					(Twister '+' $ End)
+		(Construct 'A' $ Both
+			(Construct 'R' $ Both
+				(Construct 'L' $ End)
+				(Construct ' ' $ Left
+					(Construct '+' $ End)
 				)
 			)
-			(Twister 'W' $ Both
-				(Twister 'P' $ End)
-				(Twister 'J' $ Right
-					(Twister '1' $ End)
+			(Construct 'W' $ Both
+				(Construct 'P' $ End)
+				(Construct 'J' $ Right
+					(Construct '1' $ End)
 				)
 			)
 		)
 	)
-	(Twister 'T' $ Both
-		(Twister 'N' $ Both
-			(Twister 'D' $ Both
-				(Twister 'B' $ Both
-					(Twister '6' $ End)
-					(Twister '=' $ End)
+	(Construct 'T' $ Both
+		(Construct 'N' $ Both
+			(Construct 'D' $ Both
+				(Construct 'B' $ Both
+					(Construct '6' $ End)
+					(Construct '=' $ End)
 				)
-				(Twister 'X' $ Left
-					(Twister '/' $ End)
+				(Construct 'X' $ Left
+					(Construct '/' $ End)
 				)
 			)
-			(Twister 'K' $ Both (Twister 'C' $ End) (Twister 'Y' $ End))
+			(Construct 'K' $ Both (Construct 'C' $ End) (Construct 'Y' $ End))
 		)
-		(Twister 'M' $ Both
-			(Twister 'G' $ Both
-				(Twister 'Z' $ Left
-					(Twister '7' $ End)
+		(Construct 'M' $ Both
+			(Construct 'G' $ Both
+				(Construct 'Z' $ Left
+					(Construct '7' $ End)
 				)
-				(Twister 'Q' $ End))
-			(Twister 'O' $ Both
-				(Twister ' ' $ Left (Twister '8' $ End))
-				(Twister ' ' $ Both (Twister '9' $ End) (Twister '0' $ End))
+				(Construct 'Q' $ End))
+			(Construct 'O' $ Both
+				(Construct ' ' $ Left (Construct '8' $ End))
+				(Construct ' ' $ Both (Construct '9' $ End) (Construct '0' $ End))
 			)
 		)
 	)
@@ -71,8 +71,8 @@ data Morse = Dot | Dash
 type Dictionary = Nonempty Binary Char
 
 cut :: (Pointable t, Optional t) => Morse -> Dictionary -> t Dictionary
-cut Dot = adapt . comap extract . view (sub @Left)
-cut Dash = adapt . comap extract . view (sub @Right)
+cut Dot = adapt . extract . view (sub @Left)
+cut Dash = adapt . extract . view (sub @Right)
 
 decode :: (Monad t, Optional t, Stateful Dictionary t) => Morse -> t ()
 decode x = current @Dictionary >>= cut x >>= replace
