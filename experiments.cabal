@@ -136,6 +136,27 @@ executable base-pca
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable base-p2p-shortest-path
+  main-is: base/P2P.hs
+  build-depends: base, containers, text
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
 
 executable base-morse
   main-is: base/Morse.hs
