@@ -2,24 +2,24 @@ module Main where
 
 -- Source: paper "Understanding Idiomatic Traversals Backwards and Forwards"
 
-data Batch a b c = P c | Batch a b (b -> c) :*: a
+data Batch e r a = Barely a | Plan e (Batch e r (r -> a))
 
-instance Functor (Batch a b) where
-	fmap f (P c) = P $ f c
-	fmap f (u :*: a) = fmap (f .) u :*: a
+instance Functor (Batch e r) where
+	fmap f (Barely c) = Barely $ f c
+	fmap f (Plan a u) = Plan a $ (f .) <$> u
 
-instance Applicative (Batch a b) where
-	pure = P
-	P f <*> P x = P $ f x
-	u :*: a <*> P x = (P (($ x) .) <*> u) :*: a
-	u <*> (v :*: a) = (P (.) <*> u <*> v) :*: a
+instance Applicative (Batch e r) where
+	pure = Barely
+	Barely f <*> Barely x = Barely $ f x
+	Plan a u <*> Barely x = Plan a $ Barely (($ x) .) <*> u
+	u <*> Plan a v = Plan a $ Barely (.) <*> u <*> v
 
-batch :: a -> Batch a b b
-batch x = P id :*: x
+batch :: e -> Batch e r r
+batch x = Plan x $ Barely id
 
-runWith :: Applicative m => (a -> m b) -> Batch a b c -> m c
-runWith f (P x) = pure x
-runWith f (u :*: x) = runWith f u <*> f x
+runWith :: Applicative t => (e -> t r) -> Batch e r a -> t a
+runWith f (Barely x) = pure x
+runWith f (Plan x u) = runWith f u <*> f x
 
 --------------------------------------------------------------------------------
 
