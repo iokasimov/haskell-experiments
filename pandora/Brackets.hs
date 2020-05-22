@@ -1,8 +1,9 @@
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
+import "pandora-io" Pandora.IO
 
-import qualified Prelude as Base (Integer, IO, Show, print, (+))
+import Prelude (Integer, Show, print, succ)
 
 data Shape = Opened | Closed
 
@@ -17,54 +18,62 @@ instance Setoid Style where
 
 data Symbol = Bracket Style Shape | Nevermind
 
-type Index = Base.Integer
+type Index = Integer
 
-indexate :: (Covariant t, Stateful Index t) => t ()
-indexate = modify (Base.+ (1 :: Base.Integer))
+type Open = Style :*: Index
 
 data Stumble
 	= Deadend Style Index -- Closed bracket without opened one
 	| Logjam Style Index -- Opened bracket without closed one
 	| Mismatch Style Index Style Index -- Closed bracket doesn't match opened one
 
-pass :: Pointable t => t ()
-pass = point ()
+type Checking t = (Applicative t, Monad t, Stateful Index t, Failable Stumble t, Stateful (Stack Open) t)
 
-mismatch :: (Bindable t, Stateful Index t, Failable Stumble t) => Style -> Style -> Index -> t ()
+skip :: Pointable t => t ()
+skip = point ()
+
+mismatch :: Checking t => Style -> Style -> Index -> t ()
 mismatch c o oix = current >>= failure . Mismatch o oix c
 
-logjam :: (Covariant t, Failable Stumble t) => Index -> Style -> t ()
+logjam :: Checking t => Index -> Style -> t ()
 logjam i s = failure $ Logjam s i
 
-deadend :: (Bindable t, Stateful Index t, Failable Stumble t) => Style -> t ()
+deadend :: Checking t => Style -> t ()
 deadend c = current >>= failure . Deadend c
 
-type Openings = Stack Open
+keep :: Checking t => Style -> t ()
+keep style = current >>= modify . push @Open . (style :*:)
 
-type Open = Style :*: Index
+latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
+latest on_empty f = view (top @Open) <$> current >>= maybe on_empty (|- f)
 
-hold :: Style -> (Bindable t, Stateful Index t, Stateful Openings t) => t ()
-hold style = current >>= modify . push @Open . (style :*:)
+match :: Checking t => Style -> Index -> Style -> t ()
+match closed i opened = closed == opened
+	? modify (pop @Open) $ mismatch closed opened i
 
-previous :: (Bindable t, Stateful Openings t) => t r -> (Index -> Style -> t r) -> t r
-previous on_empty f = view (top @Open) <$> current >>= maybe on_empty (|- f)
+indexate :: Checking t => t ()
+indexate = modify @Index succ
 
-match :: (Bindable t, Stateful Index t, Stateful Openings t, Failable Stumble t) => Style -> Index -> Style -> t ()
-match closed oix opened = closed == opened ? modify (pop @Open) $ mismatch closed opened oix
+decide :: Checking t => Symbol -> t ()
+decide (Bracket opened Opened) = keep opened
+decide (Bracket closed Closed) = latest (deadend closed) (match closed)
+decide Nevermind = skip
 
-inspect :: Symbol -> State Index :> State Openings :> Conclusion Stumble := ()
-inspect Nevermind = pass
-inspect (Bracket opened Opened) = hold opened
-inspect (Bracket closed Closed) = previous (deadend closed) (match closed)
+inspect :: Checking t => Symbol -> t ()
+inspect s = indexate *> decide s
 
-deriving instance Base.Show Shape
-deriving instance Base.Show Style
-deriving instance Base.Show Symbol
-deriving instance Base.Show Stumble
+--------------------------------------------------------------------------------
 
-check :: Traversable s => s Symbol -> Base.IO ()
-check code = traverse (\s -> indexate *> inspect s) code *> previous pass logjam
-	& run % 1 & run % empty & conclusion Base.print ((Base.print "OK") !)
+type Checker = State Index :> State (Stack Open) :> Conclusion Stumble := ()
+
+check :: Traversable s => s Symbol -> IO ()
+check code = (code ->> inspect *> latest skip logjam :: Checker)
+	& run % 1 & run % empty & conclusion print ((print "OK") !)
+
+deriving instance Show Shape
+deriving instance Show Style
+deriving instance Show Symbol
+deriving instance Show Stumble
 
 example_ok, example_mismatch, example_deadend, example_logjam :: Stack Symbol
 example_ok = push (Bracket Curly Opened) $ push Nevermind $ push (Bracket Curly Closed) $ empty  -- {x}

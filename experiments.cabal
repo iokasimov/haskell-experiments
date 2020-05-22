@@ -47,8 +47,9 @@ executable joint-waterflow
 
 executable pandora-brackets
   main-is: pandora/Brackets.hs
-  build-depends: base, pandora
+  build-depends: base, pandora, pandora-io
   default-extensions:
+    ConstraintKinds,
     DataKinds,
     ExplicitNamespaces,
     FlexibleContexts,
