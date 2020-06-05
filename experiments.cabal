@@ -124,6 +124,7 @@ executable base-batch
     DeriveFoldable,
     ExplicitNamespaces,
     FlexibleContexts,
+    GADTs,
     LambdaCase,
     OverloadedStrings,
     PackageImports,
