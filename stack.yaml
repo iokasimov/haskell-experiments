@@ -15,7 +15,8 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-14.23
+# resolver: lts-14.23
+resolver: nightly-2020-06-20
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -44,10 +45,9 @@ extra-deps:
 - github: iokasimov/joint
   commit: 435a3fb77d4b454753728f6a512a31e7085995f9
 - github: iokasimov/pandora
-  commit: 0e43fa411c701dcc7846d10cd081aeaf4349e8e3
+  commit: 5889201134700c67b1f0c5d6c89ae6ca920ba8e3
 - github: iokasimov/pandora-io
-  commit: 6747de926e9c3cf8bbf398e1d6e49f2c07080f49
-
+  commit: 7a43ba5e2334d60dd88d8213cf268e690d8cb54d
 # Override default flag values for local packages and extra-deps
 flags: {}
 

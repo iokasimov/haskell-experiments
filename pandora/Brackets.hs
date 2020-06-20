@@ -45,7 +45,7 @@ keep :: Checking t => Style -> t ()
 keep style = current >>= modify . push @Open . (style :*:)
 
 latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
-latest on_empty f = view (top @Open) <$> current >>= maybe on_empty (|- f)
+latest on_empty f = view (focus @Head) <$> current @(Stack Open) >>= maybe on_empty (|- f)
 
 match :: Checking t => Style -> Index -> Style -> t ()
 match closed i opened = closed == opened
