@@ -4,64 +4,74 @@ import "pandora" Pandora.Pattern
 
 import Prelude (Char, print)
 
+both :: a -> Nonempty Binary a -> Nonempty Binary a -> Nonempty Binary a
+both x l r = Construct x $ Both l r
+
+(>-) :: a -> Nonempty Binary a -> Nonempty Binary a
+x >- r = Construct x $ Right r
+
+(-<) :: Nonempty Binary a -> a -> Nonempty Binary a
+l -< x = Construct x $ Left l
+
+leaf :: a -> Nonempty Binary a
+leaf x = Construct x End
+
 dictionary :: Nonempty Binary Char
-dictionary = Construct ' ' $ Both
-	(Construct 'E' $ Both
-		(Construct 'I' $ Both
-			(Construct 'S' $ Both
-				(Construct 'H' $ Both
-					(Construct '5' $ End)
-					(Construct '4' $ End)
+dictionary = both ' '
+	(both 'E'
+		(both 'I'
+			(both 'S'
+				(both 'H'
+					(leaf '5')
+					(leaf '4')
 				)
-				(Construct 'V' $ Both
-					(Construct ' ' $ End)
-					(Construct '3' $ End)
+				(both 'V'
+					(leaf ' ')
+					(leaf '3')
 				)
 			)
-			(Construct 'U' $ Both
-				(Construct 'F' $ End)
-				(Construct ' ' $ Right
-					(Construct '2' $ End)
+			(both 'U'
+				(leaf 'F')
+				(' ' >- leaf '2'
 				)
 			)
 		)
-		(Construct 'A' $ Both
-			(Construct 'R' $ Both
-				(Construct 'L' $ End)
-				(Construct ' ' $ Left
-					(Construct '+' $ End)
-				)
+		(both 'A'
+			(both 'R'
+				(leaf 'L')
+				(leaf '+' -< ' ')
 			)
-			(Construct 'W' $ Both
-				(Construct 'P' $ End)
-				(Construct 'J' $ Right
-					(Construct '1' $ End)
-				)
+			(both 'W'
+				(leaf 'P')
+				('J' >- leaf '1')
 			)
 		)
 	)
-	(Construct 'T' $ Both
-		(Construct 'N' $ Both
-			(Construct 'D' $ Both
-				(Construct 'B' $ Both
-					(Construct '6' $ End)
-					(Construct '=' $ End)
+	(both 'T'
+		(both 'N'
+			(both 'D'
+				(both 'B'
+					(leaf '6')
+					(leaf '=')
 				)
-				(Construct 'X' $ Left
-					(Construct '/' $ End)
-				)
+				(leaf '/' -< 'X')
 			)
-			(Construct 'K' $ Both (Construct 'C' $ End) (Construct 'Y' $ End))
+			(both 'K'
+				(leaf 'C')
+				(leaf 'Y')
+			)
 		)
-		(Construct 'M' $ Both
-			(Construct 'G' $ Both
-				(Construct 'Z' $ Left
-					(Construct '7' $ End)
+		(both 'M'
+			(both 'G'
+				(leaf '7' -< 'Z')
+				(leaf 'Q')
+			)
+			(both 'O'
+				(leaf '8' -< ' ')
+				(both ' '
+					(leaf '9')
+					(leaf '0')
 				)
-				(Construct 'Q' $ End))
-			(Construct 'O' $ Both
-				(Construct ' ' $ Left (Construct '8' $ End))
-				(Construct ' ' $ Both (Construct '9' $ End) (Construct '0' $ End))
 			)
 		)
 	)
