@@ -227,3 +227,26 @@ executable base-waterflow
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
+
+executable base-wolf-goat-cabbage
+  main-is: base/wolf-goat-cabbage.hs
+  build-depends: base
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    ViewPatterns
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
