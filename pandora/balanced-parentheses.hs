@@ -82,7 +82,7 @@ example_deadend = push (Bracket Round Closed) empty -- )
 example_logjam = push (Bracket Angle Opened) empty -- <
 
 main = do
-    check example_ok
-    check example_mismatch
-    check example_deadend
-    check example_logjam
+	check example_ok
+	check example_mismatch
+	check example_deadend
+	check example_logjam
