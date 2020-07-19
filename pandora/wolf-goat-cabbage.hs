@@ -36,7 +36,7 @@ step :: State River :> Stack := Move
 step = current @River >>= \(initial :^: far) ->
 	Move % Far <$> adapt initial
 
-legal :: Chain a => a -> a -> Boolean
-legal x y = x <=> y == Equal
+coexist :: Chain a => a -> a -> Boolean
+coexist x y = x <=> y == Equal
 
 main = print "Work in progress..."
