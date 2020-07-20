@@ -1,7 +1,7 @@
 
 import "base" Control.Monad (guard)
 import "base" Data.List (delete)
-import "lens" Control.Lens (Lens', view, _1, _2, (.~), (%~))
+import "lens" Control.Lens (Lens', view, _1, _2, (&), (.~), (%~))
 import "joint" Control.Joint (Stateful, Failable, State, lift
 	, current, modify, failure, run, type (:>), type (:=))
 
@@ -26,7 +26,7 @@ data Bank = Initial | Far
 	deriving Show
 
 route :: [Bank]
-route = iterate alter Initial
+route = iterate alter Far
 
 alter :: Bank -> Bank
 alter Initial = Far
@@ -40,16 +40,25 @@ coast :: Bank -> Lens' River [Character]
 coast Initial = _1
 coast Far = _2
 
+source, target :: Bank -> Lens' River [Character]
+source = coast . alter
+target = coast
+
+transport :: Stateful River t => Bank -> Character -> t ()
+transport bank candidate = modify @River $ arrive . depart where
+
+	depart = source bank %~ delete candidate
+	arrive = target bank %~ (candidate :)
+
 step :: Bank -> State River :> [] := ()
 step bank = do
-	let source = coast $ alter bank
-	let target = coast bank
-	from <- view source <$> current
+	from <- view (source bank) <$> current
 	candidate <- lift from
-	to <- view target <$> current
+	to <- view (target bank) <$> current
 	lift @[] . guard $ all (coexist candidate) to
-	-- I can't figure out what's wrong here...
-	modify @River (source %~ delete candidate)
-	-- modify (target %~ (candidate :))
+	transport bank candidate
 
-main = print "Work in progress..."
+start :: River
+start = ([Wolf, Goat, Cabbage], [])
+
+main = print $ run (step Far) start
