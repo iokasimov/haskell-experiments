@@ -49,6 +49,7 @@ executable joint-wolf-goat-cabbage
   main-is: joint/wolf-goat-cabbage.hs
   build-depends: base, joint, lens, transformers
   default-extensions:
+    ConstraintKinds,
     DataKinds,
     ExplicitNamespaces,
     FlexibleContexts,
