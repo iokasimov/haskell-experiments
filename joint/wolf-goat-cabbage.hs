@@ -17,41 +17,41 @@ instance Ord Character where
 	compare Cabbage Goat = LT
 	compare _ _ = EQ
 
-coexist :: Ord a => a -> a -> Bool
-coexist x y = compare x y == EQ
-
 data Direction = Back | Forward
 
 type River a = ([a], [a])
 
 type Iterable = Liftable []
 
-source, target :: Direction -> Lens' (River a) [a]
-source Back = _2
-source Forward = _1
-target Back = _1
-target Forward = _2
+step :: forall a . Ord a => Direction -> State (River a) :> [] := Maybe a
+step direction = bank >>= next >>= transport where
 
-transport :: forall a t . (Eq a, Applicative t, Stateful (River a) t) => Direction -> Maybe a -> t (Maybe a)
-transport _direction Nothing = pure Nothing
-transport direction (Just x) = modify @(River a) (leave . land) $> Just x where
+	bank :: (Functor t, Stateful (River a) t) => t [a]
+	bank = view (source direction) <$> current
 
-	leave, land :: River a -> River a
-	leave = source direction %~ delete x
-	land = target direction %~ (x :)
+	next :: (Ord a, Iterable t) => [a] -> t (Maybe a)
+	next xs = lift $ filter valid $ Nothing : (Just <$> xs) where
 
-bank :: (Functor t, Stateful (River a) t) => Direction -> t [a]
-bank direction = view (source direction) <$> current
+		valid :: Maybe a -> Bool
+		valid Nothing = and $ coexist <$> xs <*> xs
+		valid (Just x) = and $ coexist <$> delete x xs <*> delete x xs
 
-next :: forall a t . (Ord a, Iterable t) => [a] -> t (Maybe a)
-next xs = lift @[] $ filter valid $ Nothing : (Just <$> xs) where
+		coexist :: Ord a => a -> a -> Bool
+		coexist x y = compare x y == EQ
 
-	valid :: Maybe a -> Bool
-	valid Nothing = and $ coexist <$> xs <*> xs
-	valid (Just x) = and $ coexist <$> delete x xs <*> delete x xs
+	transport :: (Eq a, Applicative t, Stateful (River a) t) => Maybe a -> t (Maybe a)
+	transport Nothing = pure Nothing
+	transport (Just x) = modify @(River a) (leave . land) $> Just x where
 
-step :: Ord a => Direction -> State (River a) :> [] := Maybe a
-step direction = bank direction >>= next >>= transport direction
+		leave, land :: River a -> River a
+		leave = source direction %~ delete x
+		land = target direction %~ (x :)
+
+	source, target :: Direction -> Lens' (River a) [a]
+	source Back = _2
+	source Forward = _1
+	target Back = _1
+	target Forward = _2
 
 start :: River Character
 start = ([Goat, Wolf, Cabbage], [])
