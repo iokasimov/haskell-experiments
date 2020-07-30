@@ -1,8 +1,7 @@
 import "base" Data.Functor (($>))
 import "base" Data.List (delete)
 import "lens" Control.Lens (Lens', view, _1, _2, (%~))
-import "joint" Control.Joint (Liftable, Stateful, State, lift
-	, current, modify, run, type (:>), type (:=))
+import "joint" Control.Joint (Liftable, Stateful, State, lift, current, modify, run, type (:>), type (:=))
 
 data Character = Wolf | Goat | Cabbage deriving Eq
 
@@ -23,37 +22,38 @@ coexist x y = compare x y == EQ
 
 data Direction = Back | Forward
 
-type River = ([Character], [Character])
+type River a = ([a], [a])
 
 type Iterable = Liftable []
 
-source, target :: Direction -> Lens' River [Character]
+source, target :: Direction -> Lens' (River a) [a]
 source Back = _2
 source Forward = _1
 target Back = _1
 target Forward = _2
 
-step :: Direction -> State River :> [] := Maybe Character
-step direction = bank >>= next >>= transport where
+transport :: forall a t . (Eq a, Applicative t, Stateful (River a) t) => Direction -> Maybe a -> t (Maybe a)
+transport _direction Nothing = pure Nothing
+transport direction (Just x) = modify @(River a) (leave . land) $> Just x where
 
-	bank :: (Functor t, Stateful River t) => t [Character]
-	bank = view (source direction) <$> current
+	leave, land :: River a -> River a
+	leave = source direction %~ delete x
+	land = target direction %~ (x :)
 
-	next :: Iterable t => [Character] -> t (Maybe Character)
-	next characters = lift $ filter valid $ Nothing : (Just <$> characters) where
+bank :: (Functor t, Stateful (River a) t) => Direction -> t [a]
+bank direction = view (source direction) <$> current
 
-		valid :: Maybe Character -> Bool
-		valid Nothing = and $ coexist <$> characters <*> characters
-		valid (Just c) = and $ coexist <$> delete c characters <*> delete c characters
+next :: forall a t . (Ord a, Iterable t) => [a] -> t (Maybe a)
+next xs = lift @[] $ filter valid $ Nothing : (Just <$> xs) where
 
-	transport Nothing = pure Nothing
-	transport (Just character) = modify @River (leave . land) $> Just character where
+	valid :: Maybe a -> Bool
+	valid Nothing = and $ coexist <$> xs <*> xs
+	valid (Just x) = and $ coexist <$> delete x xs <*> delete x xs
 
-		leave, land :: River -> River
-		leave = source direction %~ delete character
-		land = target direction %~ (character :)
+step :: Ord a => Direction -> State (River a) :> [] := Maybe a
+step direction = bank direction >>= next >>= transport direction
 
-start :: River
+start :: River Character
 start = ([Goat, Wolf, Cabbage], [])
 
 route :: [Direction]
