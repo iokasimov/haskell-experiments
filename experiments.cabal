@@ -57,6 +57,7 @@ executable joint-wolf-goat-cabbage
     OverloadedStrings,
     PackageImports,
     RankNTypes,
+    ScopedTypeVariables,
     TypeApplications,
     TypeFamilies,
     TypeOperators
