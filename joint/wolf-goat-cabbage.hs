@@ -10,12 +10,15 @@ instance Show Character where
 	show Goat = "🐐"
 	show Cabbage = "🥬"
 
-instance Ord Character where
-	compare Wolf Goat = GT
-	compare Goat Wolf = LT
-	compare Goat Cabbage = GT
-	compare Cabbage Goat = LT
-	compare _ _ = EQ
+class Survivable a where
+	survive :: a -> a -> Ordering
+
+instance Survivable Character where
+	survive Wolf Goat = GT
+	survive Goat Wolf = LT
+	survive Goat Cabbage = GT
+	survive Cabbage Goat = LT
+	survive _ _ = EQ
 
 data Direction = Back | Forward
 
@@ -23,21 +26,21 @@ type River a = ([a], [a])
 
 type Iterable = Liftable []
 
-step :: forall a . Ord a => Direction -> State (River a) :> [] := Maybe a
+step :: forall a . (Eq a, Survivable a) => Direction -> State (River a) :> [] := Maybe a
 step direction = bank >>= next >>= transport where
 
 	bank :: (Functor t, Stateful (River a) t) => t [a]
 	bank = view (source direction) <$> current
 
-	next :: (Ord a, Iterable t) => [a] -> t (Maybe a)
+	next :: (Survivable a, Iterable t) => [a] -> t (Maybe a)
 	next xs = lift $ filter valid $ Nothing : (Just <$> xs) where
 
 		valid :: Maybe a -> Bool
 		valid Nothing = and $ coexist <$> xs <*> xs
 		valid (Just x) = and $ coexist <$> delete x xs <*> delete x xs
 
-		coexist :: Ord a => a -> a -> Bool
-		coexist x y = compare x y == EQ
+		coexist :: Survivable a => a -> a -> Bool
+		coexist x y = survive x y == EQ
 
 	transport :: (Eq a, Applicative t, Stateful (River a) t) => Maybe a -> t (Maybe a)
 	transport Nothing = pure Nothing
