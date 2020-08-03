@@ -9,181 +9,6 @@ build-type: Simple
 extra-source-files: README.md
 cabal-version: >=1.10
 
-executable joint-balanced-parentheses
-  main-is: joint/balanced-parentheses.hs
-  build-depends: base, joint, lens
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
-  other-modules:
-  default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
-
-executable joint-trapping-rain-water
-  main-is: joint/trapping-rain-water.hs
-  build-depends: base, joint, transformers
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
-  other-modules:
-  default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
-
-executable joint-wolf-goat-cabbage
-  main-is: joint/wolf-goat-cabbage.hs
-  build-depends: base, joint, lens, transformers
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
-  other-modules:
-  default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
-
-executable pandora-balanced-parentheses
-  main-is: pandora/balanced-parentheses.hs
-  build-depends: base, pandora, pandora-io
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    LambdaCase,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
-  other-modules:
-  default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
-
-executable pandora-decode-morse-code
-  main-is: pandora/decode-morse-code.hs
-  build-depends: base, pandora, pandora-io
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    LambdaCase,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
-  other-modules:
-  default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
-
-executable pandora-probability
-  main-is: pandora/Probability.hs
-  build-depends: base, pandora, pandora-io
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    MultiParamTypeClasses,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances
-  other-modules:
-  default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
-
-executable pandora-trapping-rain-water
-  main-is: pandora/trapping-rain-water.hs
-  build-depends: base, pandora, pandora-io
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    LiberalTypeSynonyms,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances,
-    QuantifiedConstraints
-  other-modules:
-  default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
-
-executable pandora-wolf-goat-cabbage
-  main-is: pandora/wolf-goat-cabbage.hs
-  build-depends: base, pandora, pandora-io
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    LiberalTypeSynonyms,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances,
-    QuantifiedConstraints
-  other-modules:
-  default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
-
 executable base-batch
   main-is: base/Batch.hs
   build-depends: base
@@ -293,6 +118,206 @@ executable base-wolf-goat-cabbage
     TypeFamilies,
     TypeOperators,
     ViewPatterns
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable joint-balanced-parentheses
+  main-is: joint/balanced-parentheses.hs
+  build-depends: base, joint, lens
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable joint-trapping-rain-water
+  main-is: joint/trapping-rain-water.hs
+  build-depends: base, joint, transformers
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable joint-wolf-goat-cabbage
+  main-is: joint/wolf-goat-cabbage.hs
+  build-depends: base, joint, lens, transformers
+  default-extensions:
+    ConstraintKinds,
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable pandora-balanced-parentheses
+  main-is: pandora/balanced-parentheses.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions:
+    ConstraintKinds,
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable pandora-decode-morse-code
+  main-is: pandora/decode-morse-code.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable pandora-matrix-in-clockwise-spiral
+  main-is: pandora/matrix-in-clockwise-spiral.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions:
+    ConstraintKinds,
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    FlexibleInstances,
+    LambdaCase,
+    MultiParamTypeClasses,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    QuantifiedConstraints
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable pandora-probability
+  main-is: pandora/Probability.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    FlexibleInstances,
+    LambdaCase,
+    MultiParamTypeClasses,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    TypeSynonymInstances
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable pandora-trapping-rain-water
+  main-is: pandora/trapping-rain-water.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions:
+    ConstraintKinds,
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    FlexibleInstances,
+    LambdaCase,
+    LiberalTypeSynonyms,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    TypeSynonymInstances,
+    QuantifiedConstraints
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable pandora-wolf-goat-cabbage
+  main-is: pandora/wolf-goat-cabbage.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions:
+    ConstraintKinds,
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    FlexibleInstances,
+    LambdaCase,
+    LiberalTypeSynonyms,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    TypeSynonymInstances,
+    QuantifiedConstraints
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
