@@ -3,7 +3,7 @@ import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
-import Prelude (Int, print)
+import Prelude (Int, Show, print)
 import qualified Prelude as P
 
 type Vector v a = Monotonic v a
@@ -22,17 +22,19 @@ type M54 a = V5 a :*: V5 a :*: V5 a :*: V5 a
 
 matrix_example :: M54 Int
 matrix_example = (1 :*: 2 :*: 3 :*: 4 :*: 5)
-    :*: (6 :*: 7 :*: 8 :*: 9 :*: 10)
-    :*: (11 :*: 12 :*: 13 :*: 14 :*: 15)
-    :*: (16 :*: 17 :*: 18 :*: 19 :*: 20)
-
-matrix_diagonal :: Matrix m v a => m a -> v a
+	:*: (6 :*: 7 :*: 8 :*: 9 :*: 10)
+	:*: (11 :*: 12 :*: 13 :*: 14 :*: 15)
+	:*: (16 :*: 17 :*: 18 :*: 19 :*: 20)
 
 type V5 a = a :*: a :*: a :*: a :*: a
 
 vector_example :: V5 Int
 vector_example = 1 :*: 2 :*: 3 :*: 4 :*: 5
 
+deriving instance (Show a, Show b) => Show (a :*: b)
+instance Semigroup Int where (+) = (P.+)
+
 main = do
-    print $ vector_total_sum vector_example
-    print $ iterate (\x r -> r P.+ vector_total_sum @(V5 Int) x) (0 :: Int) matrix_example
+	print $ vector_total_sum vector_example
+	print $ iterate (\x r -> r P.+ vector_total_sum @(V5 Int) x) (0 :: Int) matrix_example
+	print ((1 :*: 2 :*: 3 :*: 4 :*: 5) + (6 :*: 7 :*: 8 :*: 9 :*: 10) :: V5 Int)

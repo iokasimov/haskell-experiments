@@ -230,6 +230,7 @@ executable pandora-matrix-in-clockwise-spiral
     ExplicitNamespaces,
     FlexibleContexts,
     FlexibleInstances,
+    GADTs,
     LambdaCase,
     MultiParamTypeClasses,
     NoImplicitPrelude,
