@@ -34,7 +34,11 @@ vector_example = 1 :*: 2 :*: 3 :*: 4 :*: 5
 deriving instance (Show a, Show b) => Show (a :*: b)
 instance Semigroup Int where (+) = (P.+)
 
+last :: V5 Int -> Int
+last = iterate (\x r -> x) P.undefined
+
 main = do
 	print $ vector_total_sum vector_example
 	print $ iterate (\x r -> r P.+ vector_total_sum @(V5 Int) x) (0 :: Int) matrix_example
 	print ((1 :*: 2 :*: 3 :*: 4 :*: 5) + (6 :*: 7 :*: 8 :*: 9 :*: 10) :: V5 Int)
+	print $ last vector_example
