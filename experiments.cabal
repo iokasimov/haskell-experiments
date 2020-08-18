@@ -140,6 +140,24 @@ executable joint-balanced-parentheses
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable joint-stock-prices
+  main-is: joint/stock-prices.hs
+  build-depends: base, joint, lens
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable joint-trapping-rain-water
   main-is: joint/trapping-rain-water.hs
   build-depends: base, joint, transformers
