@@ -289,6 +289,35 @@ executable pandora-probability
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+
+
+executable pandora-stock-prices
+  main-is: pandora/stock-prices.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions:
+    ConstraintKinds,
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    FlexibleInstances,
+    LambdaCase,
+    LiberalTypeSynonyms,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    TypeSynonymInstances,
+    QuantifiedConstraints
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+
 executable pandora-trapping-rain-water
   main-is: pandora/trapping-rain-water.hs
   build-depends: base, pandora, pandora-io

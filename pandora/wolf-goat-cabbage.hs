@@ -26,15 +26,11 @@ instance Chain Character where
 type River = Delta (Stack Character)
 
 start :: River
-start = (push Wolf $ push Goat $ push Cabbage $ empty) :^: empty
+start = (insert Wolf $ insert Goat $ insert Cabbage $ empty) :^: empty
 
 data Bank = Initial | Far
 
 data Move = Move Character Bank
-
-step :: State River :> Stack := Move
-step = current @River >>= \(initial :^: far) ->
-	Move % Far <$> adapt initial
 
 coexist :: Chain a => a -> a -> Boolean
 coexist x y = x <=> y == Equal

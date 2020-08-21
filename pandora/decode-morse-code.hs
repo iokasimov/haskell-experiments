@@ -88,7 +88,7 @@ decode :: (Monad t, Optional t, Stateful Dictionary t) => Morse -> t ()
 decode x = current @Dictionary >>= cut x >>= replace
 
 digit4 :: Stack Morse
-digit4 = push Dot . push Dot . push Dot . push Dot . push Dash $ empty
+digit4 = insert Dot . insert Dot . insert Dot . insert Dot . insert Dash $ empty
 
 main = maybe (print "Not found...") (print . extract . attached)
 	. run @(State Dictionary :> Maybe) % dictionary $ digit4 ->> decode

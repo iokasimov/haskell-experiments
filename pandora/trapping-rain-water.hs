@@ -24,7 +24,7 @@ instance Infimum Int where (/\) = P.min
 instance Supremum Int where (\/) = P.max
 
 walls :: Stack Int
-walls = push 2 $ push 5 $ push 1 $ push 2 $ push 3 $ push 4 $ push 7 $ push 7 $ push 6 $ empty
+walls = insert 2 $ insert 5 $ insert 1 $ insert 2 $ insert 3 $ insert 4 $ insert 7 $ insert 7 $ insert 6 $ empty
 
 main = do
 	let lhs = evaluate . themax $ walls

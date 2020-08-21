@@ -42,7 +42,7 @@ deadend :: Checking t => Style -> t ()
 deadend c = current >>= failure . Deadend c
 
 keep :: Checking t => Style -> t ()
-keep style = current >>= modify . push @Open . (style :*:)
+keep style = current >>= modify @(Stack Open) . insert . (style :*:)
 
 latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
 latest on_empty f = view (focus @Head) <$> current @(Stack Open) >>= maybe on_empty (|- f)
@@ -76,10 +76,10 @@ deriving instance Show Symbol
 deriving instance Show Stumble
 
 example_ok, example_mismatch, example_deadend, example_logjam :: Stack Symbol
-example_ok = push (Bracket Curly Opened) $ push Nevermind $ push (Bracket Curly Closed) $ empty  -- {x}
-example_mismatch = push (Bracket Curly Opened) $ push (Bracket Square Closed) $ empty -- {]
-example_deadend = push (Bracket Round Closed) empty -- )
-example_logjam = push (Bracket Angle Opened) empty -- <
+example_ok = insert (Bracket Curly Opened) $ insert Nevermind $ insert (Bracket Curly Closed) $ empty  -- {x}
+example_mismatch = insert (Bracket Curly Opened) $ insert (Bracket Square Closed) $ empty -- {]
+example_deadend = insert (Bracket Round Closed) empty -- )
+example_logjam = insert (Bracket Angle Opened) empty -- <
 
 main = do
 	check example_ok
