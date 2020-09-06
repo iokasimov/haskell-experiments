@@ -12,6 +12,10 @@ class (Functor t, Functor u) => Adjoint t u where
 	-- | Right adjunction
 	(|-) :: t a -> (a -> u b) -> b
 
+instance Adjoint ((,) a) ((->) a) where
+	x -| f = \a -> f (a, x)
+	(a, x) |- f = f x a
+
 newtype Store s a = Store ((,) s :. (->) s := a)
 
 instance Functor (Store s) where
