@@ -31,4 +31,13 @@ instance Adjoint (Store s) (State s) where
 	(|-) :: Store s a -> (a -> State s b) -> b
 	Store (s, f) |- g = extract . flip run s . g $ f s
 
+pos :: Store s a -> s
+pos (Store (s, _)) = s
+
+seek :: s -> Store s a -> Store s a
+seek s (Store (_, f)) = Store (s, f)
+
+peek :: s -> Store s a -> a
+peek s (Store (_, f)) = f s
+
 main = print "typechecked"
