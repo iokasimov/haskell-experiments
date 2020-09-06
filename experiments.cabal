@@ -151,6 +151,7 @@ executable joint-adjunctions
     DataKinds,
     ExplicitNamespaces,
     FlexibleContexts,
+    InstanceSigs,
     LambdaCase,
     LiberalTypeSynonyms,
     MultiParamTypeClasses,

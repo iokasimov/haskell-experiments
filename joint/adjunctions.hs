@@ -21,4 +21,10 @@ instance Comonad (Store s) where
 	extract (Store (s, f)) = f s
 	extend g (Store (s, f)) = Store (s, g . (\p -> Store (p, f)))
 
+instance Adjoint (Store s) (State s) where
+	(-|) :: a -> (Store s a -> b) -> State s b
+	x -| f = State $ \s -> (,) s . f $ Store (s, const x)
+	(|-) :: Store s a -> (a -> State s b) -> b
+	Store (s, f) |- g = extract . flip run s . g $ f s
+
 main = print "typechecked"
