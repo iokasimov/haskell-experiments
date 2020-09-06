@@ -40,4 +40,7 @@ seek s (Store (_, f)) = Store (s, f)
 peek :: s -> Store s a -> a
 peek s (Store (_, f)) = f s
 
+retrofit :: (s -> s) -> Store s a -> Store s a
+retrofit g (Store (s, f)) = Store (g s, f)
+
 main = print "typechecked"
