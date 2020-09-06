@@ -144,6 +144,26 @@ executable base-wolf-goat-cabbage
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable joint-adjunctions
+  main-is: joint/adjunctions.hs
+  build-depends: base, comonad, joint
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    LiberalTypeSynonyms,
+    MultiParamTypeClasses,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable joint-balanced-parentheses
   main-is: joint/balanced-parentheses.hs
   build-depends: base, joint, lens
