@@ -54,4 +54,10 @@ set lens new = peek new . lens
 over :: Lens s t -> (t -> t) -> s -> s
 over lens f = extract . retrofit f . lens
 
+example_store :: Store Int (Bool, Int)
+example_store = Store (1, (,) True)
+
+example_lens :: Lens (Bool, Int) Int
+example_lens (b, i) = Store (i, (,) b)
+
 main = print "typechecked"
