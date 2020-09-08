@@ -54,10 +54,16 @@ set lens new = peek new . lens
 over :: Lens s t -> (t -> t) -> s -> s
 over lens f = extract . retrofit f . lens
 
-example_store :: Store Int (Bool, Int)
-example_store = Store (1, (,) True)
-
 example_lens :: Lens (Bool, Int) Int
 example_lens (b, i) = Store (i, (,) b)
 
-main = print "typechecked"
+try_right_adj = store |- state . fst where
+
+	state :: Bool -> State Int String
+	state True = modify @Int (const 0) $> show True
+	state False = pure $ show False
+
+	store :: Store Int (Bool, Int)
+	store = Store (1, (,) False)
+
+main = print try_right_adj
