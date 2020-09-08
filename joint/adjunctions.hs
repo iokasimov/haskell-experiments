@@ -57,13 +57,22 @@ over lens f = extract . retrofit f . lens
 example_lens :: Lens (Bool, Int) Int
 example_lens (b, i) = Store (i, (,) b)
 
-try_right_adj = store |- state . fst where
 
-	state :: Bool -> State Int String
-	state True = modify @Int (const 0) $> show True
-	state False = pure $ show False
+
+try_right_adj :: String
+try_right_adj = store |- to_state . fst where
+
+	to_state :: Bool -> State Int String
+	to_state True = modify @Int (const 0) $> show True
+	to_state False = pure $ show False
 
 	store :: Store Int (Bool, Int)
 	store = Store (1, (,) False)
 
-main = print try_right_adj
+try_left_adj :: State Int Int
+try_left_adj = (True, 1) -| from_store where
+
+	from_store :: Store Int (Bool, Int) -> Int
+	from_store = snd . extract
+
+main = print $ run (try_left_adj) 0
