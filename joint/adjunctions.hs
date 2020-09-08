@@ -1,5 +1,6 @@
 module Main where
 
+import "base" Data.Bifunctor
 import "comonad" Control.Comonad
 import "joint" Control.Joint
 
@@ -15,6 +16,8 @@ class (Functor t, Functor u) => Adjoint t u where
 instance Adjoint ((,) a) ((->) a) where
 	x -| f = \a -> f (a, x)
 	(a, x) |- f = f x a
+
+--------------------------------------------------------------------------------
 
 newtype Store s a = Store ((,) s :. (->) s := a)
 
@@ -43,6 +46,8 @@ peek s (Store (_, f)) = f s
 retrofit :: (s -> s) -> Store s a -> Store s a
 retrofit g (Store (s, f)) = Store (g s, f)
 
+--------------------------------------------------------------------------------
+
 type Lens s t = s -> Store t s
 
 view :: Lens s t -> s -> t
@@ -54,10 +59,10 @@ set lens new = peek new . lens
 over :: Lens s t -> (t -> t) -> s -> s
 over lens f = extract . retrofit f . lens
 
-example_lens :: Lens (Bool, Int) Int
-example_lens (b, i) = Store (i, (,) b)
+zoom :: Lens bg ls -> State ls a -> State bg a
+zoom lens (State f) = State $ (\(Store (p, g)) -> bimap g id . f $ p) . lens
 
-
+--------------------------------------------------------------------------------
 
 try_right_adj :: String
 try_right_adj = store |- to_state . fst where
@@ -75,4 +80,21 @@ try_left_adj = (True, 1) -| from_store where
 	from_store :: Store Int (Bool, Int) -> Int
 	from_store = snd . extract
 
-main = print $ run (try_left_adj) 0
+--------------------------------------------------------------------------------
+
+bg_state :: String -> State (Bool, Int) ()
+bg_state s = modify @(Bool, Int) $ bimap
+	(const . even $ length s) (const $ length s)
+
+example_zoom :: State (Bool, Int) String
+example_zoom = zoom lens ls_state where
+
+	lens :: Lens (Bool, Int) Int
+	lens (b, i) = Store (i, (,) b)
+
+	ls_state :: State Int String
+	ls_state = current @Int >>= \case
+		1 -> pure "Satisfied..."
+		_ -> pure "Not satisfied"
+
+main = print $ run (example_zoom >>= bg_state) (False, 1)
