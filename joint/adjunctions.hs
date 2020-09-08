@@ -13,8 +13,10 @@ class (Functor t, Functor u) => Adjoint t u where
 	-- | Right adjunction
 	(|-) :: t a -> (a -> u b) -> b
 
-instance Adjoint ((,) a) ((->) a) where
+instance Adjoint ((,) r) ((->) r) where
+	(-|) :: a -> ((r, a) -> b) -> (r -> b)
 	x -| f = \a -> f (a, x)
+	(|-) :: (r, a) -> (a -> r -> b) -> b
 	(a, x) |- f = f x a
 
 --------------------------------------------------------------------------------
@@ -59,8 +61,8 @@ set lens new = peek new . lens
 over :: Lens s t -> (t -> t) -> s -> s
 over lens f = extract . retrofit f . lens
 
-zoom :: Lens bg ls -> State ls a -> State bg a
-zoom lens (State f) = State $ (\(Store (p, g)) -> bimap g id . f $ p) . lens
+zoom :: (bg -> Store ls bg) -> State ls a -> State bg a
+zoom lens (State f) = State $ \bg -> (bg, lens bg |- (const $ State f))
 
 --------------------------------------------------------------------------------
 
@@ -97,4 +99,6 @@ example_zoom = zoom lens ls_state where
 		1 -> pure "Satisfied..."
 		_ -> pure "Not satisfied"
 
-main = print $ run (example_zoom >>= bg_state) (False, 1)
+main = do
+    print $ run (example_zoom >>= bg_state) (True, 0)
+    print $ run (example_zoom >>= bg_state) (True, 1)
