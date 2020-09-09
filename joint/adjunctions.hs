@@ -61,8 +61,8 @@ set lens new = peek new . lens
 over :: Lens s t -> (t -> t) -> s -> s
 over lens f = extract . retrofit f . lens
 
-zoom :: (bg -> Store ls bg) -> State ls a -> State bg a
-zoom lens (State f) = State $ \bg -> (bg, lens bg |- (const $ State f))
+zoom :: Lens bg ls -> State ls a -> State bg a
+zoom lens state = State $ \bg -> (bg, lens bg |- (const state))
 
 --------------------------------------------------------------------------------
 
