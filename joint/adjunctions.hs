@@ -21,15 +21,6 @@ instance Adjoint ((,) r) ((->) r) where
 
 --------------------------------------------------------------------------------
 
-newtype Store s a = Store ((,) s :. (->) s := a)
-
-instance Functor (Store s) where
-	fmap f (Store x) = Store $ f <$$> x
-
-instance Comonad (Store s) where
-	extract (Store (s, f)) = f s
-	extend g (Store (s, f)) = Store (s, g . (\p -> Store (p, f)))
-
 instance Adjoint (Store s) (State s) where
 	(-|) :: a -> (Store s a -> b) -> State s b
 	x -| f = State $ \s -> (,) s . f $ Store (s, const x)

@@ -1,7 +1,7 @@
 import "base" Data.Functor (($>))
 import "base" Data.List (delete)
 import "lens" Control.Lens (Lens', view, _1, _2, (%~))
-import "joint" Control.Joint (Liftable, Stateful, State, lift, current, modify, run, type (:>), type (:=))
+import "joint" Control.Joint (Adaptable (adapt), Stateful, State, current, modify, run, type (:>), type (:=))
 
 data Character = Wolf | Goat | Cabbage deriving Eq
 
@@ -24,16 +24,16 @@ data Direction = Back | Forward
 
 type River a = ([a], [a])
 
-type Iterable = Liftable []
+-- type Iterable = Adaptable []
 
 step :: forall a . (Eq a, Survivable a) => Direction -> State (River a) :> [] := Maybe a
 step direction = bank >>= next >>= transport where
 
-	bank :: (Functor t, Stateful (River a) t) => t [a]
+	bank :: State (River a) :> [] := [a]
 	bank = view (source direction) <$> current
 
-	next :: (Survivable a, Iterable t) => [a] -> t (Maybe a)
-	next xs = lift $ filter valid $ Nothing : (Just <$> xs) where
+	next :: Survivable a => [a] -> State (River a) :> [] := Maybe a
+	next xs = adapt @[] $ filter valid $ Nothing : (Just <$> xs) where
 
 		valid :: Maybe a -> Bool
 		valid Nothing = and $ coexist <$> xs <*> xs
@@ -42,7 +42,7 @@ step direction = bank >>= next >>= transport where
 		coexist :: Survivable a => a -> a -> Bool
 		coexist x y = survive x y == EQ
 
-	transport :: (Eq a, Applicative t, Stateful (River a) t) => Maybe a -> t (Maybe a)
+	transport :: (Eq a, Survivable a) => Maybe a -> State (River a) :> [] := Maybe a
 	transport Nothing = pure Nothing
 	transport (Just x) = modify @(River a) (leave . land) $> Just x where
 
