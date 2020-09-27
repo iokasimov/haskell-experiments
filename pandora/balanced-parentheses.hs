@@ -1,9 +1,9 @@
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
-import "pandora-io" Pandora.IO
 
-import Prelude (Integer, Show, print, succ)
+import Prelude (IO, Integer, Show, print, succ, show)
+import Debug.Trace (trace)
 
 data Shape = Opened | Closed
 
@@ -27,32 +27,36 @@ data Stumble
 	| Logjam Style Index -- Opened bracket without closed one
 	| Mismatch Style Index Style Index -- Closed bracket doesn't match opened one
 
-type Checking t = (Applicative t, Monad t, Stateful Index t, Failable Stumble t, Stateful (Stack Open) t)
+type Trace = Index :*: Stack Open
+
+type Checking t = (Applicative t, Monad t, Stateful Trace t, Failable Stumble t)
 
 skip :: Pointable t => t ()
 skip = point ()
 
 mismatch :: Checking t => Style -> Style -> Index -> t ()
-mismatch c o oix = current >>= failure . Mismatch o oix c
+mismatch c o oix = current @Trace >>= failure . Mismatch o oix c . attached
 
 logjam :: Checking t => Index -> Style -> t ()
 logjam i s = failure $ Logjam s i
 
 deadend :: Checking t => Style -> t ()
-deadend c = current >>= failure . Deadend c
+deadend c = current @Trace >>= failure . Deadend c . attached
 
 keep :: Checking t => Style -> t ()
-keep style = current >>= modify @(Stack Open) . insert . (style :*:)
+keep style = current @Trace >>= zoom @Trace (sub @Right)
+	. replace . uncurry insert . ((style :*:) <-> identity)
 
 latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
-latest on_empty f = view (focus @Head) <$> current @(Stack Open) >>= maybe on_empty (|- f)
+latest on_empty f = view (focus @Head) . extract <$> current @Trace >>= maybe on_empty (|- f)
 
 match :: Checking t => Style -> Index -> Style -> t ()
 match closed i opened = closed == opened
-	? modify (pop @Open) $ mismatch closed opened i
+	? (zoom @Trace (sub @Right) . modify $ pop @Open)
+	$ mismatch closed opened i
 
 indexate :: Checking t => t ()
-indexate = modify @Index succ
+indexate = zoom @Trace (sub @Left) $ modify @Index succ
 
 decide :: Checking t => Symbol -> t ()
 decide (Bracket opened Opened) = keep opened
@@ -64,11 +68,11 @@ inspect s = indexate *> decide s
 
 --------------------------------------------------------------------------------
 
-type Checker = State Index :> State (Stack Open) :> Conclusion Stumble := ()
+type Checker = State (Index :*: Stack Open) :> Conclusion Stumble := ()
 
 check :: Traversable s => s Symbol -> IO ()
 check code = (code ->> inspect *> latest skip logjam :: Checker)
-	& run % 1 & run % empty & conclusion print ((print "OK") !)
+	& run % (1 :*: empty) & conclusion print ((print "OK") !)
 
 deriving instance Show Shape
 deriving instance Show Style

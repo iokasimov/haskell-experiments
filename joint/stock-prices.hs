@@ -19,7 +19,9 @@ type Prices = [Int]
 -- max_profit :: Reader Prices :> [] := Int
 -- max_profit = get @Prices >>= adapt
 
-max_profit :: Maybe :> [] := Int
-max_profit = adapt [1,2,3]
+-- max_profit :: Maybe :> [] := Int
+-- max_profit = adapt [1,2,3]
+--
+-- main = print $ run max_profit
 
-main = print $ run max_profit
+main = print "typechecked"
