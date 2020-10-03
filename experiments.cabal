@@ -222,7 +222,7 @@ executable joint-trapping-rain-water
 
 executable joint-wolf-goat-cabbage
   main-is: joint/wolf-goat-cabbage.hs
-  build-depends: base, joint, lens, transformers
+  build-depends: base, joint, lens, transformers, distributive
   default-extensions:
     ConstraintKinds,
     DataKinds,
