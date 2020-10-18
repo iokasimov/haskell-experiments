@@ -1,8 +1,9 @@
 module Main where
 
-import "base" Data.Bifunctor
-import "comonad" Control.Comonad
-import "joint" Control.Joint
+import "base" Data.Functor (($>))
+import "base" Data.Bifunctor (bimap)
+import "comonad" Control.Comonad (extract)
+import "joint" Control.Joint (State (State), Store (Store), Lens, run, current, modify, zoom)
 
 infixl 4 -|, |-
 
