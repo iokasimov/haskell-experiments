@@ -27,34 +27,6 @@ instance Adjoint (Store s) (State s) where
 	(|-) :: Store s a -> (a -> State s b) -> b
 	Store (s, f) |- g = extract . flip run s . g $ f s
 
-pos :: Store s a -> s
-pos (Store (s, _)) = s
-
-seek :: s -> Store s a -> Store s a
-seek s (Store (_, f)) = Store (s, f)
-
-peek :: s -> Store s a -> a
-peek s (Store (_, f)) = f s
-
-retrofit :: (s -> s) -> Store s a -> Store s a
-retrofit g (Store (s, f)) = Store (g s, f)
-
---------------------------------------------------------------------------------
-
-type Lens s t = s -> Store t s
-
-view :: Lens s t -> s -> t
-view lens = pos . lens
-
-set :: Lens s t -> t -> s -> s
-set lens new = peek new . lens
-
-over :: Lens s t -> (t -> t) -> s -> s
-over lens f = extract . retrofit f . lens
-
-zoom :: Lens bg ls -> State ls a -> State bg a
-zoom lens state = State $ \bg -> (bg, lens bg |- (const state))
-
 --------------------------------------------------------------------------------
 
 try_right_adj :: String
