@@ -284,6 +284,30 @@ executable pandora-decode-morse-code
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
+  ghc-options: -Wall -fno-warn-tabs
+
+executable pandora-json-parser
+  main-is: pandora/json-parser.hs
+  build-depends: base, pandora
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    QuantifiedConstraints
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 
 executable pandora-matrix-in-clockwise-spiral
   main-is: pandora/matrix-in-clockwise-spiral.hs
