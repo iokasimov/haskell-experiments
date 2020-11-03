@@ -55,6 +55,29 @@ executable base-concurrency
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable base-comonadic-life
+  main-is: base/comonadic-life.hs
+  build-depends: base, comonad, mtl
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    GADTs,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable base-conway-game-of-life
   main-is: base/conway-game-of-life.hs
   build-depends: base, mtl

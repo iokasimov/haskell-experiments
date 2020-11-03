@@ -12,19 +12,19 @@ type Cell = (Point, Status)
 type Point = (Int, Int)
 type Status = Bool
 
-prepareData :: [String] -> Field
-prepareData rawData = concat [makeRow (rawData !! y) y | y <- [0..length rawData - 1]]
+prepare :: [String] -> Field
+prepare rawData = concat [line (rawData !! y) y | y <- [0..length rawData - 1]] where
 
-makeRow :: String -> Int -> [Cell]
-makeRow row y = [((x,y), alive $ row !! x) | x <- [0..length row - 1]] where
+	line :: String -> Int -> [Cell]
+	line row y = [((x,y), alive $ row !! x) | x <- [0..length row - 1]]
 
 	alive :: Char -> Bool
 	alive 'o' = True
 	alive _ = False
 
 representation :: Status -> String
-representation True = "[●]"
-representation False = "[∙]"
+representation True = "[o]"
+representation False = "[ ]"
 
 render :: Cell -> IO ()
 render ((0, _), status) = putStr $ "\n" <> representation status
@@ -76,4 +76,4 @@ start =
 	]
 
 main :: IO ()
-main = play $ prepareData start
+main = play $ prepare start
