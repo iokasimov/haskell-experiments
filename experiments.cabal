@@ -310,8 +310,8 @@ executable pandora-balanced-parentheses
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
-executable pandora-ca-rule110
-  main-is: pandora/ca-rule110.hs
+executable pandora-ca-rule
+  main-is: pandora/ca-rule.hs
   build-depends: base, pandora
   default-extensions:
     ConstraintKinds,
@@ -327,10 +327,11 @@ executable pandora-ca-rule110
     StandaloneDeriving,
     TypeApplications,
     TypeFamilies,
-    TypeOperators
+    TypeOperators,
+    TypeSynonymInstances
   other-modules:
   default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
+  ghc-options: -Wall -fno-warn-tabs -fno-strictness
 
 executable pandora-decode-morse-code
   main-is: pandora/decode-morse-code.hs
