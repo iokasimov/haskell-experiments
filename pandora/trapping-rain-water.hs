@@ -31,4 +31,4 @@ main = do
 	let rhs = run . evaluate . themax $ Reverse walls
 	let volume l x r = (l /\ r) P.- x
 	let result = volume <$> lhs <*> walls <*> rhs
-	print $ fold 0 (+) result
+	print . extract . run @(State Int) % 0 $ fold (+) result
