@@ -5,10 +5,13 @@ import "pandora" Pandora.Pattern
 import Prelude (Char, Show, print)
 
 start :: Zipper Stack Boolean
-start = Tap True . TU $ point False :^: point False where
+start = Tap True . TU $ desert :^: desert where
 
 	desert :: Stack Boolean
-	desert = linearize $ repeat False
+	desert = insert False $ insert False
+		$ insert False $ insert False $ insert False
+		$ insert False $ insert False $ insert False
+		$ insert False $ insert False $ empty
 
 rule50 :: (Boolean :*: Boolean :*: Boolean) -> Boolean
 rule50 (True :*: True :*: True) = False
@@ -20,13 +23,19 @@ rule50 (False :*: True :*: False) = False
 rule50 (False :*: False :*: True) = True
 rule50 (False :*: False :*: False) = False
 
-something :: Zipper Stack Boolean -> Maybe (Boolean :*: Boolean :*: Boolean)
-something z = (\l x r -> l :*: x :*: r) <$> (extract <$> backward z) <*> Just (extract z) <*> (extract <$> forward z)
+neighbours :: Zipper Stack Boolean -> Boolean :*: Boolean :*: Boolean
+neighbours z = leftward :*: extract z :*: rightward where
+
+	leftward, rightward :: Boolean
+	leftward = vacant (extract <$> backward z)
+	rightward = vacant (extract <$> forward z)
+
+	vacant :: Maybe Boolean -> Boolean
+	vacant = maybe False identity
 
 deriving instance Show Boolean
 deriving instance (Show a, Show b) => Show (a :*: b)
 deriving instance Show a => Show (Maybe a)
 
-main = do
-	print $ something start
-	print $ rule50 <$> something start
+main = print $ extract <$> forward start
+	-- print . extract $ start =>> rule50 . neighbours

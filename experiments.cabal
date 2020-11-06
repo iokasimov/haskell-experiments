@@ -318,6 +318,7 @@ executable pandora-ca-rule
     DataKinds,
     ExplicitNamespaces,
     FlexibleContexts,
+    FlexibleInstances,
     LambdaCase,
     NoImplicitPrelude,
     OverloadedStrings,
@@ -378,7 +379,6 @@ executable pandora-json-parser
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
-
 executable pandora-matrix-in-clockwise-spiral
   main-is: pandora/matrix-in-clockwise-spiral.hs
   build-depends: base, pandora
@@ -428,8 +428,6 @@ executable pandora-probability
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
-
-
 
 executable pandora-stock-prices
   main-is: pandora/stock-prices.hs
