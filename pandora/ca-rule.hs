@@ -4,16 +4,22 @@ import "pandora" Pandora.Pattern
 
 import Prelude (Char, Show, print)
 
-start :: Zipper Stack Boolean
+type Status = Boolean
+
+type Field = Zipper (Nonempty Stack) Status
+
+type Neighbours = Status :*: Status :*: Status
+
+start :: Field
 start = Tap True . TU $ desert :^: desert where
 
-	desert :: Stack Boolean
+	desert :: Nonempty Stack Status
 	desert = insert False $ insert False
 		$ insert False $ insert False $ insert False
 		$ insert False $ insert False $ insert False
-		$ insert False $ insert False $ empty
+		$ insert False $ point False
 
-rule50 :: (Boolean :*: Boolean :*: Boolean) -> Boolean
+rule50 :: Neighbours -> Status
 rule50 (True :*: True :*: True) = False
 rule50 (True :*: True :*: False) = False
 rule50 (True :*: False :*: True) = True
@@ -23,19 +29,22 @@ rule50 (False :*: True :*: False) = False
 rule50 (False :*: False :*: True) = True
 rule50 (False :*: False :*: False) = False
 
-neighbours :: Zipper Stack Boolean -> Boolean :*: Boolean :*: Boolean
-neighbours z = leftward :*: extract z :*: rightward where
+neighbourhood :: Field -> Neighbours
+neighbourhood z = leftward :*: extract z :*: rightward where
 
-	leftward, rightward :: Boolean
-	leftward = vacant (extract <$> backward z)
-	rightward = vacant (extract <$> forward z)
+	leftward, rightward :: Status
+	leftward = vacant $ extract <$> backward' z
+	rightward = vacant $ extract <$> forward' z
 
-	vacant :: Maybe Boolean -> Boolean
+	vacant :: Maybe Status -> Status
 	vacant = maybe False identity
 
 deriving instance Show Boolean
 deriving instance (Show a, Show b) => Show (a :*: b)
 deriving instance Show a => Show (Maybe a)
 
-main = print $ extract <$> forward start
-	-- print . extract $ start =>> rule50 . neighbours
+main = print . extract $ start
+	-- print . extract $ start =>> rule50 . neighbourhood
+	-- print . extract $ start =>> rule50 . neighbourhood =>> rule50 . neighbourhood
+	-- print . extract $ start =>> rule50 . neighbourhood =>> rule50 . neighbourhood =>> rule50 . neighbourhood
+	-- print . extract $ start =>> rule50 . neighbourhood =>> rule50 . neighbourhood =>> rule50 . neighbourhood =>> rule50 . neighbourhood
