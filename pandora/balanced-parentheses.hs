@@ -45,7 +45,7 @@ deadend c = current @Trace >>= failure . Deadend c . attached
 
 keep :: Checking t => Style -> t ()
 keep style = current @Trace >>= zoom @Trace (sub @Right)
-	. replace . uncurry insert . ((style :*:) <-> identity)
+	. replace . (|- (insert %)) . ((style :*:) <-> identity)
 
 latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
 latest on_empty f = view (focus @Head) . extract <$> current @Trace >>= maybe on_empty (|- f)
