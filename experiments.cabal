@@ -146,6 +146,28 @@ executable base-resumption
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable base-reversing-a-list-with-continuations
+  main-is: base/reversing-a-list-with-continuations.hs
+  build-depends: base, transformers
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable base-trapping-rain-water
   main-is: base/trapping-rain-water.hs
   build-depends: base, transformers
@@ -320,6 +342,8 @@ executable pandora-ca-rule
     FlexibleContexts,
     FlexibleInstances,
     LambdaCase,
+    LiberalTypeSynonyms,
+    MultiParamTypeClasses,
     NoImplicitPrelude,
     OverloadedStrings,
     PackageImports,
