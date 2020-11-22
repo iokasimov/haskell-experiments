@@ -32,6 +32,30 @@ executable base-batch
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable base-binary-tree-zipper
+  main-is: base/binary-tree-zipper.hs
+  build-depends: base
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    GADTs,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+
 executable base-concurrency
   main-is: base/Concurrency.hs
   build-depends: base, mtl
