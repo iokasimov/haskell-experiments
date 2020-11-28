@@ -2,7 +2,8 @@ import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 
-import Prelude (Char, Int, Show, print, (<>))
+import Prelude (Char, Int, Show (show), print, (<>))
+import Control.Concurrent (threadDelay)
 
 type Status = Boolean
 
@@ -37,7 +38,17 @@ rule50 (False :*: False :*: False) = False
 neighbourhood :: Field -> Neighbours
 neighbourhood z = extract (sub @Left ^. z) :*: extract z :*: extract (sub @Right ^. z)
 
-deriving instance Show Boolean
+five_around :: Field -> [Status]
+five_around (Tap x (TU (bs :^: fs))) = last5 bs <> [x] <> first5 fs where
+
+	first5, last5 :: Stream ~> []
+	first5 (Construct x (Identity (Construct x' (Identity (Construct x'' (Identity (Construct x''' (Identity (Construct x'''' _))))))))) = [x, x', x'', x''', x'''']
+	last5 (Construct x (Identity (Construct x' (Identity (Construct x'' (Identity (Construct x''' (Identity (Construct x'''' _))))))))) = [x'''', x''', x'', x', x]
+
+instance Show Boolean where
+	show True = "*"
+	show False = " "
+
 deriving instance (Show a, Show b) => Show (a :*: b)
 deriving instance Show a => Show (Maybe a)
 deriving instance (Show e, Show a) => Show (Conclusion e a)
@@ -45,9 +56,9 @@ deriving instance (Show e, Show a) => Show (Conclusion e a)
 instance Monotonic (Construction Identity a) a where
 	bypass f r ~(Construct x (Identity xs)) = f x $ bypass f r xs
 
-main = do
-	print . neighbourhood $ start
-	print . neighbourhood $ start =>> rule50 . neighbourhood
-	print . neighbourhood $ start =>> rule50 . neighbourhood =>> rule50 . neighbourhood
-	print . neighbourhood $ start =>> rule50 . neighbourhood =>> rule50 . neighbourhood =>> rule50 . neighbourhood
-	print . neighbourhood $ start =>> rule50 . neighbourhood =>> rule50 . neighbourhood =>> rule50 . neighbourhood =>> rule50 . neighbourhood
+lifecycle act being = do
+	threadDelay 1000000
+	print $ five_around being
+	lifecycle act $ being =>> act
+
+main = lifecycle (rule50 . neighbourhood) start

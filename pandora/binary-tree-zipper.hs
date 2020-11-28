@@ -34,9 +34,6 @@ import Prelude (Int, print)
 --
 -- modify :: Loc a -> (Tree a -> Tree a) -> Loc a
 -- modify (t, c) f = (f t, c)
---
-
-data Biforked' a = Top' | Leftward' a | Rightward' a
 
 --------------------------------------------------------------------------------
 
@@ -67,27 +64,10 @@ example = Construct 1 $ Both
 -- 	| Rightward' a (t a) (Biforked' t a)
 
 -- Focus on leaf 4
-example_zipper :: Construction Wye <:.:> ((Biforked' <:.> Construction Biforked') <:.> T_ Covariant (Maybe <:.> Construction Wye)) := Int
-example_zipper = T_U . (:*:) (leaf 4) . TU . TU . Leftward'
-	$ Construct (T_ $ 2 :*: TU (Just $ leaf 5)) . Leftward'
-	$ Construct (T_ $ 1 :*: TU (Just . Construct 3 . Left $ leaf 6)) $ Top'
-
-up (T_U (x :*: (TU ctx))) = undefined
-
--- downright :: Construction Wye <:.:> (Construction Biforked' <:.> T_ Covariant (Maybe <:.> Construction Wye)) := a
--- 	-> Construction Wye <:.:> (Construction Biforked' <:.> T_ Covariant (Maybe <:.> Construction Wye)) := a
--- downright (T_U (x :*: ctx)) =
--- downright (Branch l r, c) = (r, R l c)
-
--- type instance Zipper (Construction Wye) = Construction Biforked' <:.> (T_ Covariant (Maybe <:.> Construction Wye))
-
--- Focus on left subtree§§§§§§§
--- example_zipper' :: Construction (Biforked' (Construction Wye)) (Nonempty Binary Int)
--- example_zipper' = Construct (Construct 2 $ Both (leaf 4) (leaf 5))
--- 	$ Leftward $ Construct (Construct 3 $ Left (leaf 6))
--- 		$
-
--- data Jack t a = It a | Other (t a)
+example_zipper :: Zipper (Nonempty Binary) Int
+example_zipper = T_U . (:*:) (leaf 4) . TU . TU . Leftward
+	$ Construct (T_ $ 2 :*: TU (Just $ leaf 5)) . Leftward
+	$ Construct (T_ $ 1 :*: TU (Just . Construct 3 . Left $ leaf 6)) $ Top
 
 -- Focus on left subtree
 -- example_zipper'' :: Nonempty Binary Int :*: Biforked' (Construction Wye) Int
@@ -100,3 +80,4 @@ up (T_U (x :*: (TU ctx))) = undefined
 -- 	(Leftward' (Construct 3 $ Left (leaf 6)) 1 Top')
 
 main = print "typechecked"
+	-- print $ up example_zipper
