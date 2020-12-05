@@ -49,9 +49,37 @@ natural n = n == 0 ? Zero $ Natural . natural $ n - 1
 instance Monotonic (Construction Identity a) a where
 	bypass f r ~(Construct x (Identity xs)) = f x $ bypass f r xs
 
+--------------------------------------------------------------------------------
+
+-- type II = Zipper Stream <:.> Zipper Stream
+type II = Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)
+
+instance Covariant II where
+	f <$> TU zz = TU $ f <$$> zz
+
+instance Extractable II where
+	extract = extract . extract . run
+
+instance Extendable II where
+	TU zz =>> f = TU $ f <$$> (TU <$$> hd <$> vd zz)
+
+hd :: forall a . (Zipper Stream :. Zipper Stream := a) -> (Zipper Stream :. Zipper Stream :. Zipper Stream := a)
+hd z = each <$> z where
+
+	each :: Zipper Stream a -> Zipper Stream (Zipper Stream a)
+	each x = Tap x . TU $ move (rotate @Left) x :^: move (rotate @Right) x
+
+	move rtt x = extract . deconstruct $ iterate (point . rtt) x
+
+vd :: (Zipper Stream :. Zipper Stream := a) -> (Zipper Stream :. Zipper Stream :. Zipper Stream := a)
+vd z = let move rtt = extract . deconstruct . iterate (point . rtt) $ z
+	in Tap z . TU $ move (rotate @Left) :^: move (rotate @Right)
+
+--------------------------------------------------------------------------------
+
 lifecycle act being = do
 	threadDelay 1000000
-	print $ display (natural 10) being
+	print $ display (natural 21) being
 	lifecycle act $ being =>> act
 
 main = lifecycle (rule50 . neighbourhood) start
