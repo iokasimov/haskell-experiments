@@ -72,19 +72,16 @@ instance Extractable II where
 	extract = extract . extract . run
 
 instance Extendable II where
-	TU zz =>> f = TU $ f <$$> (TU <$$> hd <$> vd zz)
+	zz =>> f = f <$> TU (plane <$> plane zz) where
 
-hd :: forall a . (Zipper Stream :. Zipper Stream := a) -> (Zipper Stream :. Zipper Stream :. Zipper Stream := a)
-hd z = each <$> z where
+		plane :: II a -> Zipper Stream (II a)
+		plane z = TU <$> divergence (run z)
 
-	each :: Zipper Stream a -> Zipper Stream (Zipper Stream a)
-	each x = Tap x . TU $ move (rotate @Left) x :^: move (rotate @Right) x
+		divergence :: Zipper Stream := a -> Zipper Stream :. Zipper Stream := a
+		divergence x = Tap x . TU $ move (rotate @Left) x :^: move (rotate @Right) x
 
-	move rtt x = extract . deconstruct $ iterate (point . rtt) x
-
-vd :: (Zipper Stream :. Zipper Stream := a) -> (Zipper Stream :. Zipper Stream :. Zipper Stream := a)
-vd z = let move rtt = extract . deconstruct . iterate (point . rtt) $ z
-	in Tap z . TU $ move (rotate @Left) :^: move (rotate @Right)
+		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
+		move act = extract . deconstruct . iterate (point . act)
 
 instance Substructure Down (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) where
 	type Substructural Down (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) a = Stream :. Zipper Stream := a
