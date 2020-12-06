@@ -425,7 +425,8 @@ executable pandora-ca-rule
     TypeApplications,
     TypeFamilies,
     TypeOperators,
-    TypeSynonymInstances
+    TypeSynonymInstances,
+    ViewPatterns
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs -fno-strictness
