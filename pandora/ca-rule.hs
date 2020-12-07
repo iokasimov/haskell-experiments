@@ -91,6 +91,20 @@ instance Substructure Up (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) 
 	type Substructural Up (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) a = Stream :. Zipper Stream := a
 	substructure (run . extract -> Tap focused (TU (down :^: up))) = Store $ up :*: Tag . TU . Tap focused . TU . (down :^:)
 
+instance Substructure Left (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) where
+	type Substructural Left (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) a = Zipper Stream :. Stream := a
+	substructure (run . extract -> Tap x (TU (d :^: u))) =
+		let target = Tap (sub @Left ^. x) . TU $ view (sub @Left) <$> d :^: view (sub @Left) <$> u in
+		let around lx = (set (sub @Left) <$> sub @Left ^. lx <*> d) :^: (set (sub @Left) <$> sub @Left ^. lx <*> u) in
+		Store $ target :*: \lx -> Tag . TU . Tap (sub @Left .~ extract lx $ x) . TU $ around lx
+
+instance Substructure Right (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) where
+	type Substructural Right (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) a = Zipper Stream :. Stream := a
+	substructure (run . extract -> Tap x (TU (d :^: u))) =
+		let target = Tap (sub @Right ^. x) . TU $ view (sub @Right) <$> d :^: view (sub @Right) <$> u in
+		let around rx = (set (sub @Right) <$> sub @Right ^. rx <*> d) :^: (set (sub @Right) <$> sub @Right ^. rx <*> u) in
+		Store $ target :*: \rx -> Tag . TU . Tap (sub @Right .~ extract rx $ x) . TU $ around lx
+
 -- (left :*: right) :*: (up :*: down) :*: major diagonal :*: minor diagonal
 type Around = (Status :*: Status) :*: (Status :*: Status) :*: (Status :*: Status) :*: (Status :*: Status)
 
