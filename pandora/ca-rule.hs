@@ -36,7 +36,6 @@ rule90 (False :*: True :*: False) = False
 rule90 (False :*: False :*: True) = True
 rule90 (False :*: False :*: False) = False
 
-
 neighbourhood :: Field -> Neighbours
 neighbourhood z = extract (sub @Left ^. z) :*: extract z :*: extract (sub @Right ^. z)
 
@@ -47,10 +46,6 @@ display n (Tap x (TU (bs :^: fs))) = take_n n bs [] <> [x] <> reverse (take_n n 
 	take_n (Natural n) (Construct x (Identity next)) r = take_n n next $ x : r
 	take_n Zero _ r = r
 
-instance Show Boolean where
-	show True = "*"
-	show False = " "
-
 instance Setoid Int where
 	x == y = if eqInt x y then True else False
 
@@ -59,6 +54,11 @@ natural n = n == 0 ? Zero $ Natural . natural $ n - 1
 
 instance Monotonic (Construction Identity a) a where
 	bypass f r ~(Construct x (Identity xs)) = f x $ bypass f r xs
+
+lifecycle act being = do
+	threadDelay 1000000
+	print $ display (natural 25) being
+	lifecycle act $ being =>> act
 
 --------------------------------------------------------------------------------
 
@@ -106,7 +106,8 @@ instance Substructure Right (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream
 		Store $ target :*: \rx -> Tag . TU . Tap (sub @Right .~ extract rx $ x) . TU $ around rx
 
 -- horizontal :*: vertical :*: major diagonal :*: minor diagonal
-type Around = (Status :*: Status) :*: (Status :*: Status) :*: (Status :*: Status) :*: (Status :*: Status)
+type Around = (Status :*: Status) :*: (Status :*: Status)
+	:*: (Status :*: Status) :*: (Status :*: Status)
 
 around :: II Status -> Around
 around z = horizontal :*: vertical :*: major :*: minor where
@@ -123,15 +124,29 @@ around z = horizontal :*: vertical :*: major :*: minor where
 		=> II Status :-. t :. u := Status -> Status
 	plane lens = extract . extract $ lens ^. z
 
-	slant :: (II Status :-. (Stream :. Zipper Stream := Status))
-		-> (Zipper Stream Status :-. Stream Status) -> Status
-	slant lens lens' = extract . view lens' . extract . view lens $ z
+	slant :: II Status :-. Stream :. Zipper Stream := Status
+		-> Zipper Stream Status :-. Stream Status -> Status
+	slant vl hl = extract . view hl . extract . view vl $ z
+
+initial :: II Status
+initial = TU . Tap one . TU $ only :^: only where
+
+	only :: Stream :. Zipper Stream := Status
+	only = Construct one . Identity $ repeat noone
+
+	one :: Zipper Stream Status
+	one = Tap True . TU $ repeat False :^: repeat False
+
+	noone :: Zipper Stream Status
+	noone = Tap False . TU $ repeat False :^: repeat False
 
 --------------------------------------------------------------------------------
 
-lifecycle act being = do
-	threadDelay 1000000
-	print $ display (natural 25) being
-	lifecycle act $ being =>> act
+deriving instance (Show a, Show b) => Show (a :*: b)
 
-main = lifecycle (rule90 . neighbourhood) start
+instance Show Boolean where
+	show True = "*"
+	show False = " "
+
+-- main = lifecycle (rule90 . neighbourhood) start
+main = print $ around initial
