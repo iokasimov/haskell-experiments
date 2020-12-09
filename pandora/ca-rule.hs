@@ -103,10 +103,29 @@ instance Substructure Right (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream
 	substructure (run . extract -> Tap x (TU (d :^: u))) =
 		let target = Tap (sub @Right ^. x) . TU $ view (sub @Right) <$> d :^: view (sub @Right) <$> u in
 		let around rx = (set (sub @Right) <$> sub @Right ^. rx <*> d) :^: (set (sub @Right) <$> sub @Right ^. rx <*> u) in
-		Store $ target :*: \rx -> Tag . TU . Tap (sub @Right .~ extract rx $ x) . TU $ around lx
+		Store $ target :*: \rx -> Tag . TU . Tap (sub @Right .~ extract rx $ x) . TU $ around rx
 
--- (left :*: right) :*: (up :*: down) :*: major diagonal :*: minor diagonal
+-- horizontal :*: vertical :*: major diagonal :*: minor diagonal
 type Around = (Status :*: Status) :*: (Status :*: Status) :*: (Status :*: Status) :*: (Status :*: Status)
+
+around :: II Status -> Around
+around z = horizontal :*: vertical :*: major :*: minor where
+
+	horizontal, vertical :: Status :*: Status
+	horizontal = plane (sub @Left) :*: plane (sub @Right)
+	vertical = plane (sub @Up) :*: plane (sub @Down)
+
+	major, minor :: Status :*: Status
+	major = slant (sub @Down) (sub @Left) :*: slant (sub @Up) (sub @Right)
+	minor = slant (sub @Up) (sub @Left) :*: slant (sub @Down) (sub @Right)
+
+	plane :: (Extractable t, Extractable u)
+		=> II Status :-. t :. u := Status -> Status
+	plane lens = extract . extract $ lens ^. z
+
+	slant :: (II Status :-. (Stream :. Zipper Stream := Status))
+		-> (Zipper Stream Status :-. Stream Status) -> Status
+	slant lens lens' = extract . view lens' . extract . view lens $ z
 
 --------------------------------------------------------------------------------
 
