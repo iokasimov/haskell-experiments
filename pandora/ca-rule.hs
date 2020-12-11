@@ -3,8 +3,10 @@ import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 
 import GHC.Int (Int, eqInt)
-import Prelude (Char, Show (show), print, reverse, (-), (<>))
+import Prelude (IO, Char, Show (show), putStr, print, reverse, (-), (<>), map)
 import Control.Concurrent (threadDelay)
+
+import qualified Prelude as Prelude (traverse)
 
 type Status = Boolean
 
@@ -39,12 +41,12 @@ rule90 (False :*: False :*: False) = False
 neighbourhood :: Field -> Neighbours
 neighbourhood z = extract (sub @Left ^. z) :*: extract z :*: extract (sub @Right ^. z)
 
-display :: Natural -> Field -> [Status]
-display n (Tap x (TU (bs :^: fs))) = take_n n bs [] <> [x] <> reverse (take_n n fs []) where
+display_1d :: Natural -> Zipper Stream a -> [a]
+display_1d n (Tap x (TU (bs :^: fs))) = take_n n [] bs <> [x] <> reverse (take_n n [] fs)
 
-	take_n :: Natural -> Stream a -> [a] -> [a]
-	take_n (Natural n) (Construct x (Identity next)) r = take_n n next $ x : r
-	take_n Zero _ r = r
+take_n :: Natural -> [a] -> Stream a -> [a]
+take_n (Natural n) r (Construct x (Identity next)) = take_n n (x : r) next
+take_n Zero r _ = r
 
 instance Setoid Int where
 	x == y = if eqInt x y then True else False
@@ -55,10 +57,10 @@ natural n = n == 0 ? Zero $ Natural . natural $ n - 1
 instance Monotonic (Construction Identity a) a where
 	bypass f r ~(Construct x (Identity xs)) = f x $ bypass f r xs
 
-lifecycle act being = do
+lifecycle_1d act being = do
 	threadDelay 1000000
-	print $ display (natural 25) being
-	lifecycle act $ being =>> act
+	print $ display_1d (natural 25) being
+	lifecycle_1d act $ being =>> act
 
 --------------------------------------------------------------------------------
 
@@ -105,20 +107,16 @@ instance Substructure Right (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream
 		let around rx = (set (sub @Right) <$> sub @Right ^. rx <*> d) :^: (set (sub @Right) <$> sub @Right ^. rx <*> u) in
 		Store $ target :*: \rx -> Tag . TU . Tap (sub @Right .~ extract rx $ x) . TU $ around rx
 
--- horizontal :*: vertical :*: major diagonal :*: minor diagonal
-type Around = (Status :*: Status) :*: (Status :*: Status)
-	:*: (Status :*: Status) :*: (Status :*: Status)
+type Around = Status -- current
+	:*: Status :*: Status -- horizontal
+	:*: Status :*: Status -- vertical
+	:*: Status :*: Status -- major diagonal
+	:*: Status :*: Status -- minor diagonal
 
 around :: II Status -> Around
-around z = horizontal :*: vertical :*: major :*: minor where
-
-	horizontal, vertical :: Status :*: Status
-	horizontal = plane (sub @Left) :*: plane (sub @Right)
-	vertical = plane (sub @Up) :*: plane (sub @Down)
-
-	major, minor :: Status :*: Status
-	major = slant (sub @Down) (sub @Left) :*: slant (sub @Up) (sub @Right)
-	minor = slant (sub @Up) (sub @Left) :*: slant (sub @Down) (sub @Right)
+around z = extract z :*: plane (sub @Left) :*: plane (sub @Right) :*: plane (sub @Up) :*: plane (sub @Down)
+	:*: slant (sub @Down) (sub @Left) :*: slant (sub @Up) (sub @Right)
+	:*: slant (sub @Up) (sub @Left) :*: slant (sub @Down) (sub @Right) where
 
 	plane :: (Extractable t, Extractable u)
 		=> II Status :-. t :. u := Status -> Status
@@ -128,17 +126,49 @@ around z = horizontal :*: vertical :*: major :*: minor where
 		-> Zipper Stream Status :-. Stream Status -> Status
 	slant vl hl = extract . view hl . extract . view vl $ z
 
+-- initial :: II Status
+-- initial = TU . Tap one . TU $ only :^: only where
+--
+-- 	only :: Stream :. Zipper Stream := Status
+-- 	only = Construct one . Identity $ repeat noone
+--
+-- 	one :: Zipper Stream Status
+-- 	one = Tap True . TU $ repeat False :^: repeat False
+--
+-- 	noone :: Zipper Stream Status
+-- 	noone = Tap False . TU $ repeat False :^: repeat False
+
 initial :: II Status
 initial = TU . Tap one . TU $ only :^: only where
+
+	-- desert :: Stream :. Zipper Stream := Status
+	-- desert = repeat noone
 
 	only :: Stream :. Zipper Stream := Status
 	only = Construct one . Identity $ repeat noone
 
 	one :: Zipper Stream Status
-	one = Tap True . TU $ repeat False :^: repeat False
+	one = Tap True . TU $ (Construct True . Identity $ repeat False) :^: (Construct True . Identity $ repeat False)
 
 	noone :: Zipper Stream Status
 	noone = Tap False . TU $ repeat False :^: repeat False
+
+blinker :: Around -> Status
+blinker (focused :*: neighbors) = case bypass (\status acc -> status ? acc + one $ acc) zero neighbors of
+	Natural (Natural Zero) -> focused
+	Natural (Natural (Natural Zero)) -> True
+	_ -> False
+
+display_2d :: Natural -> II Status -> [[Status]]
+display_2d n (TU (Tap x (TU (bs :^: fs)))) = (take_n n [] $ display_1d n <$> bs)
+	<> [display_1d n x] <> reverse (take_n n [] $ display_1d n <$> fs)
+
+lifecycle_2d :: (II Status -> Status) -> II Status -> IO ()
+lifecycle_2d act being = do
+	threadDelay 1000000
+	putStr "\ESC[2J"
+	Prelude.traverse print $ display_2d (natural 15) being
+	lifecycle_2d act $ being =>> act
 
 --------------------------------------------------------------------------------
 
@@ -148,5 +178,15 @@ instance Show Boolean where
 	show True = "*"
 	show False = " "
 
+instance Show Natural where
+	show Zero = "0"
+	show (Natural n) = "1" <> show n
+
 -- main = lifecycle (rule90 . neighbourhood) start
-main = print $ around initial
+-- main = lifecycle_2d (blinker . around) initial
+
+main = do
+	print $ take_n (natural 5) [] $ display_1d (natural 5) <$> (sub @Up ^. initial)
+	print $ take_n (natural 5) [] $ display_1d (natural 5) <$> (sub @Down ^. initial)
+	print $ take_n (natural 5) [] `map` display_1d (natural 5) (sub @Left ^. initial)
+	print $ take_n (natural 5) [] `map` display_1d (natural 5) (sub @Right ^. initial)

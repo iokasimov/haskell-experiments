@@ -419,6 +419,7 @@ executable pandora-ca-rule
     NoImplicitPrelude,
     OverloadedStrings,
     PackageImports,
+    PolyKinds,
     RankNTypes,
     ScopedTypeVariables,
     StandaloneDeriving,
