@@ -300,6 +300,25 @@ executable joint-balanced-parentheses
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable joint-cellular-automata
+  main-is: joint/cellular-automata.hs
+  build-depends: base, joint, comonad, free, lens
+  default-extensions:
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    QuantifiedConstraints
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable joint-stock-prices
   main-is: joint/stock-prices.hs
   build-depends: base, joint, lens
