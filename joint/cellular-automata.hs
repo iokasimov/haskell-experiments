@@ -56,7 +56,7 @@ listify :: Stream ~> []
 listify s = extract s : listify (runIdentity $ unwrap s)
 
 display :: Zipper ~> []
-display (Zipper ls x rs) = reverse (take 5 $ listify ls) <> [x] <> take 5 (listify rs)
+display (Zipper ls x rs) = reverse (take 25 $ listify ls) <> [x] <> take 25 (listify rs)
 
 start_d1 :: Field
 start_d1 = let desert = coiter Identity Dead
@@ -92,9 +92,23 @@ instance Comonad Grid where
 blinker :: Grid Status
 blinker = TU $ Zipper (only :< Identity (coiter Identity noone)) only (only :< Identity (coiter Identity noone)) where
 
-	only, noone :: Zipper Status
-	only = Zipper (coiter Identity Dead) Alive (coiter Identity Dead)
-	noone = Zipper (coiter Identity Dead) Dead (coiter Identity Dead)
+glider :: Grid Status
+glider = TU $ Zipper (coiter Identity noone) noone shape where
+
+	s1, s2, s3 :: Stream Status
+	s1 = Dead :< Identity (Alive :< Identity (coiter Identity Dead))
+	s2 = Dead :< Identity (Dead :< Identity (Alive :< Identity (coiter Identity Dead)))
+	s3 = Alive :< Identity (Alive :< Identity (Alive :< Identity (coiter Identity Dead)))
+
+	line :: Stream Status -> Zipper Status
+	line detail = Zipper (coiter Identity Dead) Dead detail -- (detail :< Identity (coiter Identity Dead))
+
+	shape :: Stream :. Zipper := Status
+	shape = line s1 :< Identity (line s2 :< Identity (line s3 :< Identity (coiter Identity noone)))
+
+only, noone :: Zipper Status
+only = Zipper (coiter Identity Dead) Alive (coiter Identity Dead)
+noone = Zipper (coiter Identity Dead) Dead (coiter Identity Dead)
 
 -- (horizontal, vertical, major diagonal, minor diagonal)
 type Around = ((Status, Status), (Status, Status), (Status, Status), (Status, Status))
@@ -126,9 +140,9 @@ liferule z = case liveness $ around z of
 
 conway :: Grid Status -> (Grid Status -> Status) -> IO ()
 conway field act = do
-	threadDelay 1000000
+	threadDelay 100000
 	putStr "\ESC[2J"
 	traverse print $ display <$> display (run field)
 	conway (field =>> act) act
 
-main = conway blinker liferule
+main = conway glider liferule
