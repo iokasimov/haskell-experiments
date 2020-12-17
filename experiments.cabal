@@ -309,6 +309,7 @@ executable joint-cellular-automata
     FlexibleContexts,
     FlexibleInstances,
     LambdaCase,
+    LiberalTypeSynonyms,
     OverloadedStrings,
     PackageImports,
     RankNTypes,
@@ -425,8 +426,8 @@ executable pandora-binary-tree-zipper
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
-executable pandora-ca-rule
-  main-is: pandora/ca-rule.hs
+executable pandora-cellular-automata
+  main-is: pandora/cellular-automata.hs
   build-depends: base, pandora
   default-extensions:
     ConstraintKinds,

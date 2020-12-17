@@ -18,16 +18,6 @@ start :: Field
 start = let desert = repeat False
 	in Tap True . TU $ desert :^: desert
 
--- rule50 :: Neighbours -> Status
--- rule50 (True :*: True :*: True) = False
--- rule50 (True :*: True :*: False) = False
--- rule50 (True :*: False :*: True) = True
--- rule50 (True :*: False :*: False) = True
--- rule50 (False :*: True :*: True) = False
--- rule50 (False :*: True :*: False) = False
--- rule50 (False :*: False :*: True) = True
--- rule50 (False :*: False :*: False) = False
-
 rule90 :: Neighbours -> Status
 rule90 (True :*: True :*: True) = False
 rule90 (True :*: True :*: False) = True
@@ -74,13 +64,11 @@ instance Extractable II where
 	extract = extract . extract . run
 
 instance Extendable II where
-	zz =>> f = f <$> TU (plane <$> plane zz) where
+	zz =>> f = f <$> TU (horizontal <$> vertical zz) where
 
-		plane :: II a -> Zipper Stream (II a)
-		plane z = TU <$> divergence (run z)
-
-		divergence :: Zipper Stream := a -> Zipper Stream :. Zipper Stream := a
-		divergence x = Tap x . TU $ move (rotate @Left) x :^: move (rotate @Right) x
+		horizontal, vertical :: II a -> Zipper Stream (II a)
+		horizontal z = Tap z . TU $ move (TU . (rotate @Left <$>) . run) z :^: move (TU . (rotate @Right <$>) . run) z
+		vertical z = Tap z . TU $ move (TU . rotate @Left . run) z :^: move (TU . rotate @Right . run) z
 
 		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
 		move act = extract . deconstruct . iterate (point . act)
@@ -126,23 +114,8 @@ around z = extract z :*: plane (sub @Left) :*: plane (sub @Right) :*: plane (sub
 		-> Zipper Stream Status :-. Stream Status -> Status
 	slant vl hl = extract . view hl . extract . view vl $ z
 
--- initial :: II Status
--- initial = TU . Tap one . TU $ only :^: only where
---
--- 	only :: Stream :. Zipper Stream := Status
--- 	only = Construct one . Identity $ repeat noone
---
--- 	one :: Zipper Stream Status
--- 	one = Tap True . TU $ repeat False :^: repeat False
---
--- 	noone :: Zipper Stream Status
--- 	noone = Tap False . TU $ repeat False :^: repeat False
-
 initial :: II Status
 initial = TU . Tap one . TU $ only :^: only where
-
-	-- desert :: Stream :. Zipper Stream := Status
-	-- desert = repeat noone
 
 	only :: Stream :. Zipper Stream := Status
 	only = Construct one . Identity $ repeat noone
@@ -153,8 +126,8 @@ initial = TU . Tap one . TU $ only :^: only where
 	noone :: Zipper Stream Status
 	noone = Tap False . TU $ repeat False :^: repeat False
 
-blinker :: Around -> Status
-blinker (focused :*: neighbors) = case bypass (\status acc -> status ? acc + one $ acc) zero neighbors of
+liferule :: Around -> Status
+liferule (focused :*: neighbors) = case bypass (\status acc -> status ? acc + one $ acc) zero neighbors of
 	Natural (Natural Zero) -> focused
 	Natural (Natural (Natural Zero)) -> True
 	_ -> False
@@ -182,11 +155,4 @@ instance Show Natural where
 	show Zero = "0"
 	show (Natural n) = "1" <> show n
 
--- main = lifecycle (rule90 . neighbourhood) start
--- main = lifecycle_2d (blinker . around) initial
-
-main = do
-	print $ take_n (natural 5) [] $ display_1d (natural 5) <$> (sub @Up ^. initial)
-	print $ take_n (natural 5) [] $ display_1d (natural 5) <$> (sub @Down ^. initial)
-	print $ take_n (natural 5) [] `map` display_1d (natural 5) (sub @Left ^. initial)
-	print $ take_n (natural 5) [] `map` display_1d (natural 5) (sub @Right ^. initial)
+main = lifecycle_2d (liferule . around) initial
