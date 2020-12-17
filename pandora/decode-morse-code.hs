@@ -90,5 +90,7 @@ decode x = current @Dictionary >>= cut x >>= replace
 digit4 :: Stack Morse
 digit4 = insert Dot . insert Dot . insert Dot . insert Dot . insert Dash $ empty
 
-main = maybe (print "Not found...") (print . extract . attached)
-	. run @(State Dictionary :> Maybe) % dictionary $ digit4 ->> decode
+-- FIXME: use `resolve (print . extract . attached) (print "Not found...")` instead
+main = case run @(State Dictionary :> Maybe) % dictionary $ digit4 ->> decode of
+	Just r -> print . extract . attached $ r
+	Nothing -> print "Not found..."

@@ -47,13 +47,16 @@ keep :: Checking t => Style -> t ()
 keep style = current @Trace >>= zoom @Trace (sub @Right)
 	. replace . (|- (insert %)) . ((style :*:) <-> identity)
 
+-- FIXME: use `resolve (|- f) on_empty` instad pattern matching
 latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
-latest on_empty f = view (focus @Head) . extract <$> current @Trace >>= maybe on_empty (|- f)
+latest on_empty f = view (focus @Head) . extract <$> current @Trace >>= \case
+	Just x -> x |- f
+	Nothing -> on_empty
 
 match :: Checking t => Style -> Index -> Style -> t ()
 match closed i opened = closed == opened
 	? (zoom @Trace (sub @Right) . modify $ pop @Open)
-	$ mismatch closed opened i
+		$ mismatch closed opened i
 
 indexate :: Checking t => t ()
 indexate = zoom @Trace (sub @Left) $ modify @Index succ

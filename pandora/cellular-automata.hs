@@ -31,8 +31,8 @@ rule90 (False :*: False :*: False) = False
 neighbourhood :: Field -> Neighbours
 neighbourhood z = extract (sub @Left ^. z) :*: extract z :*: extract (sub @Right ^. z)
 
-display_1d :: Natural -> Zipper Stream a -> [a]
-display_1d n (Tap x (TU (bs :^: fs))) = take_n n [] bs <> [x] <> reverse (take_n n [] fs)
+display :: Natural -> Zipper Stream a -> [a]
+display n (Tap x (TU (bs :^: fs))) = take_n n [] bs <> [x] <> reverse (take_n n [] fs)
 
 take_n :: Natural -> [a] -> Stream a -> [a]
 take_n (Natural n) r (Construct x (Identity next)) = take_n n (x : r) next
@@ -45,11 +45,11 @@ natural :: Int -> Natural
 natural n = n == 0 ? Zero $ Natural . natural $ n - 1
 
 instance Monotonic (Construction Identity a) a where
-	bypass f r ~(Construct x (Identity xs)) = f x $ bypass f r xs
+	reduce f r ~(Construct x (Identity xs)) = f x $ reduce f r xs
 
 lifecycle_1d act being = do
 	threadDelay 1000000
-	print $ display_1d (natural 25) being
+	print $ display (natural 25) being
 	lifecycle_1d act $ being =>> act
 
 --------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ instance Extendable II where
 		vertical z = Tap z . TU $ move (TU . rotate @Left . run) z :^: move (TU . rotate @Right . run) z
 
 		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
-		move act = extract . deconstruct . iterate (point . act)
+		move f x = extract . deconstruct $ point . f .-+ x
 
 instance Substructure Down (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) where
 	type Substructural Down (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) a = Stream :. Zipper Stream := a
@@ -127,14 +127,14 @@ initial = TU . Tap one . TU $ only :^: only where
 	noone = Tap False . TU $ repeat False :^: repeat False
 
 liferule :: Around -> Status
-liferule (focused :*: neighbors) = case bypass (\status acc -> status ? acc + one $ acc) zero neighbors of
+liferule (focused :*: neighbors) = case reduce (\status acc -> status ? acc + one $ acc) zero neighbors of
 	Natural (Natural Zero) -> focused
 	Natural (Natural (Natural Zero)) -> True
 	_ -> False
 
 display_2d :: Natural -> II Status -> [[Status]]
-display_2d n (TU (Tap x (TU (bs :^: fs)))) = (take_n n [] $ display_1d n <$> bs)
-	<> [display_1d n x] <> reverse (take_n n [] $ display_1d n <$> fs)
+display_2d n (TU (Tap x (TU (bs :^: fs)))) = (take_n n [] $ display n <$> bs)
+	<> [display n x] <> reverse (take_n n [] $ display n <$> fs)
 
 lifecycle_2d :: (II Status -> Status) -> II Status -> IO ()
 lifecycle_2d act being = do
