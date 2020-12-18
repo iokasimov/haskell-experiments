@@ -171,6 +171,30 @@ executable base-effectful-bft
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable base-sequence-literal
+  main-is: base/sequence-literal.hs
+  build-depends: base, transformers
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleInstances,
+    FlexibleContexts,
+    LambdaCase,
+    MultiParamTypeClasses,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable base-resumption
   main-is: base/resumption.hs
   build-depends: base, transformers
