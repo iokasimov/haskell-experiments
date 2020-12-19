@@ -171,6 +171,32 @@ executable base-effectful-bft
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable base-probability-distribution
+  main-is: base/probability-distribution.hs
+  build-depends: base, transformers, random
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    FlexibleInstances,
+    GeneralizedNewtypeDeriving,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TupleSections,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    TypeSynonymInstances
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable base-sequence-literal
   main-is: base/sequence-literal.hs
   build-depends: base, transformers
