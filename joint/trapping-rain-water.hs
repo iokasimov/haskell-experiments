@@ -1,7 +1,5 @@
 module Main where
 
--- Source: https://chrisdone.com/posts/twitter-problem-loeb/
-
 import "base" Data.Traversable (for)
 import "transformers" Data.Functor.Reverse (Reverse (Reverse))
 import "joint" Control.Joint (Stateful, State, current, modify, run)

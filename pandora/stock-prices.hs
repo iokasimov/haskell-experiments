@@ -1,7 +1,6 @@
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
--- import "pandora-io" Pandora.IO
 
 import Prelude (Int, Show, print)
 import qualified Prelude as P
