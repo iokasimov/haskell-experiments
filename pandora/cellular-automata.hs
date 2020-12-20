@@ -1,12 +1,11 @@
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
+import "pandora-io" Pandora.IO
 
 import GHC.Int (Int, eqInt)
 import Prelude (IO, Char, Show (show), putStr, print, reverse, (-), (<>), map)
 import Control.Concurrent (threadDelay)
-
-import qualified Prelude as Prelude (traverse)
 
 type Status = Boolean
 
@@ -41,16 +40,22 @@ take_n Zero r _ = r
 instance Setoid Int where
 	x == y = if eqInt x y then True else False
 
-natural :: Int -> Natural
-natural n = n == 0 ? Zero $ Natural . natural $ n - 1
+nat :: Int -> Natural
+nat n = n == 0 ? Zero $ Natural . nat $ n - 1
 
 instance Monotonic (Construction Identity a) a where
 	reduce f r ~(Construct x (Identity xs)) = f x $ reduce f r xs
 
-lifecycle_1d act being = do
-	threadDelay 1000000
-	print $ display (natural 25) being
-	lifecycle_1d act $ being =>> act
+record :: (Field -> Status) -> Field -> IO ()
+record act being = delay *> snapshot *> evolve where
+
+	evolve, snapshot :: IO ()
+	evolve = record act $ being =>> act
+	snapshot = print $ display (nat 25) being
+
+delay, purge :: IO ()
+delay = threadDelay 1000000
+purge = putStr "\ESC[2J"
 
 --------------------------------------------------------------------------------
 
@@ -120,28 +125,31 @@ initial = TU . Tap one . TU $ only :^: only where
 	only :: Stream :. Zipper Stream := Status
 	only = Construct one . Identity $ repeat noone
 
-	one :: Zipper Stream Status
-	one = Tap True . TU $ (Construct True . Identity $ repeat False) :^: (Construct True . Identity $ repeat False)
-
-	noone :: Zipper Stream Status
+	one, noone :: Zipper Stream Status
+	one = Tap True . TU $ alone :^: alone
 	noone = Tap False . TU $ repeat False :^: repeat False
 
-liferule :: Around -> Status
-liferule (focused :*: neighbors) = case reduce (\status acc -> status ? acc + one $ acc) zero neighbors of
-	Natural (Natural Zero) -> focused
-	Natural (Natural (Natural Zero)) -> True
-	_ -> False
+	alone :: Stream Status
+	alone = Construct True . Identity $ repeat False
+
+conway :: Around -> Status
+conway (focused :*: neighbors) = let count status acc = status ? acc + one $ acc
+	in case reduce count zero neighbors of
+		Natural (Natural Zero) -> focused
+		Natural (Natural (Natural Zero)) -> True
+		_ -> False
 
 display_2d :: Natural -> II Status -> [[Status]]
 display_2d n (TU (Tap x (TU (bs :^: fs)))) = (take_n n [] $ display n <$> bs)
 	<> [display n x] <> reverse (take_n n [] $ display n <$> fs)
 
-lifecycle_2d :: (II Status -> Status) -> II Status -> IO ()
-lifecycle_2d act being = do
-	threadDelay 1000000
-	putStr "\ESC[2J"
-	Prelude.traverse print $ display_2d (natural 15) being
-	lifecycle_2d act $ being =>> act
+lifecycle :: (II Status -> Status) -> II Status -> IO ()
+lifecycle act being = delay *> purge *> snapshot *> evolve where
+
+	evolve, snapshot :: IO ()
+	evolve = lifecycle act $ being =>> act
+	snapshot = void $ let screen = display (nat 15)
+		in screen (screen <$> run being) ->> print
 
 --------------------------------------------------------------------------------
 
@@ -155,4 +163,11 @@ instance Show Natural where
 	show Zero = "0"
 	show (Natural n) = "1" <> show n
 
-main = lifecycle_2d (liferule . around) initial
+instance Covariant [] where
+	f <$> xs = map f xs
+
+instance Traversable [] where
+	[] ->> _ = point []
+	(x : xs) ->> f = (:) <$> f x <*> xs ->> f
+
+main = lifecycle (conway . around) initial
