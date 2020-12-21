@@ -1,15 +1,19 @@
 module Main where
 
-import "base" Control.Applicative (Alternative (empty, (<|>)))
-import "joint" Control.Joint (Adaptable (adapt), Stateful, State, current, modify, run, type (:>), type (:=))
+import "base" Control.Applicative (Alternative ((<|>)))
+import "joint" Control.Joint (Adaptable (adapt), Stateful, State
+	, current, replace, run, type (:>), type (:=))
 
 type Prices = [Int]
 
-max_profit :: State Prices :> [] := Int
+max_profit :: State Prices :> [] := (Int, Int, Int)
 max_profit = current @Prices >>= \case
-	(buy : []) -> pure $ negate buy
-	(buy : sales) -> (+) (negate buy) <$> adapt sales <|> modify (const sales) *> max_profit
-	[] -> pure 0
+	[] -> pure (0, 0, 0)
+	(buy : rest) ->
+		let result sell = (sell - buy, buy, sell) in
+		let now = result <$> adapt rest in
+		let later = replace rest *> max_profit in
+		now <|> later
 
 prices :: Prices
 prices = [10, 7, 5, 8, 11, 9]
