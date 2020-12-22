@@ -3,31 +3,50 @@ import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
-import Prelude (Int, Show, print)
+import Prelude (Int, Show, print, (-), compare)
+import qualified Prelude as P
 
 type Prices = Nonempty Stack Int
 
-step :: Prices -> Maybe :. Nonempty Stack := Int :*: Int
-step prices = (:*:) buy <$$> sales where
+maximum :: (Monotonic (t a) a, Monoid a, Supremum a) => t a -> a
+maximum = reduce (\/) zero
 
-	buy :: Int
-	buy = extract prices
+data Transaction = Transaction Int Int deriving Show
 
-	sales :: Maybe :. Nonempty Stack := Int
-	sales = deconstruct prices
+instance Semigroup Transaction where
+	Transaction buy sell + Transaction buy' sell' =
+		Transaction (buy + buy') (sell + sell')
+
+instance Monoid Transaction where
+	zero = Transaction 0 0
+
+instance Supremum Transaction where
+	Transaction buy sell \/ Transaction buy' sell' =
+		case compare (sell - buy) (sell' - buy') of
+			P.GT -> Transaction buy sell
+			P.EQ -> Transaction buy sell
+			P.LT -> Transaction buy' sell'
+
+type Potentials = Stack Transaction
+
+stonks :: Prices -> Transaction
+stonks prices = top $ prices =>> potential where
+
+	potential :: Prices -> Stack := Transaction
+	potential remaining = TU $ Transaction (extract remaining) <$$> deconstruct remaining
+
+	top :: Construction Maybe Potentials -> Transaction
+	top = maximum . reduce @_ @Potentials (+) empty
 
 --------------------------------------------------------------------------------
 
 example :: Prices
-example = insert 10 $ insert 7 $ insert 5 $ insert 8 $ insert 11 $ point 9
--- example = insert 1 $ insert 3 $ insert 2 $ insert 8 $ insert 4 $ point 10
+example = insert 9 $ insert 11 $ insert 8 $ insert 5 $ insert 7 $ point 10
+-- example = insert 10 $ insert 7 $ insert 5 $ insert 8 $ insert 11 $ point 9
 
--- x = run $ Comprehension example >>= Comprehension . insert 0 . insert % empty
--- x = (:*:) <$> Comprehension example <*> Comprehension example
-
-listify :: [a] -> Nonempty Stack a -> [a]
-listify r (Construct x (Just next)) = listify (x : r) next
-listify r (Construct x Nothing) = x : r
+listify :: [a] -> Stack a -> [a]
+listify r (TU (Just (Construct x next))) = listify (x : r) $ TU next
+listify r (TU Nothing) = r
 
 instance Covariant [] where
 	f <$> [] = []
@@ -40,6 +59,9 @@ instance Traversable [] where
 deriving instance (Show a, Show b) => Show (a :*: b)
 deriving instance Show a => Show (Maybe a)
 
-main = do
-	print "typechecked"
-	(listify [] <$$> listify [] (example =>> step)) ->> print
+instance Semigroup Int where (+) = (P.+)
+instance Monoid Int where zero = 0
+instance Infimum Int where (/\) = P.min
+instance Supremum Int where (\/) = P.max
+
+main = print $ stonks example
