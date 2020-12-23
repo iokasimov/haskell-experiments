@@ -1,11 +1,12 @@
+import "base" Control.Concurrent (threadDelay)
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
-import GHC.Int (Int, eqInt)
-import Prelude (IO, Char, Show (show), putStr, print, reverse, (-), (<>), map)
-import Control.Concurrent (threadDelay)
+import Gears.Instances
+
+import Prelude (IO, Char, Int, putStr, print, reverse, (-), (<>))
 
 type Status = Boolean
 
@@ -36,9 +37,6 @@ display n (Tap x (TU (bs :^: fs))) = take_n n [] bs <> [x] <> reverse (take_n n 
 take_n :: Natural -> [a] -> Stream a -> [a]
 take_n (Natural n) r (Construct x (Identity next)) = take_n n (x : r) next
 take_n Zero r _ = r
-
-instance Setoid Int where
-	x == y = if eqInt x y then True else False
 
 nat :: Int -> Natural
 nat n = n == 0 ? Zero $ Natural . nat $ n - 1
@@ -152,22 +150,5 @@ lifecycle act being = delay *> purge *> snapshot *> evolve where
 		in screen (screen <$> run being) ->> print
 
 --------------------------------------------------------------------------------
-
-deriving instance (Show a, Show b) => Show (a :*: b)
-
-instance Show Boolean where
-	show True = "*"
-	show False = " "
-
-instance Show Natural where
-	show Zero = "0"
-	show (Natural n) = "1" <> show n
-
-instance Covariant [] where
-	f <$> xs = map f xs
-
-instance Traversable [] where
-	[] ->> _ = point []
-	(x : xs) ->> f = (:) <$> f x <*> xs ->> f
 
 main = lifecycle (conway . around) initial

@@ -33,6 +33,7 @@ library
     TypeSynonymInstances,
     ViewPatterns
   exposed-modules:
+    Gears.Instances
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-batch

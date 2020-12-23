@@ -5,6 +5,8 @@ import "pandora" Pandora.Pattern
 import Prelude (Int, Show, print)
 import qualified Prelude as P
 
+import Gears.Instances
+
 type Vector v a = Monotonic v a
 
 vector_total_sum :: Vector v Int => v -> Int
@@ -29,9 +31,6 @@ type V5 a = a :*: a :*: a :*: a :*: a
 
 vector_example :: V5 Int
 vector_example = 1 :*: 2 :*: 3 :*: 4 :*: 5
-
-deriving instance (Show a, Show b) => Show (a :*: b)
-instance Semigroup Int where (+) = (P.+)
 
 last :: V5 Int -> Int
 last = reduce (\x r -> x) P.undefined

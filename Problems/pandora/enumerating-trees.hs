@@ -5,6 +5,8 @@ import "pandora-io" Pandora.IO
 
 import Prelude (Int, Show, print)
 
+import Gears.Instances
+
 -- enumerate :: Nonempty Stack Int ->
 -- enumerate elements = extract elements <$> deconstruct elements
 
@@ -14,8 +16,8 @@ listify :: [a] -> Stack a -> [a]
 listify r (TU (Just (Construct x next))) = listify (x : r) $ TU next
 listify r (TU Nothing) = r
 
-deriving instance (Show a, Show b) => Show (a :*: b)
-deriving instance Show a => Show (Maybe a)
+-- deriving instance (Show a, Show b) => Show (a :*: b)
+-- deriving instance Show a => Show (Maybe a)
 
 --------------------------------------------------------------------------------
 

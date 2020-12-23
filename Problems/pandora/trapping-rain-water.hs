@@ -5,6 +5,8 @@ import "pandora" Pandora.Pattern
 import Prelude (Int, print)
 import qualified Prelude as P
 
+import Gears.Instances
+
 type Peaksearch t u a = (Traversable t, Applicative u, Pointable u, Stateful a u, Supremum a)
 
 compute :: (Traversable t, Monoid a, Supremum a) => t a -> t a
@@ -20,11 +22,6 @@ compute = evaluate . max where
 	compare x = modify (x \/) *> current
 
 --------------------------------------------------------------------------------
-
-instance Semigroup Int where (+) = (P.+)
-instance Monoid Int where zero = 0
-instance Infimum Int where (/\) = P.min
-instance Supremum Int where (\/) = P.max
 
 walls :: Stack Int
 walls = insert 2 $ insert 5 $ insert 1 $ insert 2 $ insert 3 $ insert 4 $ insert 7 $ insert 7 $ insert 6 $ empty
