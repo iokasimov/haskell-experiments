@@ -2,15 +2,15 @@ import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 
-import Prelude (Int, Show, print)
+import Prelude (Int, print)
 import qualified Prelude as P
 
-import Gears.Instances
+import Gears.Instances ()
 
 type Vector v a = Monotonic v a
 
 vector_total_sum :: Vector v Int => v -> Int
-vector_total_sum = reduce (P.+) (0 :: Int)
+vector_total_sum = reduce @_ @Int (+) 0
 
 type Matrix m v a = (Monotonic m v, Vector v a)
 

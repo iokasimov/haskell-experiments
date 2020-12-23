@@ -46,8 +46,4 @@ example :: Prices
 example = insert 9 $ insert 11 $ insert 8 $ insert 5 $ insert 7 $ point 10
 -- example = insert 10 $ insert 7 $ insert 5 $ insert 8 $ insert 11 $ point 9
 
-listify :: [a] -> Stack a -> [a]
-listify r (TU (Just (Construct x next))) = listify (x : r) $ TU next
-listify r (TU Nothing) = r
-
 main = print $ stonks example

@@ -34,6 +34,7 @@ library
     ViewPatterns
   exposed-modules:
     Gears.Instances
+    Gears.Utils
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-batch

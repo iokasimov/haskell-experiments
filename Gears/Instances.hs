@@ -3,7 +3,6 @@ module Gears.Instances where
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
--- import "pandora-io" Pandora.IO
 
 import qualified GHC.Int as Base (eqInt)
 import qualified Prelude as Base (Int, Semigroup ((<>)), Show (show), min, max, (+), (-))
@@ -18,6 +17,7 @@ instance Traversable [] where
 
 deriving instance (Base.Show a, Base.Show b) => Base.Show (a :*: b)
 deriving instance Base.Show a => Base.Show (Maybe a)
+deriving instance Base.Show a => Base.Show (Delta a)
 
 instance Base.Show Boolean where
 	show True = "*"

@@ -5,7 +5,7 @@ import "pandora-io" Pandora.IO
 
 import Prelude (Int, Show, print)
 
-import Gears.Instances
+import Gears.Instances ()
 
 -- enumerate :: Nonempty Stack Int ->
 -- enumerate elements = extract elements <$> deconstruct elements

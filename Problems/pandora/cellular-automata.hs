@@ -1,10 +1,12 @@
 import "base" Control.Concurrent (threadDelay)
+import "base" Data.List (take)
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
-import Gears.Instances
+import Gears.Instances ()
+import Gears.Utils (stream_to_list)
 
 import Prelude (IO, Char, Int, putStr, print, reverse, (-), (<>))
 
@@ -31,15 +33,8 @@ rule90 (False :*: False :*: False) = False
 neighbourhood :: Field -> Neighbours
 neighbourhood z = extract (sub @Left ^. z) :*: extract z :*: extract (sub @Right ^. z)
 
-display :: Natural -> Zipper Stream a -> [a]
-display n (Tap x (TU (bs :^: fs))) = take_n n [] bs <> [x] <> reverse (take_n n [] fs)
-
-take_n :: Natural -> [a] -> Stream a -> [a]
-take_n (Natural n) r (Construct x (Identity next)) = take_n n (x : r) next
-take_n Zero r _ = r
-
-nat :: Int -> Natural
-nat n = n == 0 ? Zero $ Natural . nat $ n - 1
+display :: Int -> Zipper Stream a -> [a]
+display n (Tap x (TU (bs :^: fs))) = take n (stream_to_list bs) <> [x] <> reverse (take n $ stream_to_list fs)
 
 instance Monotonic (Construction Identity a) a where
 	reduce f r ~(Construct x (Identity xs)) = f x $ reduce f r xs
@@ -49,7 +44,7 @@ record act being = delay *> snapshot *> evolve where
 
 	evolve, snapshot :: IO ()
 	evolve = record act $ being =>> act
-	snapshot = print $ display (nat 25) being
+	snapshot = print $ display 25 being
 
 delay, purge :: IO ()
 delay = threadDelay 1000000
@@ -137,16 +132,12 @@ conway (focused :*: neighbors) = let count status acc = status ? acc + one $ acc
 		Natural (Natural (Natural Zero)) -> True
 		_ -> False
 
-display_2d :: Natural -> II Status -> [[Status]]
-display_2d n (TU (Tap x (TU (bs :^: fs)))) = (take_n n [] $ display n <$> bs)
-	<> [display n x] <> reverse (take_n n [] $ display n <$> fs)
-
 lifecycle :: (II Status -> Status) -> II Status -> IO ()
 lifecycle act being = delay *> purge *> snapshot *> evolve where
 
 	evolve, snapshot :: IO ()
 	evolve = lifecycle act $ being =>> act
-	snapshot = void $ let screen = display (nat 15)
+	snapshot = void $ let screen = display 15
 		in screen (screen <$> run being) ->> print
 
 --------------------------------------------------------------------------------
