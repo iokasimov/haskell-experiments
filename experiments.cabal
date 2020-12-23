@@ -9,8 +9,34 @@ build-type: Simple
 extra-source-files: README.md
 cabal-version: >=1.10
 
+library
+  build-depends: base, pandora, pandora-io
+  default-extensions:
+    ConstraintKinds,
+    DataKinds,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    FlexibleInstances,
+    LambdaCase,
+    LiberalTypeSynonyms,
+    MultiParamTypeClasses,
+    NoImplicitPrelude,
+    OverloadedStrings,
+    PackageImports,
+    PolyKinds,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators,
+    TypeSynonymInstances,
+    ViewPatterns
+  exposed-modules:
+  ghc-options: -Wall -fno-warn-tabs
+
 executable base-batch
-  main-is: base/Batch.hs
+  main-is: Problems/base/Batch.hs
   build-depends: base
   default-extensions:
     DataKinds,
@@ -33,7 +59,7 @@ executable base-batch
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-binary-tree-zipper
-  main-is: base/binary-tree-zipper.hs
+  main-is: Problems/base/binary-tree-zipper.hs
   build-depends: base
   default-extensions:
     DataKinds,
@@ -57,7 +83,7 @@ executable base-binary-tree-zipper
 
 
 executable base-concurrency
-  main-is: base/Concurrency.hs
+  main-is: Problems/base/Concurrency.hs
   build-depends: base, mtl
   default-extensions:
     DataKinds,
@@ -80,7 +106,7 @@ executable base-concurrency
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-comonadic-life
-  main-is: base/comonadic-life.hs
+  main-is: Problems/base/comonadic-life.hs
   build-depends: base, comonad, mtl
   default-extensions:
     DataKinds,
@@ -103,7 +129,7 @@ executable base-comonadic-life
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-conway-game-of-life
-  main-is: base/conway-game-of-life.hs
+  main-is: Problems/base/conway-game-of-life.hs
   build-depends: base, mtl
   default-extensions:
     DataKinds,
@@ -127,7 +153,7 @@ executable base-conway-game-of-life
 
 
 executable base-decode-morse-code
-  main-is: base/decode-morse-code.hs
+  main-is: Problems/base/decode-morse-code.hs
   build-depends: base, comonad, free, transformers
   default-extensions:
     DataKinds,
@@ -149,7 +175,7 @@ executable base-decode-morse-code
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-effectful-bft
-  main-is: base/effectful-bft.hs
+  main-is: Problems/base/effectful-bft.hs
   build-depends: base, comonad, free
   default-extensions:
     DataKinds,
@@ -172,7 +198,7 @@ executable base-effectful-bft
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-probability-distribution
-  main-is: base/probability-distribution.hs
+  main-is: Problems/base/probability-distribution.hs
   build-depends: base, transformers, random
   default-extensions:
     DataKinds,
@@ -198,7 +224,7 @@ executable base-probability-distribution
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-sequence-literal
-  main-is: base/sequence-literal.hs
+  main-is: Problems/base/sequence-literal.hs
   build-depends: base, transformers
   default-extensions:
     DataKinds,
@@ -222,7 +248,7 @@ executable base-sequence-literal
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-resumption
-  main-is: base/resumption.hs
+  main-is: Problems/base/resumption.hs
   build-depends: base, transformers
   default-extensions:
     DataKinds,
@@ -244,7 +270,7 @@ executable base-resumption
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-reversing-a-list-with-continuations
-  main-is: base/reversing-a-list-with-continuations.hs
+  main-is: Problems/base/reversing-a-list-with-continuations.hs
   build-depends: base, transformers
   default-extensions:
     DataKinds,
@@ -266,7 +292,7 @@ executable base-reversing-a-list-with-continuations
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-trapping-rain-water
-  main-is: base/trapping-rain-water.hs
+  main-is: Problems/base/trapping-rain-water.hs
   build-depends: base, transformers
   default-extensions:
     DataKinds,
@@ -288,7 +314,7 @@ executable base-trapping-rain-water
   ghc-options: -Wall -fno-warn-tabs
 
 executable base-wolf-goat-cabbage
-  main-is: base/wolf-goat-cabbage.hs
+  main-is: Problems/base/wolf-goat-cabbage.hs
   build-depends: base
   default-extensions:
     DataKinds,
@@ -311,7 +337,7 @@ executable base-wolf-goat-cabbage
   ghc-options: -Wall -fno-warn-tabs
 
 executable joint-adjunctions
-  main-is: joint/adjunctions.hs
+  main-is: Problems/joint/adjunctions.hs
   build-depends: base, comonad, joint
   default-extensions:
     DataKinds,
@@ -332,7 +358,7 @@ executable joint-adjunctions
   ghc-options: -Wall -fno-warn-tabs
 
 executable joint-balanced-parentheses
-  main-is: joint/balanced-parentheses.hs
+  main-is: Problems/joint/balanced-parentheses.hs
   build-depends: base, joint, lens
   default-extensions:
     DataKinds,
@@ -351,7 +377,7 @@ executable joint-balanced-parentheses
   ghc-options: -Wall -fno-warn-tabs
 
 executable joint-cellular-automata
-  main-is: joint/cellular-automata.hs
+  main-is: Problems/joint/cellular-automata.hs
   build-depends: base, joint, comonad, free, lens
   default-extensions:
     DataKinds,
@@ -373,7 +399,7 @@ executable joint-cellular-automata
   ghc-options: -Wall -fno-warn-tabs
 
 executable joint-stock-prices
-  main-is: joint/stock-prices.hs
+  main-is: Problems/joint/stock-prices.hs
   build-depends: base, joint, lens
   default-extensions:
     DataKinds,
@@ -391,7 +417,7 @@ executable joint-stock-prices
   ghc-options: -Wall -fno-warn-tabs
 
 executable joint-trapping-rain-water
-  main-is: joint/trapping-rain-water.hs
+  main-is: Problems/joint/trapping-rain-water.hs
   build-depends: base, joint, transformers
   default-extensions:
     DataKinds,
@@ -409,7 +435,7 @@ executable joint-trapping-rain-water
   ghc-options: -Wall -fno-warn-tabs
 
 executable joint-wolf-goat-cabbage
-  main-is: joint/wolf-goat-cabbage.hs
+  main-is: Problems/joint/wolf-goat-cabbage.hs
   build-depends: base, joint, lens, transformers, distributive
   default-extensions:
     ConstraintKinds,
@@ -430,7 +456,7 @@ executable joint-wolf-goat-cabbage
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-balanced-parentheses
-  main-is: pandora/balanced-parentheses.hs
+  main-is: Problems/pandora/balanced-parentheses.hs
   build-depends: base, pandora
   default-extensions:
     ConstraintKinds,
@@ -454,7 +480,7 @@ executable pandora-balanced-parentheses
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-binary-tree-zipper
-  main-is: pandora/binary-tree-zipper.hs
+  main-is: Problems/pandora/binary-tree-zipper.hs
   build-depends: base, pandora
   default-extensions:
     DataKinds,
@@ -477,7 +503,7 @@ executable pandora-binary-tree-zipper
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-cellular-automata
-  main-is: pandora/cellular-automata.hs
+  main-is: Problems/pandora/cellular-automata.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     ConstraintKinds,
@@ -505,7 +531,7 @@ executable pandora-cellular-automata
   ghc-options: -Wall -fno-warn-tabs -fno-strictness -fno-warn-orphans
 
 executable pandora-decode-morse-code
-  main-is: pandora/decode-morse-code.hs
+  main-is: Problems/pandora/decode-morse-code.hs
   build-depends: base, pandora
   default-extensions:
     DataKinds,
@@ -528,7 +554,7 @@ executable pandora-decode-morse-code
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-enumerating-trees
-  main-is: pandora/enumerating-trees.hs
+  main-is: Problems/pandora/enumerating-trees.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     DataKinds,
@@ -551,7 +577,7 @@ executable pandora-enumerating-trees
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-json-parser
-  main-is: pandora/json-parser.hs
+  main-is: Problems/pandora/json-parser.hs
   build-depends: base, pandora
   default-extensions:
     DataKinds,
@@ -573,7 +599,7 @@ executable pandora-json-parser
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-matrix-in-clockwise-spiral
-  main-is: pandora/matrix-in-clockwise-spiral.hs
+  main-is: Problems/pandora/matrix-in-clockwise-spiral.hs
   build-depends: base, pandora
   default-extensions:
     ConstraintKinds,
@@ -599,7 +625,7 @@ executable pandora-matrix-in-clockwise-spiral
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-probability
-  main-is: pandora/Probability.hs
+  main-is: Problems/pandora/Probability.hs
   build-depends: base, pandora
   default-extensions:
     DataKinds,
@@ -623,7 +649,7 @@ executable pandora-probability
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-roman-numbers
-  main-is: pandora/roman-numbers.hs
+  main-is: Problems/pandora/roman-numbers.hs
   build-depends: base, pandora
   default-extensions:
     DataKinds,
@@ -648,7 +674,7 @@ executable pandora-roman-numbers
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-stock-prices
-  main-is: pandora/stock-prices.hs
+  main-is: Problems/pandora/stock-prices.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     ConstraintKinds,
@@ -674,7 +700,7 @@ executable pandora-stock-prices
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-trapping-rain-water
-  main-is: pandora/trapping-rain-water.hs
+  main-is: Problems/pandora/trapping-rain-water.hs
   build-depends: base, pandora
   default-extensions:
     ConstraintKinds,
@@ -700,7 +726,7 @@ executable pandora-trapping-rain-water
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-wolf-goat-cabbage
-  main-is: pandora/wolf-goat-cabbage.hs
+  main-is: Problems/pandora/wolf-goat-cabbage.hs
   build-depends: base, pandora
   default-extensions:
     ConstraintKinds,
