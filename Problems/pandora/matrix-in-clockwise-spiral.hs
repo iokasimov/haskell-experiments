@@ -7,12 +7,12 @@ import qualified Prelude as P
 
 import Gears.Instances ()
 
-type Vector v a = Monotonic v a
+type Vector v a = Monotonic a v
 
 vector_total_sum :: Vector v Int => v -> Int
-vector_total_sum = reduce @_ @Int (+) 0
+vector_total_sum = reduce @Int (+) 0
 
-type Matrix m v a = (Monotonic m v, Vector v a)
+type Matrix m v a = (Monotonic v m, Vector v a)
 
 --------------------------------------------------------------------------------
 

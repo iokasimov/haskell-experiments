@@ -4,43 +4,43 @@ import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
 import Prelude (Int, Show, print, (-), compare)
-import qualified Prelude as P
+import qualified Prelude as Base (Ordering (GT, EQ, LT))
 
 import Gears.Instances
 
 type Prices = Nonempty Stack Int
 
-maximum :: (Monotonic (t a) a, Monoid a, Supremum a) => t a -> a
-maximum = reduce (\/) zero
+type Potential = Stack Closed
 
-data Transaction = Transaction Int Int deriving Show
-
-instance Semigroup Transaction where
-	Transaction buy sell + Transaction buy' sell' =
-		Transaction (buy + buy') (sell + sell')
-
-instance Monoid Transaction where
-	zero = Transaction 0 0
-
-instance Supremum Transaction where
-	Transaction buy sell \/ Transaction buy' sell' =
-		case compare (sell - buy) (sell' - buy') of
-			P.GT -> Transaction buy sell
-			P.EQ -> Transaction buy sell
-			P.LT -> Transaction buy' sell'
-
-type Potentials = Stack Transaction
-
-stonks :: Prices -> Transaction
+stonks :: Prices -> Closed
 stonks prices = top $ prices =>> potential where
 
-	potential :: Prices -> Stack := Transaction
-	potential remaining = TU $ Transaction (extract remaining) <$$> deconstruct remaining
+	potential :: Prices -> Stack := Closed
+	potential remaining = let buy = extract remaining in
+		unite $ Closed buy <$$> deconstruct remaining
 
-	top :: Nonempty Stack Potentials -> Transaction
-	top = maximum . reduce @_ @Potentials (+) empty
+	top :: Nonempty Stack Potential -> Closed
+	top = reduce (\/) zero . reduce @Potential (+) empty
+
+data Closed = Closed Int Int
+
+instance Semigroup Closed where
+	Closed buy sell + Closed buy' sell' =
+		Closed (buy + buy') (sell + sell')
+
+instance Monoid Closed where
+	zero = Closed 0 0
+
+instance Supremum Closed where
+	Closed buy sell \/ Closed buy' sell' =
+		case compare (sell - buy) (sell' - buy') of
+			Base.GT -> Closed buy sell
+			Base.EQ -> Closed buy sell
+			Base.LT -> Closed buy' sell'
 
 --------------------------------------------------------------------------------
+
+deriving instance Show Closed
 
 example :: Prices
 example = insert 9 $ insert 11 $ insert 8 $ insert 5 $ insert 7 $ point 10

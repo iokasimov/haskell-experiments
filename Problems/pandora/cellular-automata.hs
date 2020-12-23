@@ -36,7 +36,7 @@ neighbourhood z = extract (sub @Left ^. z) :*: extract z :*: extract (sub @Right
 display :: Int -> Zipper Stream a -> [a]
 display n (Tap x (TU (bs :^: fs))) = take n (stream_to_list bs) <> [x] <> reverse (take n $ stream_to_list fs)
 
-instance Monotonic (Construction Identity a) a where
+instance Monotonic a (Construction Identity a) where
 	reduce f r ~(Construct x (Identity xs)) = f x $ reduce f r xs
 
 record :: (Field -> Status) -> Field -> IO ()
