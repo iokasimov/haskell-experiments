@@ -5,7 +5,7 @@ import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 
 import qualified GHC.Int as Base (eqInt)
-import qualified Prelude as Base (Int, Semigroup ((<>)), Show (show), min, max, (+), (-))
+import qualified Prelude as Base (Int, Semigroup ((<>)), Show (show), min, max, take, (+), (-))
 
 import Gears.Instances ()
 
@@ -18,3 +18,6 @@ stream_to_list (Construct x (Identity next)) = x : stream_to_list next
 
 nat :: Base.Int -> Natural
 nat n = n == 0 ? Zero $ Natural . nat $ n Base.- 1
+
+take_n_stream :: Base.Int -> Stream ~> []
+take_n_stream n = Base.take n . stream_to_list

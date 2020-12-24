@@ -74,7 +74,7 @@ inspect s = indexate *> decide s
 type Checker = State (Index :*: Stack Open) :> Conclusion Stumble := ()
 
 check :: Traversable s => s Symbol -> IO ()
-check code = (code ->> inspect *> latest skip logjam :: Checker)
+check code = ((code ->> inspect) *> latest skip logjam :: Checker)
 	& run % (1 :*: empty) & conclusion print ((print "OK") !)
 
 deriving instance Show Shape

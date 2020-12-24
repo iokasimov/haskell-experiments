@@ -752,7 +752,7 @@ executable pandora-trapping-rain-water
 
 executable pandora-wolf-goat-cabbage
   main-is: Problems/pandora/wolf-goat-cabbage.hs
-  build-depends: base, pandora
+  build-depends: base, pandora, pandora-io
   default-extensions:
     ConstraintKinds,
     DataKinds,
