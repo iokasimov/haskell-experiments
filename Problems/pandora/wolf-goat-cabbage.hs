@@ -15,26 +15,12 @@ instance Setoid Character where
 	Cabbage == Cabbage = True
 	_ == _ = False
 
-instance Chain Character where
-	Wolf <=> Wolf = Equal
-	Wolf <=> Goat = Greater
-	Wolf <=> Cabbage = Equal
-	Goat <=> Wolf = Less
-	Goat <=> Goat = Equal
-	Goat <=> Cabbage = Greater
-	Cabbage <=> Wolf = Equal
-	Cabbage <=> Goat = Less
-	Cabbage <=> Cabbage = Equal
-
-class Survivable a where
-	survive :: a -> a -> Ordering
-
-instance Survivable Character where
-	survive Wolf Goat = Greater
-	survive Goat Wolf = Less
-	survive Goat Cabbage = Greater
-	survive Cabbage Goat = Less
-	survive _ _ = Equal
+survive :: Character -> Character -> Maybe ()
+survive Wolf Goat = Nothing
+survive Goat Wolf = Nothing
+survive Goat Cabbage = Nothing
+survive Cabbage Goat = Nothing
+survive _ _ = Just ()
 
 type River = Delta :. Stack := Character
 
@@ -44,50 +30,40 @@ start = characters :^: empty where
 	characters :: Stack Character
 	characters = insert Wolf $ insert Goat $ insert Cabbage $ empty
 
-data Way = Back | Forward
-
 type Enumeration = Comprehension Maybe
 
-route :: Stack Way
-route = unite . Just $ point . alter .-+ Forward where
+route :: Stream Boolean
+route = point . invert .-+ zero
 
-	alter :: Way -> Way
-	alter Back = Forward
-	alter Forward = Back
-
-step :: Way -> State River :> Enumeration := Maybe Character
-step way = bank >>= adapt . next >>= transport where
+step :: Boolean -> State River :> Enumeration := Maybe Character
+step way = bank >>=:> choice >>=:> transport where
 
 	bank :: (Covariant t, Stateful River t) => t :. Stack := Character
 	bank = view (source way) <$> current
 
-	source, target :: Way -> River :-. Stack Character
-	source Back = sub @Right
-	source Forward = sub @Left
-	target Back = sub @Left
-	target Forward = sub @Right
-
-	next :: Stack Character -> Enumeration :. Maybe := Character
-	next xs = Comprehension . filter valid . insert Nothing $ Just <$> xs where
+	choice :: Stack Character -> Enumeration :. Maybe := Character
+	choice xs = Comprehension . filter valid . insert Nothing $ Just <$> xs where
 
 		valid :: Predicate :. Maybe := Character
 		valid = Predicate $ resolve @() (True !) False . void . sequence . lunchtime
 
 		lunchtime :: Maybe Character -> Enumeration :. Maybe := ()
-		lunchtime x = coexist <$> boat x <*> boat x
+		lunchtime x = survive <$> boat x <*> boat x
 
 		boat Nothing = Comprehension xs
 		boat (Just x) = Comprehension $ delete x xs
 
-		coexist :: Character -> Character -> Maybe ()
-		coexist x y = survive x y == Equal ? Just () $ Nothing
-
+	transport :: Maybe Character |-> State River
 	transport Nothing = point Nothing
 	transport (Just x) = modify @River (leave . land) $> Just x where
 
 		leave, land :: River -> River
 		leave = source way %~ delete x
 		land = target way %~ insert x
+
+	source, target :: Boolean -> River :-. Stack Character
+	source = represent . invert
+	target = represent
 
 --------------------------------------------------------------------------------
 
@@ -99,5 +75,5 @@ instance Show Character where
 main = do
 	let path = take_n_stream 7 route
 	let result = run . run % start $ path ->> step
-	let moved = Predicate $ (==) (TU Nothing) . view (sub @Left) . attached
+	let moved = view (sub @Left) . attached >$< null
 	extract <$> filter moved result ->> print
