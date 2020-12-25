@@ -15,6 +15,11 @@ instance Setoid Character where
 	Cabbage == Cabbage = True
 	_ == _ = False
 
+instance Show Character where
+	show Wolf = "🐺"
+	show Goat = "🐐"
+	show Cabbage = "🥬"
+
 survive :: Character -> Character -> Maybe ()
 survive Wolf Goat = Nothing
 survive Goat Wolf = Nothing
@@ -24,34 +29,25 @@ survive _ _ = Just ()
 
 type River = Delta :. Stack := Character
 
-start :: River
-start = characters :^: empty where
-
-	characters :: Stack Character
-	characters = insert Wolf $ insert Goat $ insert Cabbage $ empty
-
 type Enumeration = Comprehension Maybe
 
-route :: Stream Boolean
-route = point . invert .-+ zero
-
 step :: Boolean -> State River :> Enumeration := Maybe Character
-step way = bank >>=:> choice >>=:> transport where
+step way = adapt bank >>=:> choice >>=:> transport where
 
-	bank :: (Covariant t, Stateful River t) => t :. Stack := Character
+	bank :: State River := Stack Character
 	bank = view (source way) <$> current
 
 	choice :: Stack Character -> Enumeration :. Maybe := Character
-	choice xs = Comprehension . filter valid . insert Nothing $ Just <$> xs where
+	choice xs = Comprehension . filter (not $ lunchtime >$< null) $ boats where
 
-		valid :: Predicate :. Maybe := Character
-		valid = Predicate $ resolve @() (True !) False . void . sequence . lunchtime
+		lunchtime :: Maybe Character -> Maybe :. Enumeration := ()
+		lunchtime x = sequence $ survive <$> selection x <*> selection x
 
-		lunchtime :: Maybe Character -> Enumeration :. Maybe := ()
-		lunchtime x = survive <$> boat x <*> boat x
+		selection :: Maybe Character -> Enumeration Character
+		selection = Comprehension . resolve @Character (delete % xs) xs
 
-		boat Nothing = Comprehension xs
-		boat (Just x) = Comprehension $ delete x xs
+		boats :: Stack :. Maybe := Character
+		boats = insert Nothing $ Just <$> xs
 
 	transport :: Maybe Character |-> State River
 	transport Nothing = point Nothing
@@ -67,13 +63,25 @@ step way = bank >>=:> choice >>=:> transport where
 
 --------------------------------------------------------------------------------
 
-instance Show Character where
-	show Wolf = "🐺"
-	show Goat = "🐐"
-	show Cabbage = "🥬"
+start :: River
+start = characters :^: empty where
 
-main = do
-	let path = take_n_stream 7 route
-	let result = run . run % start $ path ->> step
-	let moved = view (sub @Left) . attached >$< null
-	extract <$> filter moved result ->> print
+	characters :: Stack Character
+	characters = insert Wolf $ insert Goat $ insert Cabbage $ empty
+
+solution :: Stack [Maybe Character]
+solution = extract <$> filter moved result where
+
+	path :: [Boolean]
+	path = take_n_stream 7 route
+
+	route :: Stream Boolean
+	route = point . invert .-+ zero
+
+	result :: Stack (River :*: [Maybe Character])
+	result = run . run % start $ path ->> step
+
+	moved :: Predicate (River :*: [Maybe Character])
+	moved = null >&< view (sub @Left |> sub @Left)
+
+main = solution ->> print
