@@ -12,20 +12,13 @@ import Gears.Instances ()
 
 --------------------------------------------------------------------------------
 
-listify :: [a] -> Stack a -> [a]
-listify r (TU (Just (Construct x next))) = listify (x : r) $ TU next
-listify r (TU Nothing) = r
-
--- deriving instance (Show a, Show b) => Show (a :*: b)
--- deriving instance Show a => Show (Maybe a)
-
---------------------------------------------------------------------------------
-
 example :: Nonempty Stack Int
 example = insert 1 $ insert 2 $ insert 3 $ point 4
 
-comb = (:*:) <$> point (extract example) <*> Comprehension (TU $ deconstruct example)
+-- comb = (:*:) <$> point (extract example) <*> Comprehension (TU $ deconstruct example)
+comb = (:*:) <$> (Comprehension . unite $ Just example) <*> (Comprehension . unite $ Just example)
 
-main = do
-	void $ deconstruct example ->>> print
-	void $ comb ->> print
+example_zipper :: Zipper Stack Int
+example_zipper = Tap 1 . TU $ empty :^: unite (deconstruct example)
+
+main = void $ comb ->> print
