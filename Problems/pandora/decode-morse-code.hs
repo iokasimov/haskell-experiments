@@ -80,17 +80,19 @@ data Morse = Dot | Dash
 
 type Dictionary = Nonempty Binary Char
 
-cut :: (Pointable t, Optional t) => Morse -> Dictionary -> t Dictionary
-cut Dot = adapt . view (sub @Left)
-cut Dash = adapt . view (sub @Right)
+search :: Stack Morse -> Maybe Char
+search code = extract . attached <$> run @(State Dictionary :> Maybe) (code ->> decode) dictionary where
 
-decode :: (Monad t, Optional t, Stateful Dictionary t) => Morse -> t ()
-decode x = current @Dictionary >>= cut x >>= replace
+	decode :: (Monad t, Optional t, Stateful Dictionary t) => Morse -> t ()
+	decode x = current @Dictionary >>= cut x >>= replace
+
+	cut :: (Pointable t, Optional t) => Morse -> Dictionary -> t Dictionary
+	cut Dot = adapt . view (sub @Left)
+	cut Dash = adapt . view (sub @Right)
+
+--------------------------------------------------------------------------------
 
 digit4 :: Stack Morse
 digit4 = insert Dot . insert Dot . insert Dot . insert Dot . insert Dash $ empty
 
--- FIXME: use `resolve (print . extract . attached) (print "Not found...")` instead
-main = case run @(State Dictionary :> Maybe) % dictionary $ digit4 ->> decode of
-	Just r -> print . extract . attached $ r
-	Nothing -> print "Not found..."
+main = search digit4 & resolve @Char print (print "Not found...")

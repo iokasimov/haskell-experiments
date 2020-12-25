@@ -49,9 +49,8 @@ keep style = current @Trace >>= zoom @Trace (sub @Right)
 
 -- FIXME: use `resolve (|- f) on_empty` instad pattern matching
 latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
-latest on_empty f = view (focus @Head) . extract <$> current @Trace >>= \case
-	Just x -> x |- f
-	Nothing -> on_empty
+latest on_empty f = view (focus @Head) . extract <$> current @Trace
+	>>= resolve @Open (|- f) on_empty
 
 match :: Checking t => Style -> Index -> Style -> t ()
 match closed i opened = closed == opened
