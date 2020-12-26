@@ -83,7 +83,6 @@ executable base-binary-tree-zipper
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
-
 executable base-concurrency
   main-is: Problems/base/Concurrency.hs
   build-depends: base, mtl
@@ -163,6 +162,29 @@ executable base-decode-morse-code
     DeriveFoldable,
     ExplicitNamespaces,
     FlexibleContexts,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+executable base-enumerating-trees
+  main-is: Problems/base/enumerating-trees.hs
+  build-depends: base, comonad, free
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    GADTs,
     LambdaCase,
     OverloadedStrings,
     PackageImports,
