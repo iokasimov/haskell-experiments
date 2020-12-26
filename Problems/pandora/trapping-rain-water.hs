@@ -2,8 +2,7 @@ import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 
-import Prelude (Int, print)
-import qualified Prelude as P
+import Prelude (Int, print, (-))
 
 import Gears.Instances
 
@@ -21,10 +20,15 @@ compute = evaluate . max where
 	compare :: (Applicative t, Stateful a t, Supremum a) => a |-> t
 	compare x = modify (x \/) *> current
 
+trapped :: (Applicative t, Traversable t) => t Int -> t Int
+trapped ws = volume <$> compute ws <*> ws <*> via @Reverse compute ws where
+
+	volume :: Int -> Int -> Int -> Int
+	volume ls x rs = (ls /\ rs) - x
+
 --------------------------------------------------------------------------------
 
-walls :: Stack Int
-walls = insert 2 $ insert 5 $ insert 1 $ insert 2 $ insert 3 $ insert 4 $ insert 7 $ insert 7 $ insert 6 $ empty
+example :: Stack Int
+example = insert 2 $ insert 5 $ insert 1 $ insert 2 $ insert 3 $ insert 4 $ insert 7 $ insert 7 $ insert 6 $ empty
 
-main = let volume ls x rs = (ls /\ rs) P.- x in print . reduce @Int (+) 0
-	$ volume <$> compute walls <*> walls <*> via @Reverse compute walls
+main = print . reduce @Int (+) 0 $ trapped example
