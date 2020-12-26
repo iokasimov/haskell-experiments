@@ -7,39 +7,39 @@ import Prelude (Int, Show, print)
 
 import Gears.Instances
 
-type Prices = Nonempty Stack Int
+data Profit a = Profit a a
 
-type Potential = Stack Profit
-
-stonks :: Prices -> Profit
-stonks prices = top $ prices =>> potential where
-
-	potential :: Prices -> Stack := Profit
-	potential remaining = let buy = extract remaining in
-		unite $ Profit buy <$$> deconstruct remaining
-
-	top :: Nonempty Stack Potential -> Profit
-	top = reduce (\/) zero . reduce @Potential (+) empty
-
-data Profit = Profit Int Int
-
-instance Semigroup Profit where
+instance Semigroup a => Semigroup (Profit a) where
 	Profit buy sell + Profit buy' sell' =
 		Profit (buy + buy') (sell + sell')
 
-instance Monoid Profit where
-	zero = Profit 0 0
+instance Monoid a => Monoid (Profit a) where
+	zero = Profit zero zero
 
-instance Supremum Profit where
+instance (Chain a, Group a) => Supremum (Profit a) where
 	l@(Profit buy sell) \/ r@(Profit buy' sell') =
 		let cheaper = buy <=> buy' & order r l l
 		in sell - buy <=> sell' - buy' & order r cheaper l
 
+type Quotes = Nonempty Stack
+
+type Potential a = Stack :. Profit := a
+
+stonks :: forall a . (Chain a, Group a) => Quotes a -> Profit a
+stonks prices = top $ prices =>> potential where
+
+	potential :: Quotes a -> Stack := Profit a
+	potential remaining = let buy = extract remaining in
+		unite $ Profit buy <$$> deconstruct remaining
+
+	top :: Nonempty Stack (Potential a) -> Profit a
+	top = reduce (\/) zero . reduce @(Potential a) (+) empty
+
 --------------------------------------------------------------------------------
 
-deriving instance Show Profit
+deriving instance Show a => Show (Profit a)
 
-example :: Prices
+example :: Quotes Int
 example = insert 9 $ insert 11 $ insert 8 $ insert 5 $ insert 7 $ point 10
 -- example = insert 10 $ insert 7 $ insert 5 $ insert 8 $ insert 11 $ point 9
 
