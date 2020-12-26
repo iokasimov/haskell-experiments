@@ -58,7 +58,7 @@ step way = adapt bank >>=:> choice >>=:> transport where
 		land = target way %~ insert x
 
 	source, target :: Boolean -> River :-. Stack Character
-	source = represent . invert
+	source = represent . bool True False
 	target = represent
 
 --------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ solution = extract <$> filter moved result where
 	path = take_n_stream 7 route
 
 	route :: Stream Boolean
-	route = point . invert .-+ zero
+	route = point . bool True False .-+ zero
 
 	result :: Stack (River :*: [Maybe Character])
 	result = run . run % start $ path ->> step

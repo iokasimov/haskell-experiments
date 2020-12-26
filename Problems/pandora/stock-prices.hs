@@ -3,7 +3,7 @@ import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
-import Prelude (Int, Show, print, (-), compare)
+import Prelude (Int, Show, print, compare)
 import qualified Prelude as Base (Ordering (GT, EQ, LT))
 
 import Gears.Instances

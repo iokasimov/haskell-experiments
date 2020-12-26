@@ -2,29 +2,21 @@ import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 
-import Prelude (Int, print, (-))
+import Prelude (Int, print)
 
 import Gears.Instances
 
-type Peaksearch t u a = (Traversable t, Applicative u, Pointable u, Stateful a u, Supremum a)
+trapped :: forall a t . (Applicative t, Traversable t, Group a, Infimum a, Supremum a) => t a -> t a
+trapped walls = volume <$> peak walls <*> walls <*> peak @(Reverse t) -=: walls where
 
-compute :: (Traversable t, Monoid a, Supremum a) => t a -> t a
-compute = evaluate . max where
-
-	evaluate :: (Traversable t, Monoid a) => State a (t a) -> t a
-	evaluate = extract . run % zero
-
-	max :: Peaksearch t u a => t a |-> u
-	max xs = xs ->> compare
-
-	compare :: (Applicative t, Stateful a t, Supremum a) => a |-> t
-	compare x = modify (x \/) *> current
-
-trapped :: (Applicative t, Traversable t) => t Int -> t Int
-trapped ws = volume <$> compute ws <*> ws <*> via @Reverse compute ws where
-
-	volume :: Int -> Int -> Int -> Int
+	volume :: a -> a -> a -> a
 	volume ls x rs = (ls /\ rs) - x
+
+	peak :: Traversable v => v a -> v a
+	peak columns = extract . run % zero $ columns ->> compare
+
+	compare :: a |-> State a
+	compare x = modify (x \/) *> current
 
 --------------------------------------------------------------------------------
 
