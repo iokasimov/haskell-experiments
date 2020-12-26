@@ -19,5 +19,9 @@ stream_to_list (Construct x (Identity next)) = x : stream_to_list next
 nat :: Base.Int -> Natural
 nat n = n == 0 ? Zero $ Natural . nat $ n Base.- 1
 
+int :: Natural -> Base.Int
+int (Natural n) = 1 + int n
+int Zero = 0
+
 take_n_stream :: Base.Int -> Stream ~> []
 take_n_stream n = Base.take n . stream_to_list

@@ -6,20 +6,22 @@ import "pandora-io" Pandora.IO
 import Prelude (Int, Show, print)
 
 import Gears.Instances ()
+import Gears.Utils (int)
+
+zipper_to_binary_degenerated :: Zipper Stack ~> Nonempty Binary
+zipper_to_binary_degenerated (Tap x (TU (bs :^: fs))) = Construct x $ branches
+	(hoist (branch Left) <$> run bs) (hoist (branch Right) <$> run fs) where
+
+	branch :: a |-> Wye -> Maybe a -> Wye a
+	branch f (Just x) = f x
+	branch _ Nothing = End
+
 --------------------------------------------------------------------------------
 
 example :: Nonempty Stack Int
-example = insert 1 $ insert 2 $ insert 3 $ point 4
-
--- comb = (:*:) <$> point (extract example) <*> Comprehension (TU $ deconstruct example)
-comb = let stack = Comprehension . unite $ Just example in (:*:) <$> stack <*> stack
+example = insert 1 $ insert 2 $ point 3
 
 example_zipper :: Zipper Stack Int
 example_zipper = Tap 1 . TU $ empty :^: unite (deconstruct example)
 
--- enumerate :: Nonempty Stack Int ->
--- enumerate (TU Just $ nonempty) = Left $ Construct (extract nonempty) $ enumerate ()
--- enumerate (TU Nothing) = End
-
-main = void $ do
-	example ->> print
+main = void . print . extract $ example_zipper =>> int . cardinality

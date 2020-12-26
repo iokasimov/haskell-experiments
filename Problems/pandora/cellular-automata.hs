@@ -55,12 +55,6 @@ purge = putStr "\ESC[2J"
 -- type II = Zipper Stream <:.> Zipper Stream
 type II = Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)
 
-instance Covariant II where
-	f <$> TU zz = TU $ f <$$> zz
-
-instance Extractable II where
-	extract = extract . extract . run
-
 instance Extendable II where
 	zz =>> f = f <$> TU (horizontal <$> vertical zz) where
 
