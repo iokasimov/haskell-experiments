@@ -3,44 +3,41 @@ import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
-import Prelude (Int, Show, print, compare)
-import qualified Prelude as Base (Ordering (GT, EQ, LT))
+import Prelude (Int, Show, print)
 
 import Gears.Instances
 
 type Prices = Nonempty Stack Int
 
-type Potential = Stack Closed
+type Potential = Stack Profit
 
-stonks :: Prices -> Closed
+stonks :: Prices -> Profit
 stonks prices = top $ prices =>> potential where
 
-	potential :: Prices -> Stack := Closed
+	potential :: Prices -> Stack := Profit
 	potential remaining = let buy = extract remaining in
-		unite $ Closed buy <$$> deconstruct remaining
+		unite $ Profit buy <$$> deconstruct remaining
 
-	top :: Nonempty Stack Potential -> Closed
+	top :: Nonempty Stack Potential -> Profit
 	top = reduce (\/) zero . reduce @Potential (+) empty
 
-data Closed = Closed Int Int
+data Profit = Profit Int Int
 
-instance Semigroup Closed where
-	Closed buy sell + Closed buy' sell' =
-		Closed (buy + buy') (sell + sell')
+instance Semigroup Profit where
+	Profit buy sell + Profit buy' sell' =
+		Profit (buy + buy') (sell + sell')
 
-instance Monoid Closed where
-	zero = Closed 0 0
+instance Monoid Profit where
+	zero = Profit 0 0
 
-instance Supremum Closed where
-	Closed buy sell \/ Closed buy' sell' =
-		case compare (sell - buy) (sell' - buy') of
-			Base.GT -> Closed buy sell
-			Base.EQ -> Closed buy sell
-			Base.LT -> Closed buy' sell'
+instance Supremum Profit where
+	l@(Profit buy sell) \/ r@(Profit buy' sell') =
+		let cheaper = buy <=> buy' & order r l l
+		in sell - buy <=> sell' - buy' & order r cheaper l
 
 --------------------------------------------------------------------------------
 
-deriving instance Show Closed
+deriving instance Show Profit
 
 example :: Prices
 example = insert 9 $ insert 11 $ insert 8 $ insert 5 $ insert 7 $ point 10

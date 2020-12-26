@@ -50,3 +50,9 @@ instance Supremum Base.Int where
 
 instance Setoid Base.Int where
 	x == y = if Base.eqInt x y then True else False
+
+instance Chain Base.Int where
+	x <=> y = case Base.compare x y of
+		Base.GT -> Greater
+		Base.EQ -> Equal
+		Base.LT -> Less
