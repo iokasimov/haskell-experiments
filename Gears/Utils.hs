@@ -13,6 +13,10 @@ stack_to_list :: [a] -> Stack a -> [a]
 stack_to_list r (TU (Just (Construct x next))) = stack_to_list (x : r) $ TU next
 stack_to_list r (TU Nothing) = r
 
+nonempty_stack_to_list :: [a] -> Nonempty Stack a -> [a]
+nonempty_stack_to_list r (Construct x Nothing) = x : r
+nonempty_stack_to_list r (Construct x (Just next)) = x : nonempty_stack_to_list r next
+
 stream_to_list :: Stream ~> []
 stream_to_list (Construct x (Identity next)) = x : stream_to_list next
 
