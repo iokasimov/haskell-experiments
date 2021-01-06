@@ -72,10 +72,7 @@ lifecycle being act = do
 
 type Grid = TU Zipper Zipper
 
-instance Functor Grid where
-	fmap f (TU zz) = TU $ f <$$> zz
-
-instance Comonad Grid where
+instance {-# OVERLAPS #-} Comonad Grid where
 	extract = extract . extract . run
 	duplicate zz = TU $ horizontal <$> vertical zz where
 
