@@ -221,6 +221,30 @@ executable base-effectful-bft
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable base-minimum-number-of-jumps
+  main-is: Problems/base/minimum-number-of-jumps.hs
+  build-depends: base
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    GADTs,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
+
 executable base-handheld-halting
   main-is: Problems/base/handheld-halting.hs
   build-depends: base, containers, MissingH
