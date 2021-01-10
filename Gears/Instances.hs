@@ -24,9 +24,9 @@ instance Base.Show Boolean where
 	show True = "*"
 	show False = " "
 
-instance Base.Show Natural where
-	show Zero = "0"
-	show (Natural n) = "1" Base.<> Base.show n
+-- instance Base.Show Numerator where
+-- 	show Zero = "0"
+-- 	show (Numerator n) = "1" Base.<> Base.show n
 
 instance Semigroup Base.Int where
 	(+) = (Base.+)

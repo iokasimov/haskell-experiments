@@ -7,7 +7,7 @@ tail' (_ : xs) = xs
 tail' [] = []
 
 solve :: [Int] -> [[Int]]
-solve [] = [[0]]
+solve [] = []
 solve (x : []) = [[x]]
 solve (x : xs) = (x :) <$> (take x (iterate tail' xs) >>= solve)
 

@@ -122,8 +122,8 @@ initial = TU . Tap one . TU $ only :^: only where
 conway :: Around -> Status
 conway (focused :*: neighbors) = let count status acc = status ? acc + one $ acc
 	in case reduce count zero neighbors of
-		Natural (Natural Zero) -> focused
-		Natural (Natural (Natural Zero)) -> True
+		Numerator (Denumerator (Denumerator One)) -> focused
+		Numerator (Denumerator (Denumerator (Denumerator One))) -> True
 		_ -> False
 
 lifecycle :: (II Status -> Status) -> II Status -> IO ()
@@ -136,4 +136,5 @@ lifecycle act being = delay *> purge *> snapshot *> evolve where
 
 --------------------------------------------------------------------------------
 
-main = lifecycle (conway . around) initial
+-- main = lifecycle (conway . around) initial
+main = let screen = display 15 in screen (screen <$> run initial) ->> print

@@ -20,12 +20,16 @@ nonempty_stack_to_list r (Construct x (Just next)) = x : nonempty_stack_to_list 
 stream_to_list :: Stream ~> []
 stream_to_list (Construct x (Identity next)) = x : stream_to_list next
 
-nat :: Base.Int -> Natural
-nat n = n == 0 ? Zero $ Natural . nat $ n Base.- 1
+-- nat :: Base.Int -> Numerator
+-- nat n = n == 0 ? Zero $ Numerator . nat $ n Base.- 1
 
-int :: Natural -> Base.Int
-int (Natural n) = 1 + int n
+int :: Numerator -> Base.Int
+int (Numerator n) = 1 + denum_int n
 int Zero = 0
+
+denum_int :: Denumerator -> Base.Int
+denum_int (Denumerator n) = 1 + denum_int n
+denum_int One = 1
 
 take_n_stream :: Base.Int -> Stream ~> []
 take_n_stream n = Base.take n . stream_to_list
