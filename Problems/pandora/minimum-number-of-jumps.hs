@@ -7,6 +7,8 @@ import "pandora-io" Pandora.IO
 import "base" Data.Int (Int)
 import "base" System.IO (print)
 
+import Gears.Instances ()
+
 -- jump :: Nonempty Stack Int -> _
 -- jump capabilities = insert (extract capabilities) <$>
 
@@ -19,4 +21,7 @@ example :: Nonempty Stack Int
 example = insert 6 $ insert 2 $ insert 4 $ insert 0 $ insert 5
 	$ insert 1 $ insert 1 $ insert 4 $ insert 2 $ point 9
 
-main = void $ example ->> print
+main = void $ do
+	view (sub @(Delete First)) example 4 ->> print
+	print "-------------------------------------"
+	view (sub @(Delete All)) example 4 ->> print

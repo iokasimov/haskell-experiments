@@ -44,7 +44,7 @@ step way = adapt bank >>=:> choice >>=:> transport where
 		lunchtime x = sequence $ survive <$> selection x <*> selection x
 
 		selection :: Maybe Character -> Enumeration Character
-		selection = Comprehension . resolve @Character (delete % xs) xs
+		selection = Comprehension . resolve @Character (view (sub @(Delete First)) xs) xs
 
 		boats :: Stack :. Maybe := Character
 		boats = insert Nothing $ Just <$> xs
@@ -54,7 +54,7 @@ step way = adapt bank >>=:> choice >>=:> transport where
 	transport (Just x) = modify @River (leave . land) $> Just x where
 
 		leave, land :: River -> River
-		leave = source way %~ delete x
+		leave = source way %~ (view (sub @(Delete First)) % x)
 		land = target way %~ insert x
 
 	source, target :: Boolean -> River :-. Stack Character

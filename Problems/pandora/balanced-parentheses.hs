@@ -54,7 +54,7 @@ latest on_empty f = view (focus @Head) . extract <$> current @Trace
 
 match :: Checking t => Style -> Index -> Style -> t ()
 match closed i opened = closed == opened
-	? (zoom @Trace (sub @Right) . modify $ pop @Open)
+	? (zoom @Trace (sub @Right) . modify @(Stack Open) $ view (sub @Tail))
 		$ mismatch closed opened i
 
 indexate :: Checking t => t ()

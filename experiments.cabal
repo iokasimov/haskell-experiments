@@ -856,8 +856,10 @@ executable pandora-wolf-goat-cabbage
     ExplicitNamespaces,
     FlexibleContexts,
     FlexibleInstances,
+    GADTs,
     LambdaCase,
     LiberalTypeSynonyms,
+    MultiParamTypeClasses,
     NoImplicitPrelude,
     OverloadedStrings,
     PackageImports,
@@ -867,7 +869,6 @@ executable pandora-wolf-goat-cabbage
     TypeApplications,
     TypeFamilies,
     TypeOperators,
-    TypeSynonymInstances,
     QuantifiedConstraints
   other-modules:
   default-language: Haskell2010
