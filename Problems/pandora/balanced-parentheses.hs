@@ -52,8 +52,8 @@ latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
 latest on_empty f = view (focus @Head) . extract <$> current @Trace
 	>>= resolve @Open (|- f) on_empty
 
-match :: Checking t => Style -> Index -> Style -> t ()
-match closed i opened = closed == opened
+juxtapose :: Checking t => Style -> Index -> Style -> t ()
+juxtapose closed i opened = closed == opened
 	? (zoom @Trace (sub @Right) . modify @(Stack Open) $ view (sub @Tail))
 		$ mismatch closed opened i
 
@@ -62,7 +62,7 @@ indexate = zoom @Trace (sub @Left) $ modify @Index succ
 
 decide :: Checking t => Symbol -> t ()
 decide (Bracket opened Opened) = keep opened
-decide (Bracket closed Closed) = latest (deadend closed) (match closed)
+decide (Bracket closed Closed) = latest (deadend closed) (juxtapose closed)
 decide Nevermind = skip
 
 inspect :: Checking t => Symbol -> t ()
