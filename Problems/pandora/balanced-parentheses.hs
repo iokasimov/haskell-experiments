@@ -44,7 +44,7 @@ deadend :: Checking t => Style -> t ()
 deadend c = current @Trace >>= failure . Deadend c . attached
 
 keep :: Checking t => Style -> t ()
-keep style = current @Trace >>= zoom @Trace (sub @Right)
+keep style = current @Trace >>= zoom @Trace (focus @Right)
 	. replace . (|- (insert %)) . ((style :*:) <-> identity)
 
 -- FIXME: use `resolve (|- f) on_empty` instad pattern matching
@@ -54,11 +54,12 @@ latest on_empty f = view (focus @Head) . extract <$> current @Trace
 
 juxtapose :: Checking t => Style -> Index -> Style -> t ()
 juxtapose closed i opened = closed == opened
-	? (zoom @Trace (sub @Right) . modify @(Stack Open) $ view (sub @Tail))
+	? (zoom @Trace (focus @Right) . modify @(Stack Open) $ view (sub @Tail))
 		$ mismatch closed opened i
 
 indexate :: Checking t => t ()
-indexate = zoom @Trace (sub @Left) $ modify @Index succ
+-- indexate = zoom @Trace (sub @Left) $ modify @Index succ
+indexate = zoom @Trace (focus @Left) $ modify @Index succ
 
 decide :: Checking t => Symbol -> t ()
 decide (Bracket opened Opened) = keep opened

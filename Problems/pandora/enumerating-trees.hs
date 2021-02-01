@@ -12,7 +12,7 @@ zipper_to_binary_degenerated :: Zipper Stack ~> Nonempty Binary
 zipper_to_binary_degenerated (Tap x (TU (bs :^: fs))) = Construct x $ branches
 	(hoist (branch Left) <$> run bs) (hoist (branch Right) <$> run fs) where
 
-	branch :: a |-> Wye -> Maybe a -> Wye a
+	branch :: a :=> Wye -> Maybe a -> Wye a
 	branch f (Just x) = f x
 	branch _ Nothing = End
 

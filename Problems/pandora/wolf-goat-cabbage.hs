@@ -44,18 +44,18 @@ step way = adapt bank >>=:> choice >>=:> transport where
 		lunchtime x = sequence $ survive <$> selection x <*> selection x
 
 		selection :: Maybe Character -> Enumeration Character
-		selection = Comprehension . resolve @Character (view (sub @(Delete First)) xs) xs
+		selection = Comprehension . resolve @Character (delete % xs . equate) xs
 
 		boats :: Stack :. Maybe := Character
 		boats = insert Nothing $ Just <$> xs
 
-	transport :: Maybe Character |-> State River
+	transport :: Maybe Character :=> State River
 	transport Nothing = point Nothing
 	transport (Just x) = modify @River (leave . land) $> Just x where
 
 		leave, land :: River -> River
-		leave = source way %~ (view (sub @(Delete First)) % x)
-		land = target way %~ insert x
+		leave = over (source way) (delete $ equate x)
+		land = over (target way) (insert x)
 
 	source, target :: Boolean -> River :-. Stack Character
 	source = represent . bool True False
@@ -82,6 +82,7 @@ solution = extract <$> filter moved result where
 	result = run . run % start $ path ->> step
 
 	moved :: Predicate (River :*: [Maybe Character])
-	moved = null >&< view (sub @Left |> sub @Left)
+	-- moved = null >&< view (focus @Left |> sub @Left)
+	moved = Predicate $ \((start :^: _ ) :*: _) -> start == TU Nothing
 
 main = solution ->> print

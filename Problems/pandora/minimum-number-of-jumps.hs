@@ -22,6 +22,8 @@ example = insert 6 $ insert 2 $ insert 4 $ insert 0 $ insert 5
 	$ insert 1 $ insert 1 $ insert 4 $ insert 2 $ point 9
 
 main = void $ do
-	view (sub @(Delete First)) example 4 ->> print
-	print "-------------------------------------"
-	view (sub @(Delete All)) example 4 ->> print
+	point ()
+	-- delete (equate 4) example ->> print
+	-- view (sub @(Delete First)) example 4 ->> print
+	-- print "-------------------------------------"
+	-- view (sub @(Delete All)) example 4 ->> print
