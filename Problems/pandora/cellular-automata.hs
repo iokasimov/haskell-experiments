@@ -36,7 +36,6 @@ neighbourhood :: Zipper Stream Status -> Neighbours
 neighbourhood z = extract (subview @Left $ lower z) :*: extract z :*: extract (subview @Right $ lower z)
 
 display :: Int -> Zipper Stream a -> [a]
--- display n (Tap x (TU (bs :^: fs))) = take n (stream_to_list bs) <> [x] <> reverse (take n $ stream_to_list fs)
 display n (Tap x (TU (bs :^: fs))) = reverse (take n $ stream_to_list bs) <> [x] <> take n (stream_to_list fs)
 
 instance Monotonic a (Construction Identity a) where
@@ -86,7 +85,7 @@ instance Substructure Left (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)
 instance Substructure Right (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) where
 	type Substructural Right (Tap (Delta <:.> Stream) <:.> Tap (Delta <:.> Stream)) = Zipper Stream <:.> Stream
 	substructure (run . extract . run -> Tap x (TU (d :^: u))) =
-		let target = TU . Tap (view (sub @Tail |> sub @Right) x) . TU $ view (sub @Tail |> sub @Right) <$> d :^: view (sub @Tail |> sub @Right) <$> u in
+		let target = TU . Tap (view (sub @Tail |> sub @Right) x) . TU $ (view (sub @Tail |> sub @Right) <$> d) :^: (view (sub @Tail |> sub @Right) <$> u) in
 		let around rx = (set (sub @Tail |> sub @Right) <$> view (sub @Tail |> sub @Right) rx <*> d) :^: (set (sub @Tail |> sub @Right) <$> view (sub @Tail |> sub @Right) rx <*> u) in
 		Store $ target :*: \rx -> lift . TU . Tap (set (sub @Tail |> sub @Right) (extract $ run rx) $ x) . TU $ around (run rx)
 
@@ -101,12 +100,10 @@ around z = extract z :*: plane (sub @Left) :*: plane (sub @Right) :*: plane (sub
 	:*: slant (sub @Down) (sub @Tail |> sub @Left) :*: slant (sub @Up) (sub @Tail |> sub @Right)
 	:*: slant (sub @Up) (sub @Tail |> sub @Left) :*: slant (sub @Down) (sub @Tail |> sub @Right) where
 
-	plane :: (Extractable t, Extractable u)
-		=> II Status :-. t <:.> u := Status -> Status
+	plane :: (Extractable t, Extractable u) => II :~. (t <:.> u) -> Status
 	plane lens = extract . extract . run . view lens $ z
 
-	slant :: II Status :-. Stream <:.> Zipper Stream := Status
-		-> Zipper Stream Status :-. Stream Status -> Status
+	slant :: II :~. (Stream <:.> Zipper Stream) -> (Zipper Stream :~. Stream) -> Status
 	slant vl hl = extract . view hl . extract . run . view vl $ z
 
 initial :: II Status
@@ -144,6 +141,12 @@ lifecycle act being = delay *> purge *> snapshot *> evolve where
 main = void $ do
 	let screen = display 15
 	screen (screen <$> run initial) ->> print
+	print . around $ initial
 	screen (screen <$> run (initial =>> conway . around)) ->> print
+	print . around $ initial =>> conway . around
+	-- print "-------------------------------------"
+	-- screen (subview @Right initial) ->> print
+	-- screen (extract $ run initial) ->> print
+	-- screen (extract . run $ initial =>> conway . around) ->> print
 	-- print $ around initial
 	-- screen $ initial =>> conway . around
