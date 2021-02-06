@@ -529,21 +529,10 @@ executable joint-wolf-goat-cabbage
 executable pandora-balanced-parentheses
   main-is: Problems/pandora/balanced-parentheses.hs
   build-depends: base, pandora
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    LambdaCase,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns
+    ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs

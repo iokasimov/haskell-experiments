@@ -2,8 +2,9 @@ import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 
-import Prelude (IO, Integer, Show, print, succ, show)
-import Debug.Trace (trace)
+import Prelude (IO, Int, Show (show), print)
+
+import Gears.Instances ()
 
 data Shape = Opened | Closed
 
@@ -18,7 +19,7 @@ instance Setoid Style where
 
 data Symbol = Bracket Style Shape | Nevermind
 
-type Index = Integer
+type Index = Int
 
 type Open = Style :*: Index
 
@@ -27,51 +28,54 @@ data Stumble
 	| Logjam Style Index -- Opened bracket without closed one
 	| Mismatch Style Index Style Index -- Closed bracket doesn't match opened one
 
-type Trace = Index :*: Stack Open
+type Opened = Stack Open
+
+type Trace = Index :*: Opened
 
 type Checking t = (Applicative t, Monad t, Stateful Trace t, Failable Stumble t)
 
-skip :: Pointable t => t ()
-skip = point ()
-
-mismatch :: Checking t => Style -> Style -> Index -> t ()
-mismatch c o oix = current @Trace >>= failure . Mismatch o oix c . attached
-
-logjam :: Checking t => Index -> Style -> t ()
-logjam i s = failure $ Logjam s i
-
-deadend :: Checking t => Style -> t ()
-deadend c = current @Trace >>= failure . Deadend c . attached
-
-keep :: Checking t => Style -> t ()
-keep style = current @Trace >>= zoom @Trace (focus @Right)
-	. replace . (|- (insert %)) . ((style :*:) <-> identity)
-
--- FIXME: use `resolve (|- f) on_empty` instad pattern matching
-latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
-latest on_empty f = view (focus @Head) . extract <$> current @Trace
-	>>= resolve @Open (|- f) on_empty
-
-juxtapose :: Checking t => Style -> Index -> Style -> t ()
-juxtapose closed i opened = closed == opened
-	? (zoom @Trace (focus @Right) . modify @(Stack Open) $ view (sub @Tail))
-		$ mismatch closed opened i
-
-indexate :: Checking t => t ()
--- indexate = zoom @Trace (sub @Left) $ modify @Index succ
-indexate = zoom @Trace (focus @Left) $ modify @Index succ
+inspect :: Checking t => Symbol -> t ()
+inspect s = indexate *> decide s
 
 decide :: Checking t => Symbol -> t ()
 decide (Bracket opened Opened) = keep opened
 decide (Bracket closed Closed) = latest (deadend closed) (juxtapose closed)
 decide Nevermind = skip
 
-inspect :: Checking t => Symbol -> t ()
-inspect s = indexate *> decide s
+indexate :: Checking t => t ()
+indexate = adjust @Trace @Index (+ one)
+
+keep :: Checking t => Style -> t ()
+keep style = adjust @Trace @Opened . (!) =<< insert
+	<$> ((:*:) style <$> magnify @Trace @Index)
+	<*> magnify @Trace @Opened
+
+-- TODO: it looks too complicated
+latest :: Checking t => t r -> (Index -> Style -> t r) -> t r
+latest on_empty f = zoom @Trace (focus @Right |> focus @Head) current
+	>>= resolve @Open @(Maybe Open) (|- f) on_empty
+
+juxtapose :: Checking t => Style -> Index -> Style -> t ()
+juxtapose closed oi opened = closed /= opened
+	? mismatch closed opened oi
+	$ adjust @Trace @Opened $ view (sub @Tail)
+
+skip :: Pointable t => t ()
+skip = point ()
+
+mismatch :: Checking t => Style -> Style -> Index -> t ()
+mismatch closed opened oi = magnify @Trace @Index
+	>>= failure . Mismatch opened oi closed
+
+logjam :: Checking t => Index -> Style -> t ()
+logjam i = failure . Logjam % i
+
+deadend :: Checking t => Style -> t ()
+deadend closed = magnify @Trace @Index >>= failure . Deadend closed
 
 --------------------------------------------------------------------------------
 
-type Checker = State (Index :*: Stack Open) :> Conclusion Stumble := ()
+type Checker = State (Index :*: Opened) :> Conclusion Stumble := ()
 
 check :: Traversable s => s Symbol -> IO ()
 check code = ((code ->> inspect) *> latest skip logjam :: Checker)
