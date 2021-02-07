@@ -17,7 +17,7 @@ instance Traversable [] where
 
 deriving instance (Base.Show a, Base.Show b) => Base.Show (a :*: b)
 deriving instance Base.Show a => Base.Show (Maybe a)
-deriving instance Base.Show a => Base.Show (Delta a)
+-- deriving instance Base.Show a => Base.Show (Delta a)
 deriving instance Base.Show a => Base.Show (Wye a)
 
 instance Base.Show Boolean where

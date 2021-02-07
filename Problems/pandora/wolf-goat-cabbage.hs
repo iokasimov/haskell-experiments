@@ -5,6 +5,8 @@ import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
+import "base" Debug.Trace (traceShow)
+
 import Gears.Utils (take_n_stream, stack_to_list)
 
 data Character = Wolf | Goat | Cabbage
@@ -27,7 +29,9 @@ survive Goat Cabbage = Nothing
 survive Cabbage Goat = Nothing
 survive _ _ = Just ()
 
-type River = Delta :. Stack := Character
+-- type River = Delta :. Stack := Character
+-- type River = (:*:) <:.:> Stack := Character
+type River = Stack Character :*: Stack Character
 
 type Enumeration = Comprehension Maybe
 
@@ -35,7 +39,7 @@ step :: Boolean -> State River :> Enumeration := Maybe Character
 step way = adapt bank >>=:> choice >>=:> transport where
 
 	bank :: State River := Stack Character
-	bank = view (source way) <$> current
+	bank = view source <$> current
 
 	choice :: Stack Character -> Enumeration :. Maybe := Character
 	choice xs = Comprehension . filter (not $ lunchtime >$< null) $ boats where
@@ -54,17 +58,17 @@ step way = adapt bank >>=:> choice >>=:> transport where
 	transport (Just x) = modify @River (leave . land) $> Just x where
 
 		leave, land :: River -> River
-		leave = over (source way) (delete $ equate x)
-		land = over (target way) (insert x)
+		leave = over source (delete $ equate x)
+		land = over target (insert x)
 
-	source, target :: Boolean -> River :-. Stack Character
-	source = represent . bool True False
-	target = represent
+	source, target :: River :-. Stack Character
+	source = way ? focus @Right $ focus @Left
+	target = way ? focus @Left $ focus @Right
 
 --------------------------------------------------------------------------------
 
 start :: River
-start = characters :^: empty where
+start = characters :*: empty where
 
 	characters :: Stack Character
 	characters = insert Wolf $ insert Goat $ insert Cabbage $ empty
@@ -83,6 +87,12 @@ solution = extract <$> filter moved result where
 
 	moved :: Predicate (River :*: [Maybe Character])
 	-- moved = null >&< view (focus @Left |> sub @Left)
-	moved = Predicate $ \((start :^: _ ) :*: _) -> start == TU Nothing
+	-- moved = Predicate $ \((start :*: _ ) :*: _) -> start == TU Nothing
+	moved = Predicate $ \((_ :*: end) :*: _) -> end == TU Nothing
 
-main = solution ->> print
+-- main = solution ->> print
+-- main = take_n_stream 7 (point . bool True False .-+ zero) ->> print
+-- main = view (focus @Left) start ->> print
+
+-- main = view (False ? focus @Right $ focus @Left) start ->> print
+main = print "WIP"
