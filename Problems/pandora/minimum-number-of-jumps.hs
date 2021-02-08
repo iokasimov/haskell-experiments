@@ -18,11 +18,10 @@ import Gears.Instances ()
 --------------------------------------------------------------------------------
 
 example :: Nonempty Stack Int
-example = insert 6 $ insert 2 $ insert 4 $ insert 0 $ insert 5
-	$ insert 1 $ insert 1 $ insert 4 $ insert 2 $ point 9
+example = 6 += 2 += 4 += 0 += 5 += 1 += 1 += 4 += 2 += point 9
 
 main = void $ do
-	point ()
+	print "WIP"
 	-- delete (equate 4) example ->> print
 	-- view (sub @(Delete First)) example 4 ->> print
 	-- print "-------------------------------------"

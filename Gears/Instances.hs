@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Gears.Instances where
 
 import "pandora" Pandora.Core
@@ -23,6 +25,14 @@ deriving instance Base.Show a => Base.Show (Wye a)
 instance Base.Show Boolean where
 	show True = "*"
 	show False = " "
+
+instance Base.Show a => Base.Show (Construction Maybe a) where
+	show (Construct x (Just xs)) = Base.show x Base.++ Base.show xs
+	show (Construct x Nothing) = Base.show x
+
+instance Base.Show a => Base.Show (Stack a) where
+	show (TU (Just stack)) = Base.show stack
+	show (TU Nothing) = ""
 
 -- instance Base.Show Numerator where
 -- 	show Zero = "0"

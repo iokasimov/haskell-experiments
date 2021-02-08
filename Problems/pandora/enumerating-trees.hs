@@ -19,7 +19,7 @@ zipper_to_binary_degenerated (Tap x (T_U (bs :*: fs))) = Construct x $ branches
 --------------------------------------------------------------------------------
 
 example :: Nonempty Stack Int
-example = insert 1 $ insert 2 $ point 3
+example = 1 += 2 += point 3
 
 example_zipper :: Zipper Stack Int
 example_zipper = Tap 1 . T_U $ empty :*: unite (deconstruct example)

@@ -93,6 +93,6 @@ search code = extract . attached <$> run @(State Dictionary :> Maybe) (code ->> 
 --------------------------------------------------------------------------------
 
 digit4 :: Stack Morse
-digit4 = insert Dot . insert Dot . insert Dot . insert Dot . insert Dash $ empty
+digit4 = Dot += Dot += Dot += Dot += Dash += empty
 
 main = search digit4 & resolve @Char print (print "Not found...")

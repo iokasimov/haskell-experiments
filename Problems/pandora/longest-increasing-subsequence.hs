@@ -19,9 +19,10 @@ connect :: Nonempty Stack Int -> Maybe (Construction Maybe (Stack Int))
 connect subseq = increase (extract subseq) <$$> deconstruct subseq where
 
 	increase :: Int -> Int -> Stack Int
-	increase x y = x < y ? (empty & insert x & insert y) $ unite Nothing
+	increase x y = x < y ? (empty & (x +=) & (y +=)) $ unite Nothing
 
 example :: Nonempty Stack Int
-example = insert 3 $ insert 1 $ insert 8 $ insert 2 $ point 5
+example = 3 += 1 += 8 += 2 += point 5
 
-main = void $ try example ->>> print . comap (stack_to_list []) . nonempty_stack_to_list []
+main = void $ print "WIP"
+	-- try example ->>> print . comap (stack_to_list []) . nonempty_stack_to_list []
