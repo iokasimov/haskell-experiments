@@ -40,7 +40,6 @@ step way = adapt bank >>= adapt . choice >>= adapt . (->> transport) where
 	choice :: Stack Character -> Enumeration :. Maybe := Character
 	choice xs = Comprehension $ filter (lunchtime >$< null) boats where
 
-		-- TODO: rewrite it so we check one combination only once
 		lunchtime :: Maybe Character -> Maybe :. Enumeration := ()
 		lunchtime x = sequence $ survive <$> selection x <*> selection x
 

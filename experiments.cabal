@@ -556,32 +556,6 @@ executable pandora-balanced-parentheses
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
-  ghc-options: -Wall -fno-warn-tabs
-
-executable pandora-binary-tree-zipper
-  main-is: Problems/pandora/binary-tree-zipper.hs
-  build-depends: base, pandora
-  default-extensions:
-    DataKinds,
-    DeriveFunctor,
-    DeriveFoldable,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    GADTs,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
-  other-modules:
-  default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
-
 executable pandora-cellular-automata
   main-is: Problems/pandora/cellular-automata.hs
   build-depends: base, pandora, pandora-io
