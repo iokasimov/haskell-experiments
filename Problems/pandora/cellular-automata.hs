@@ -1,4 +1,4 @@
-{-# LANGUAGE UndecidableInstances #-}
+-- {-# LANGUAGE UndecidableInstances #-}
 
 import "base" Control.Concurrent (threadDelay)
 import "base" Data.List (take)
@@ -75,19 +75,27 @@ instance Substructure Up (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)
 	type Substructural Up (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Stream <:.> Zipper Stream
 	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) = Store $ TU u :*: lift . TU . Tap focused . T_U . (d :*:) . run
 
--- instance Substructure Left (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
--- 	type Substructural Left (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Zipper Stream <:.> Stream
--- 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) =
--- 		let target = TU . Tap (view (sub @Tail |> sub @Left) x) . TU $ view (sub @Tail |> sub @Left) <$> d :*: view (sub @Tail |> sub @Left) <$> u in
--- 		let around lx = (set (sub @Tail |> sub @Left) <$> view (sub @Tail |> sub @Left) lx <*> d) :*: (set (sub @Tail |> sub @Left) <$> view (sub @Tail |> sub @Left) lx <*> u) in
--- 		Store $ target :*: \lx -> lift . TU . Tap (set (sub @Tail |> sub @Left) (extract $ run lx) $ x) . T_U $ around (run lx)
+instance Covariant t => Substructure Left ((:*:) <:.:> t) where
+	type Substructural Left ((:*:) <:.:> t) = t
+	substructure (run . extract . run -> l :*: r) = Store $ l :*: lift . T_U . (:*: r)
 
--- instance Substructure Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
--- 	type Substructural Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Zipper Stream <:.> Stream
--- 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) =
--- 		let target = TU . Tap (view (sub @Tail |> sub @Right) x) . TU $ (view (sub @Tail |> sub @Right) <$> d) :*: (view (sub @Tail |> sub @Right) <$> u) in
--- 		let around rx = (set (sub @Tail |> sub @Right) <$> view (sub @Tail |> sub @Right) rx <*> d) :*: (set (sub @Tail |> sub @Right) <$> view (sub @Tail |> sub @Right) rx <*> u) in
--- 		Store $ target :*: \rx -> lift . TU . Tap (set (sub @Tail |> sub @Right) (extract $ run rx) $ x) . TU $ around (run rx)
+instance Covariant t => Substructure Right ((:*:) <:.:> t) where
+	type Substructural Right ((:*:) <:.:> t) = t
+	substructure (run . extract . run -> l :*: r) = Store $ r :*: lift . T_U . (l :*:)
+
+instance Substructure Left (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
+	type Substructural Left (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Zipper Stream <:.> Stream
+	substructure (run . extract . run -> Tap x (T_U (d :*: u))) =
+		let target = TU . Tap (view (sub @Tail |> sub @Left) x) . T_U $ (view (sub @Tail |> sub @Left) <$> d) :*: (view (sub @Tail |> sub @Left) <$> u) in
+		let around lx = (set (sub @Tail |> sub @Left) <$> view (sub @Tail |> sub @Left) lx <*> d) :*: (set (sub @Tail |> sub @Left) <$> view (sub @Tail |> sub @Left) lx <*> u) in
+		Store $ target :*: \lx -> lift . TU . Tap (set (sub @Tail |> sub @Left) (extract $ run lx) $ x) . T_U $ around (run lx)
+
+instance Substructure Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
+	type Substructural Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Zipper Stream <:.> Stream
+	substructure (run . extract . run -> Tap x (T_U (d :*: u))) =
+		let target = TU . Tap (view (sub @Tail |> sub @Right) x) . T_U $ (view (sub @Tail |> sub @Right) <$> d) :*: (view (sub @Tail |> sub @Right) <$> u) in
+		let around rx = (set (sub @Tail |> sub @Right) <$> view (sub @Tail |> sub @Right) rx <*> d) :*: (set (sub @Tail |> sub @Right) <$> view (sub @Tail |> sub @Right) rx <*> u) in
+		Store $ target :*: \rx -> lift . TU . Tap (set (sub @Tail |> sub @Right) (extract $ run rx) $ x) . T_U $ around (run rx)
 
 type Around = Status -- current
 	:*: Status :*: Status -- horizontal
@@ -96,35 +104,21 @@ type Around = Status -- current
 	:*: Status :*: Status -- minor diagonal
 
 around :: II Status -> Around
-around _ = True :*: True :*: True :*: True :*: True :*: True :*: True :*: True :*: True
--- around z = extract z :*: plane (sub @Left) :*: plane (sub @Right) :*: plane (sub @Up) :*: plane (sub @Down)
--- 	:*: slant (sub @Down) (sub @Tail |> sub @Left) :*: slant (sub @Up) (sub @Tail |> sub @Right)
--- 	:*: slant (sub @Up) (sub @Tail |> sub @Left) :*: slant (sub @Down) (sub @Tail |> sub @Right) where
---
--- 	plane :: (Extractable t, Extractable u) => II :~. (t <:.> u) -> Status
--- 	plane lens = extract . extract . run . view lens $ z
---
--- 	slant :: II :~. (Stream <:.> Zipper Stream) -> (Zipper Stream :~. Stream) -> Status
--- 	slant vl hl = extract . view hl . extract . run . view vl $ z
+around z = extract z :*: plane (sub @Left) :*: plane (sub @Right) :*: plane (sub @Up) :*: plane (sub @Down)
+	:*: slant (sub @Down) (sub @Tail |> sub @Left) :*: slant (sub @Up) (sub @Tail |> sub @Right)
+	:*: slant (sub @Up) (sub @Tail |> sub @Left) :*: slant (sub @Down) (sub @Tail |> sub @Right) where
 
-initial :: II Status
-initial = TU . Tap one . T_U $ only :*: only where
+	plane :: (Extractable t, Extractable u) => II :~. (t <:.> u) -> Status
+	plane lens = extract . extract . run . view lens $ z
 
-	only :: Stream :. Zipper Stream := Status
-	only = Construct one . Identity $ repeat noone
-
-	one, noone :: Zipper Stream Status
-	one = Tap True . T_U $ alone :*: alone
-	noone = Tap False . T_U $ repeat False :*: repeat False
-
-	alone :: Stream Status
-	alone = Construct True . Identity $ repeat False
+	slant :: II :~. (Stream <:.> Zipper Stream) -> (Zipper Stream :~. Stream) -> Status
+	slant vl hl = extract . view hl . extract . run . view vl $ z
 
 conway :: Around -> Status
 conway (focused :*: neighbors) = let count status acc = status ? acc + one $ acc
-	in case reduce count zero neighbors of
-		Numerator (Denumerator (Denumerator One)) -> focused
-		Numerator (Denumerator (Denumerator (Denumerator One))) -> True
+	in case reduce count Zero neighbors of
+		Numerator (Denumerator One) -> focused
+		Numerator (Denumerator (Denumerator One)) -> True
 		_ -> False
 
 lifecycle :: (II Status -> Status) -> II Status -> IO ()
@@ -137,18 +131,27 @@ lifecycle act being = delay *> purge *> snapshot *> evolve where
 
 --------------------------------------------------------------------------------
 
--- main = lifecycle (conway . around) initial
--- main = let screen = display 15 in screen (screen <$> run initial) ->> print
-main = void $ do
-	-- let screen = display 15
-	-- screen (screen <$> run initial) ->> print
-	-- print . around $ initial
-	-- screen (screen <$> run (initial =>> conway . around)) ->> print
-	-- print . around $ initial =>> conway . around
-	print "WIP"
-	-- print "-------------------------------------"
-	-- screen (subview @Right initial) ->> print
-	-- screen (extract $ run initial) ->> print
-	-- screen (extract . run $ initial =>> conway . around) ->> print
-	-- print $ around initial
-	-- screen $ initial =>> conway . around
+cube :: II Status
+cube = TU . Tap one . T_U $ only :*: only where
+
+	only :: Stream :. Zipper Stream := Status
+	only = Construct one . Identity $ repeat noone
+
+	one, noone :: Zipper Stream Status
+	one = Tap True . T_U $ alone :*: alone
+	noone = Tap False . T_U $ repeat False :*: repeat False
+
+	alone :: Stream Status
+	alone = Construct True . Identity $ repeat False
+
+blinker :: II Status
+blinker = TU . Tap one . T_U $ repeat noone :*: repeat noone where
+
+	one, noone :: Zipper Stream Status
+	one = Tap True . T_U $ alone :*: alone
+	noone = Tap False . T_U $ repeat False :*: repeat False
+
+	alone :: Stream Status
+	alone = Construct True . Identity $ repeat False
+
+main = lifecycle (conway . around) cube

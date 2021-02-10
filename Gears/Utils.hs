@@ -24,7 +24,7 @@ stream_to_list (Construct x (Identity next)) = x : stream_to_list next
 -- nat n = n == 0 ? Zero $ Numerator . nat $ n Base.- 1
 
 int :: Numerator -> Base.Int
-int (Numerator n) = 1 + denum_int n
+int (Numerator n) = denum_int n
 int Zero = 0
 
 denum_int :: Denumerator -> Base.Int

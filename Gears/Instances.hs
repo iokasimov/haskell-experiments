@@ -22,6 +22,9 @@ deriving instance Base.Show a => Base.Show (Maybe a)
 -- deriving instance Base.Show a => Base.Show (Delta a)
 deriving instance Base.Show a => Base.Show (Wye a)
 
+deriving instance Base.Show Numerator
+deriving instance Base.Show Denumerator
+
 instance Base.Show Boolean where
 	show True = "*"
 	show False = " "
