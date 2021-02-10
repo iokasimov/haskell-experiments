@@ -16,6 +16,8 @@ l -< x = Construct x $ Left l
 leaf :: a -> Nonempty Binary a
 leaf x = Construct x End
 
+type Dictionary = Nonempty Binary Char
+
 dictionary :: Dictionary
 dictionary = both ' '
 	(both 'E'
@@ -78,17 +80,15 @@ dictionary = both ' '
 
 data Morse = Dot | Dash
 
-type Dictionary = Nonempty Binary Char
+(.-) Dot x _ = x
+(.-) Dash _ y = y
 
 search :: Stack Morse -> Maybe Char
-search code = extract . attached <$> run @(State Dictionary :> Maybe) (code ->> decode) dictionary where
+search code = extract . attached <$> run @(State Dictionary :> Maybe) (code ->> decode) dictionary
 
-	decode :: (Monad t, Optional t, Stateful Dictionary t) => Morse -> t ()
-	decode x = current @Dictionary >>= cut x >>= replace
-
-	cut :: (Pointable t, Optional t) => Morse -> Dictionary -> t Dictionary
-	cut Dot = adapt . run . view (sub @Left)
-	cut Dash = adapt . run . view (sub @Right)
+decode :: (Monad t, Optional t, Stateful Dictionary t) => Morse -> t ()
+decode x = zoom @Dictionary (x .- sub @Left $ sub @Right) current
+	>>= adapt . run @Binary >>= replace @Dictionary
 
 --------------------------------------------------------------------------------
 
