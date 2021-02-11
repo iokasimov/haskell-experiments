@@ -61,8 +61,8 @@ instance Extendable II where
 	zz =>> f = f <$> TU (horizontal <$> vertical zz) where
 
 		horizontal, vertical :: II a -> Zipper Stream (II a)
-		horizontal z = Tap z . T_U $ move (TU . (morph @(Rotate Left) <$>) . run) z :*: move (TU . (morph @(Rotate Right) <$>) . run) z
-		vertical z = Tap z . T_U $ move (TU . morph @(Rotate Left) . run) z :*: move (TU . morph @(Rotate Right) . run) z
+		horizontal z = Tap z . T_U $ move ((morph @(Rotate Left) <$>) ||=) z :*: move ((morph @(Rotate Right) <$>) ||=) z
+		vertical z = Tap z . T_U $ move (morph @(Rotate Left) ||=) z :*: move (morph @(Rotate Right) ||=) z
 
 		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
@@ -85,17 +85,17 @@ instance Covariant t => Substructure Right ((:*:) <:.:> t) where
 
 instance Substructure Left (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
 	type Substructural Left (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Zipper Stream <:.> Stream
-	substructure (run . extract . run -> Tap x (T_U (d :*: u))) =
-		let target = TU . Tap (view (sub @Tail |> sub @Left) x) . T_U $ (view (sub @Tail |> sub @Left) <$> d) :*: (view (sub @Tail |> sub @Left) <$> u) in
-		let around lx = (set (sub @Tail |> sub @Left) <$> view (sub @Tail |> sub @Left) lx <*> d) :*: (set (sub @Tail |> sub @Left) <$> view (sub @Tail |> sub @Left) lx <*> u) in
-		Store $ target :*: \lx -> lift . TU . Tap (set (sub @Tail |> sub @Left) (extract $ run lx) $ x) . T_U $ around (run lx)
+	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let left = sub @Tail |> sub @Left in
+		let target = TU . Tap (view left x) . T_U $ view left <$> d :*: view left <$> u in
+		let around lx = set left <$> view left lx <*> d :*: set left <$> view left lx <*> u in
+		Store $ target :*: \lx -> lift . TU . Tap (set left (extract $ run lx) x) . T_U $ around (run lx)
 
 instance Substructure Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
 	type Substructural Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Zipper Stream <:.> Stream
-	substructure (run . extract . run -> Tap x (T_U (d :*: u))) =
-		let target = TU . Tap (view (sub @Tail |> sub @Right) x) . T_U $ (view (sub @Tail |> sub @Right) <$> d) :*: (view (sub @Tail |> sub @Right) <$> u) in
-		let around rx = (set (sub @Tail |> sub @Right) <$> view (sub @Tail |> sub @Right) rx <*> d) :*: (set (sub @Tail |> sub @Right) <$> view (sub @Tail |> sub @Right) rx <*> u) in
-		Store $ target :*: \rx -> lift . TU . Tap (set (sub @Tail |> sub @Right) (extract $ run rx) $ x) . T_U $ around (run rx)
+	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let right = sub @Tail |> sub @Right in
+		let target = TU . Tap (view right x) . T_U $ view right <$> d :*: view right <$> u in
+		let around rx = set right <$> view right rx <*> d :*: set right <$> view right rx <*> u in
+		Store $ target :*: \rx -> lift . TU . Tap (set right (extract $ run rx) x) . T_U $ around (run rx)
 
 type Around = Status -- current
 	:*: Status :*: Status -- horizontal
