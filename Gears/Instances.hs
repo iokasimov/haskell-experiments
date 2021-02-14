@@ -30,7 +30,7 @@ instance Base.Show Boolean where
 	show False = " "
 
 instance Base.Show a => Base.Show (Construction Maybe a) where
-	show (Construct x (Just xs)) = Base.show x Base.++ Base.show xs
+	show (Construct x (Just xs)) = Base.show x Base.++ ", " Base.++ Base.show xs
 	show (Construct x Nothing) = Base.show x
 
 instance Base.Show a => Base.Show (Stack a) where
@@ -70,3 +70,6 @@ instance Chain Base.Int where
 		Base.GT -> Greater
 		Base.EQ -> Equal
 		Base.LT -> Less
+
+instance Setoid Base.Char where
+	x == y = if x Base.== y then True else False
