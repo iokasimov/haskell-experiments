@@ -556,6 +556,17 @@ executable pandora-balanced-parentheses
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable pandora-boustrophedon
+  main-is: Problems/pandora/boustrophedon.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable pandora-cellular-automata
   main-is: Problems/pandora/cellular-automata.hs
   build-depends: base, pandora, pandora-io
@@ -649,7 +660,7 @@ executable pandora-lindenmayer-system
   default-extensions: DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints, InstanceSigs
     FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
     MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns
-    ScopedTypeVariables, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
+    ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs

@@ -56,7 +56,7 @@ latest on_empty f = zoom @Trace (focus @Right |> focus @Head) current
 	>>= resolve @Open @(Maybe Open) (|- f) on_empty
 
 juxtapose :: Checking t => Style -> Index -> Style -> t ()
-juxtapose closed oi opened = closed /= opened
+juxtapose closed oi opened = closed != opened
 	? mismatch closed opened oi
 	$ adjust @Trace @Opened $ view (sub @Tail)
 
