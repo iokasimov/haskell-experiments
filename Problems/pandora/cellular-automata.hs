@@ -126,7 +126,7 @@ lifecycle act being = delay *> purge *> snapshot *> evolve where
 
 	evolve, snapshot :: IO ()
 	evolve = lifecycle act $ being =>> act
-	snapshot = void $ let screen = display 15
+	snapshot = void $ let screen = display 5
 		in screen (screen <$> run being) ->> print
 
 --------------------------------------------------------------------------------
