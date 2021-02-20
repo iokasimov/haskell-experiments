@@ -5,16 +5,20 @@ import "pandora-io" Pandora.IO
 
 import "base" System.IO (print)
 
-instance Morphable (Into (Levelorder (Construction Maybe))) (Construction Wye) where
-	type Morphing (Into (Levelorder (Construction Maybe))) (Construction Wye) = Construction Maybe
-	morphing (extract . run -> Construct x End) = point x
-	-- morphing (extract . run -> Construct x (Left lst)) = point x + into @(Levelorder (Nonempty Stack)) lst
-	-- morphing (extract . run -> Construct x (Right rst)) = point x + into @(Levelorder (Nonempty Stack)) lst
-	-- morphing (extract . run -> Construct x (Both lst rst)) = point x + extract lst + extract rst +
+import Gears.Instances
 
-example = Construct 1 $ Both (Construct 2 $ Both (Construct 4 End) (Construct 5 End)) (Construct 3 . Right $ Construct 6 End)
+-- I need a queue to implement such an instance
+-- instance Morphable (Into (Levelorder (Construction Maybe))) (Construction Wye) where
+	-- type Morphing (Into (Levelorder (Construction Maybe))) (Construction Wye) = Construction Maybe
+
+example = Construct 1 $ Both
+	(Construct 2 $ Both (Construct 4 End) (Construct 5 End))
+	(Construct 3 . Right $ Construct 6 End)
 
 main = void $ do
-	into @(Preorder (Nonempty Stack)) example ->> print
-	into @(Postorder (Nonempty Stack)) example ->> print
-	into @(Inorder (Nonempty Stack)) example ->> print
+	print "--------------------- Preorder -----------------------"
+	print $ into @(Preorder (Nonempty Stack)) example
+	print "--------------------- Postorder -----------------------"
+	print $ into @(Postorder (Nonempty Stack)) example
+	print "--------------------- Inorder -----------------------"
+	print $ into @(Inorder (Nonempty Stack)) example
