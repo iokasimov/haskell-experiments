@@ -58,7 +58,7 @@ latest on_empty f = zoom @Trace (focus @Right |> focus @Head) current
 juxtapose :: Checking t => Style -> Index -> Style -> t ()
 juxtapose closed oi opened = closed != opened
 	? mismatch closed opened oi
-	$ adjust @Trace @Opened $ view (sub @Tail)
+	$ adjust @Trace @Opened $ view / sub @Tail
 
 skip :: Pointable t => t ()
 skip = point ()

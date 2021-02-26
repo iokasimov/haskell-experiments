@@ -88,14 +88,14 @@ instance Substructure Left (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Strea
 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let left = sub @Tail |> sub @Left in
 		let target = TU . Tap (view left x) . T_U $ view left <$> d :*: view left <$> u in
 		let around lx = set left <$> view left lx <*> d :*: set left <$> view left lx <*> u in
-		Store $ target :*: \lx -> lift . TU . Tap (set left (extract $ run lx) x) . T_U $ around (run lx)
+		Store $ target :*: \lx -> lift . TU . Tap (set left / extract (run lx) / x) . T_U $ around / run lx
 
 instance Substructure Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
 	type Substructural Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Zipper Stream <:.> Stream
 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let right = sub @Tail |> sub @Right in
 		let target = TU . Tap (view right x) . T_U $ view right <$> d :*: view right <$> u in
 		let around rx = set right <$> view right rx <*> d :*: set right <$> view right rx <*> u in
-		Store $ target :*: \rx -> lift . TU . Tap (set right (extract $ run rx) x) . T_U $ around (run rx)
+		Store $ target :*: \rx -> lift . TU . Tap (set right / extract (run rx) / x) . T_U $ around / run rx
 
 type Around = Status -- current
 	:*: Status :*: Status -- horizontal
@@ -154,4 +154,4 @@ blinker = TU . Tap one . T_U $ repeat noone :*: repeat noone where
 	alone :: Stream Status
 	alone = Construct True . Identity $ repeat False
 
-main = lifecycle (conway . around) cube
+main = lifecycle / conway . around / cube

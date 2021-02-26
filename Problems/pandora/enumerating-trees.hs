@@ -9,8 +9,8 @@ import Gears.Instances ()
 import Gears.Utils (int)
 
 zipper_to_binary_degenerated :: Zipper Stack ~> Nonempty Binary
-zipper_to_binary_degenerated (Tap x (T_U (bs :*: fs))) = Construct x $ branches
-	(hoist (branch Left) <$> run bs) (hoist (branch Right) <$> run fs) where
+zipper_to_binary_degenerated (Tap x (T_U (bs :*: fs))) = Construct x . into @Wye
+	$ twosome / hoist (branch Left) <$> run bs / hoist (branch Right) <$> run fs where
 
 	branch :: a :=> Wye -> Maybe a -> Wye a
 	branch f (Just x) = f x
