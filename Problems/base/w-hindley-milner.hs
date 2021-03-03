@@ -28,21 +28,21 @@ data Grounded
 	deriving (Eq, Ord, Show)
 
 data Monotype
-	= Grounded Grounded
-	| Parametric String
+	= Parametric Int
+	| Grounded Grounded
 	| Function Monotype Monotype
 	deriving (Eq, Ord, Show)
 
-data Polytype = Polytype [String] Monotype
+data Polytype = Polytype [Int] Monotype
 
 -- Finite mappings from type variables to types
-type Substitution = Map String Monotype
+type Substitution = Map Int Monotype
 
 composeSubst :: Substitution -> Substitution -> Substitution
 composeSubst s1 s2 = Data.Map.union (apply s1 <$> s2) s1
 
 class Types a where
-	ftv :: a -> Set String
+	ftv :: a -> Set Int
 	apply :: Substitution -> a -> a
 
 instance Types Monotype where
@@ -72,7 +72,7 @@ instance Types Г where
 generalize :: Г -> Monotype -> Polytype
 generalize env t = Polytype vars t where
 
-	vars :: [String]
+	vars :: [Int]
 	vars = Data.Set.toList $ Data.Set.difference (ftv t) (ftv env)
 
 data TIEnv = TIEnv
@@ -84,14 +84,12 @@ type TI a = ErrorT String (ReaderT TIEnv (StateT TIState IO)) a
 runTI :: TI a -> IO (Either String a, TIState)
 runTI t = runStateT (runReaderT (runErrorT t) TIEnv) 0
 
-newTyVar :: String -> TI Monotype
-newTyVar prefix = do
-	modify (+1)
-	Parametric . (prefix ++) . show <$> get
+newTyVar :: TI Monotype
+newTyVar = modify (+1) *> (Parametric <$> get)
 
 instantiate :: Polytype -> TI Monotype
 instantiate (Polytype vars t) = do
-	nvars <- mapM (\_ -> newTyVar "a") vars
+	nvars <- mapM (\_ -> newTyVar) vars
 	let s = Data.Map.fromList $ zip vars nvars
 	return $ apply s t
 
@@ -106,10 +104,10 @@ mgu (Grounded Integer') (Grounded Integer') = pure mempty
 mgu (Grounded Boolean') (Grounded Boolean') = pure mempty
 mgu t t' = throwError $ "Monotypes do not unify: " ++ show t ++ " vs. " ++ show t'
 
-varBind :: String -> Monotype -> TI Substitution
-varBind u t | t == Parametric u = pure mempty
-			| u `Data.Set.member` ftv t = throwError $ "occurs check fails: " ++ u ++ " vs. " ++ show t
-			| otherwise = pure $ Data.Map.singleton u t
+varBind :: Int -> Monotype -> TI Substitution
+varBind n t | t == Parametric n = pure mempty
+			| n `Data.Set.member` ftv t = throwError $ "occurs check fails: " ++ show n ++ " vs. " ++ show t
+			| otherwise = pure $ Data.Map.singleton n t
 
 tiLit :: Literal -> TI (Substitution, Monotype)
 tiLit (Integer _) = return (mempty, Grounded Integer')
@@ -121,13 +119,13 @@ ti (Г env) (Variable n) = case Data.Map.lookup n env of
 	Just sigma -> (,) mempty <$> instantiate sigma
 ti _ (Literal l) = tiLit l
 ti env (Abstraction n e) = do
-	tv <- newTyVar "a"
+	tv <- newTyVar
 	let Г env' = remove env n
 	let env'' = Г $ Data.Map.union env' $ Data.Map.singleton n $ Polytype [] tv
 	(s1, t1) <- ti env'' e
 	pure (s1, Function (apply s1 tv) t1)
 ti env exp@(Application e1 e2) = do
-	tv <- newTyVar "a"
+	tv <- newTyVar
 	(s1, t1) <- ti env e1
 	(s2, t2) <- ti (apply s1 env) e2
 	s3 <- mgu (apply s2 t1) (Function t2 tv)
