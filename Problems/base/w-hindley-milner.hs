@@ -49,8 +49,8 @@ data Polytype = Polytype [Int] Monotype
 -- Finite mappings from type variables to types
 type Substitution = Map Int Monotype
 
-composeSubst :: Substitution -> Substitution -> Substitution
-composeSubst s1 s2 = Data.Map.union (apply s1 <$> s2) s1
+mergeSubstitutions :: Substitution -> Substitution -> Substitution
+mergeSubstitutions s1 s2 = Data.Map.union (apply s1 <$> s2) s1
 
 class Types a where
 	free :: a -> Set Int
@@ -81,11 +81,8 @@ instance Types Г where
 	free (Г env) = free $ Data.Map.elems env
 	apply s (Г env) = Г $ apply s <$> env
 
-generalize :: Г -> Monotype -> Polytype
-generalize env t = Polytype vars t where
-
-	vars :: [Int]
-	vars = Data.Set.toList $ Data.Set.difference (free t) (free env)
+generalize :: Monotype -> Г -> Polytype
+generalize t env = flip Polytype t . Data.Set.toList $ Data.Set.difference (free t) (free env)
 
 type Typechecker a = ExceptT Error (State Int) a
 
@@ -116,7 +113,7 @@ unification :: Monotype -> Monotype -> Typechecker Substitution
 unification (Function src tgt) (Function src' tgt') = do
 	arg <- unification src src'
 	result <- unification (apply arg tgt) (apply arg tgt')
-	pure $ composeSubst arg result
+	pure $ mergeSubstitutions arg result
 unification (Parametric u) t = varBind u t
 unification t (Parametric u) = varBind u t
 unification (Grounded Integer') (Grounded Integer') = pure mempty
@@ -145,15 +142,15 @@ ti env exp@(Application e1 e2) = do
 	(s1, t1) <- ti env e1
 	(s2, t2) <- ti (apply s1 env) e2
 	s3 <- unification (apply s2 t1) (Function t2 tv)
-	pure (s3 `composeSubst` s2 `composeSubst` s1, apply s3 tv)
+	pure (s3 `mergeSubstitutions` s2 `mergeSubstitutions` s1, apply s3 tv)
 	`catchError` (throwError . Within exp)
 ti env (Let x e1 e2) = do
 	(s1, t1) <- ti env e1
 	let Г env' = remove env x
-	let t' = generalize (apply s1 env) t1
+	let t' = generalize t1 $ apply s1 env
 	let env'' = Г $ Data.Map.insert x t' env'
 	(s2, t2) <- ti (apply s1 env'') e2
-	pure (s1 `composeSubst` s2, t2)
+	pure (s1 `mergeSubstitutions` s2, t2)
 
 typeInference :: Map String Polytype -> Expression -> Typechecker Monotype
 typeInference env e = uncurry apply <$> ti (Г env) e
@@ -165,5 +162,10 @@ test e = case fst $ tc (typeInference mempty e) of
 
 e0 = Let "id" (Abstraction "x" (Variable "x")) (Variable "id")
 e1 = Let "id" (Abstraction "x" (Variable "x")) (Application (Variable "id") (Variable "id"))
+e2 = Let "id" (Abstraction "x" (Let "y" (Variable "x") (Variable "y"))) (Application (Variable "id") (Variable "id"))
+e3 = Let "id" (Abstraction "x" (Let "y" (Variable "x") (Variable "y"))) (Application (Application (Variable "id") (Variable "id")) (Literal (Integer 2)))
+e4 = Let "id" (Abstraction "x" (Application (Variable "x") (Variable "x"))) (Variable "id")
+e5 = Abstraction "m" (Let "y" (Variable "m") (Let "x" (Application (Variable "y") (Literal (Boolean True))) (Variable "x")))
+e6 = Application (Literal (Integer 2)) (Literal (Integer 2))
 
-main = for [e0, e1] test
+main = for [e0, e1, e2, e3, e4, e5, e6] test
