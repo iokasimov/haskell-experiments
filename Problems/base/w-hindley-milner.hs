@@ -2,6 +2,7 @@ module Main where
 
 -- Source: https://github.com/wh5a/Algorithm-W-Step-By-Step
 
+import "base" Data.Traversable
 import "containers" Data.Map
 import "containers" Data.Set
 import "mtl" Control.Monad.Error
@@ -15,12 +16,23 @@ data Expression
 	| Application Expression Expression
 	| Abstraction String Expression
 	| Let String Expression Expression
-	deriving (Eq, Ord, Show)
+	deriving (Eq, Ord)
+
+instance Show Expression where
+	show (Variable v) = show v
+	show (Literal l) = show l
+	show (Application e e') = show e ++ "" ++ show e'
+	show (Abstraction arg body) = "\\" ++ show arg ++ " -> " ++ show body
+	show (Let v e body) = "let " ++ show v ++ " " ++ show e ++ " in " ++ show body
 
 data Literal
 	= Integer Integer
 	| Boolean Bool
-	deriving (Eq, Ord, Show)
+	deriving (Eq, Ord)
+
+instance Show Literal where
+	show (Integer i) = show i
+	show (Boolean b) = show b
 
 data Grounded
 	= Integer'
@@ -88,16 +100,13 @@ newTyVar :: TI Monotype
 newTyVar = modify (+1) *> (Parametric <$> get)
 
 instantiate :: Polytype -> TI Monotype
-instantiate (Polytype vars t) = do
-	nvars <- mapM (\_ -> newTyVar) vars
-	let s = Data.Map.fromList $ zip vars nvars
-	return $ apply s t
+instantiate (Polytype vars t) = flip apply t . Data.Map.fromList . zip vars <$> for vars (const newTyVar)
 
 mgu :: Monotype -> Monotype -> TI Substitution
 mgu (Function src tgt) (Function src' tgt') = do
-	s1 <- mgu src src'
-	s2 <- mgu (apply s1 tgt) (apply s1 tgt')
-	pure $ composeSubst s1 s2
+	arg <- mgu src src'
+	result <- mgu (apply arg tgt) (apply arg tgt')
+	pure $ composeSubst arg result
 mgu (Parametric u) t = varBind u t
 mgu t (Parametric u) = varBind u t
 mgu (Grounded Integer') (Grounded Integer') = pure mempty
@@ -109,15 +118,12 @@ varBind n t | t == Parametric n = pure mempty
 			| n `Data.Set.member` ftv t = throwError $ "occurs check fails: " ++ show n ++ " vs. " ++ show t
 			| otherwise = pure $ Data.Map.singleton n t
 
-tiLit :: Literal -> TI (Substitution, Monotype)
-tiLit (Integer _) = return (mempty, Grounded Integer')
-tiLit (Boolean _) = return (mempty, Grounded Boolean')
-
 ti :: Г -> Expression -> TI (Substitution, Monotype)
 ti (Г env) (Variable n) = case Data.Map.lookup n env of
 	Nothing -> throwError $ "Unbound variable: " ++ n
 	Just sigma -> (,) mempty <$> instantiate sigma
-ti _ (Literal l) = tiLit l
+ti _ (Literal (Integer _)) = pure (mempty, Grounded Integer')
+ti _ (Literal (Boolean _)) = pure (mempty, Grounded Boolean')
 ti env (Abstraction n e) = do
 	tv <- newTyVar
 	let Г env' = remove env n
@@ -147,7 +153,7 @@ test e = fst <$> runTI (typeInference mempty e) >>= \case
 	Left err -> putStrLn $ show e ++ "\n " ++ err ++ "\n"
 	Right t -> putStrLn $ show e ++ " : " ++ show t ++ "\n"
 
--- let id = \x -> x in id
 e0 = Let "id" (Abstraction "x" (Variable "x")) (Variable "id")
+e1 = Let "id" (Abstraction "x" (Variable "x")) (Application (Variable "id") (Variable "id"))
 
-main = test e0
+main = for [e0, e1] test
