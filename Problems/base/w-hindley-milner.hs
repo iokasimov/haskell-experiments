@@ -2,12 +2,11 @@ module Main where
 
 -- Source: https://github.com/wh5a/Algorithm-W-Step-By-Step
 
-import "base" Data.Traversable
+import "base" Data.Traversable (for)
 import "containers" Data.Map
 import "containers" Data.Set
-import "mtl" Control.Monad.Error
-import "mtl" Control.Monad.Reader
-import "mtl" Control.Monad.State
+import "mtl" Control.Monad.Except (ExceptT, runExceptT, catchError, throwError)
+import "mtl" Control.Monad.State (State, runState, get, modify)
 import "pretty" Text.PrettyPrint
 
 data Expression
@@ -88,10 +87,22 @@ generalize env t = Polytype vars t where
 	vars :: [Int]
 	vars = Data.Set.toList $ Data.Set.difference (free t) (free env)
 
-type Typechecker a = ErrorT String (StateT Int IO) a
+type Typechecker a = ExceptT Error (State Int) a
 
-tc :: Typechecker a -> IO (Either String a, Int)
-tc t = runStateT (runErrorT t) 0
+data Error
+	= Unbound String
+	| DoNotUnify Monotype Monotype
+	| CheckFail Int Monotype
+	| Within Expression Error
+
+instance Show Error where
+	show (Unbound n) = "Unbound variable: " ++ n
+	show (DoNotUnify t t') = "Monotypes do not unify: " ++ show t ++ " vs. " ++ show t'
+	show (CheckFail n t) = "Occurs check fails: " ++ show n ++ " vs. " ++ show t
+	show (Within expr err) = show err ++ "\n in " ++ show expr
+
+tc :: Typechecker a -> (Either Error a, Int)
+tc t = runState (runExceptT t) 0
 
 newTyVar :: Typechecker Monotype
 newTyVar = modify (+1) *> (Parametric <$> get)
@@ -110,16 +121,16 @@ unification (Parametric u) t = varBind u t
 unification t (Parametric u) = varBind u t
 unification (Grounded Integer') (Grounded Integer') = pure mempty
 unification (Grounded Boolean') (Grounded Boolean') = pure mempty
-unification t t' = throwError $ "Monotypes do not unify: " ++ show t ++ " vs. " ++ show t'
+unification t t' = throwError $ DoNotUnify t t'
 
 varBind :: Int -> Monotype -> Typechecker Substitution
 varBind n t | t == Parametric n = pure mempty
-			| n `Data.Set.member` free t = throwError $ "occurs check fails: " ++ show n ++ " vs. " ++ show t
+			| n `Data.Set.member` free t = throwError $ CheckFail n t
 			| otherwise = pure $ Data.Map.singleton n t
 
 ti :: Г -> Expression -> Typechecker (Substitution, Monotype)
 ti (Г env) (Variable n) = case Data.Map.lookup n env of
-	Nothing -> throwError $ "Unbound variable: " ++ n
+	Nothing -> throwError $ Unbound n
 	Just sigma -> (,) mempty <$> instantiate sigma
 ti _ (Literal (Integer _)) = pure (mempty, Grounded Integer')
 ti _ (Literal (Boolean _)) = pure (mempty, Grounded Boolean')
@@ -135,7 +146,7 @@ ti env exp@(Application e1 e2) = do
 	(s2, t2) <- ti (apply s1 env) e2
 	s3 <- unification (apply s2 t1) (Function t2 tv)
 	pure (s3 `composeSubst` s2 `composeSubst` s1, apply s3 tv)
-	`catchError` (\e -> throwError $ e ++ "\n in " ++ show exp)
+	`catchError` (throwError . Within exp)
 ti env (Let x e1 e2) = do
 	(s1, t1) <- ti env e1
 	let Г env' = remove env x
@@ -148,8 +159,8 @@ typeInference :: Map String Polytype -> Expression -> Typechecker Monotype
 typeInference env e = uncurry apply <$> ti (Г env) e
 
 test :: Expression -> IO ()
-test e = fst <$> tc (typeInference mempty e) >>= \case
-	Left err -> putStrLn $ show e ++ "\n " ++ err ++ "\n"
+test e = case fst $ tc (typeInference mempty e) of
+	Left err -> putStrLn $ show e ++ "\n " ++ show err ++ "\n"
 	Right t -> putStrLn $ show e ++ " : " ++ show t ++ "\n"
 
 e0 = Let "id" (Abstraction "x" (Variable "x")) (Variable "id")
