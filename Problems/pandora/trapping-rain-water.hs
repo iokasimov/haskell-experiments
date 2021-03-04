@@ -16,7 +16,7 @@ trapped walls = volume <$> peak walls <*> walls <*> peak @(Reverse t) -=: walls 
 	peak columns = extract . run % zero $ columns ->> compare
 
 	compare :: a :=> State a
-	compare x = modify (x \/) *> current
+	compare x = modify (x \/)
 
 --------------------------------------------------------------------------------
 

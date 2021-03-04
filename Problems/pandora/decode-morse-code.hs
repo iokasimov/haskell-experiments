@@ -86,7 +86,7 @@ data Morse = Dot | Dash
 search :: Stack Morse -> Maybe Char
 search code = extract . attached <$> run @(State Decoder :> Maybe) (code ->> decode) dictionary
 
-decode :: (Monad t, Optional t, Stateful Decoder t) => Morse -> t ()
+decode :: (Monad t, Optional t, Stateful Decoder t) => Morse -> t Decoder
 decode x = zoom @Decoder (x .- sub @Left $ sub @Right) current
 	>>= adapt . run @Binary >>= replace @Decoder
 

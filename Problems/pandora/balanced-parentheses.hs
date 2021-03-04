@@ -38,14 +38,14 @@ inspect :: Checking t => Symbol -> t ()
 inspect s = indexate *> decide s
 
 decide :: Checking t => Symbol -> t ()
-decide (Bracket opened Opened) = keep opened
-decide (Bracket closed Closed) = latest (deadend closed) (juxtapose closed)
+decide (Bracket opened Opened) = void $ keep opened
+decide (Bracket closed Closed) = void $ latest (deadend closed) (juxtapose closed)
 decide Nevermind = skip
 
-indexate :: Checking t => t ()
+indexate :: Checking t => t Index
 indexate = adjust @Trace @Index (+ one)
 
-keep :: Checking t => Style -> t ()
+keep :: Checking t => Style -> t Opened
 keep style = adjust @Trace @Opened . (!) =<< (+=)
 	<$> ((:*:) style <$> magnify @Trace @Index)
 	<*> magnify @Trace @Opened
@@ -58,7 +58,7 @@ latest on_empty f = zoom @Trace (focus @Right |> focus @Head) current
 juxtapose :: Checking t => Style -> Index -> Style -> t ()
 juxtapose closed oi opened = closed != opened
 	? mismatch closed opened oi
-	$ adjust @Trace @Opened $ view / sub @Tail
+	$ void . adjust @Trace @Opened $ view / sub @Tail
 
 skip :: Pointable t => t ()
 skip = point ()
@@ -86,15 +86,14 @@ deriving instance Show Style
 deriving instance Show Symbol
 deriving instance Show Stumble
 
-example_ok :: Stack Symbol -- , example_mismatch, example_deadend, example_logjam :: Stack Symbol
--- example_ok = insert (Bracket Curly Opened) $ insert Nevermind $ insert (Bracket Curly Closed) $ empty  -- {x}
+example_ok, example_mismatch, example_deadend, example_logjam :: Stack Symbol
 example_ok = Bracket Curly Opened += Nevermind += Bracket Curly Closed += empty  -- {x}
--- example_mismatch = insert (Bracket Curly Opened) $ insert (Bracket Square Closed) $ empty -- {]
--- example_deadend = insert (Bracket Round Closed) empty -- )
--- example_logjam = insert (Bracket Angle Opened) empty -- <
+example_mismatch = Bracket Curly Opened += Bracket Square Closed += empty -- {]
+example_deadend = Bracket Round Closed += empty -- )
+example_logjam = Bracket Angle Opened += empty -- <
 
 main = do
 	check example_ok
-	-- check example_mismatch
-	-- check example_deadend
-	-- check example_logjam
+	check example_mismatch
+	check example_deadend
+	check example_logjam

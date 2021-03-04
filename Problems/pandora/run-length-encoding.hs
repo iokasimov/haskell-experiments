@@ -16,9 +16,9 @@ type Counter = Stack Occurence
 proceed :: Char -> State Counter ()
 proceed next = zoom @Counter (focus @Head) (current @(Maybe Occurence)) >>= \case
 	Just (n :*: previous) -> next == previous
-		? zoom @Counter (focus @Head) (replace . Just $ n + 1 :*: previous)
-		$ modify @Counter ((1 :*: next) +=)
-	Nothing -> modify @Counter ((1 :*: next) +=)
+		? void (zoom @Counter (focus @Head) (replace . Just $ n + 1 :*: previous))
+		$ void (modify @Counter ((1 :*: next) +=))
+	Nothing -> void $ modify @Counter ((1 :*: next) +=)
 
 --------------------------------------------------------------------------------
 
