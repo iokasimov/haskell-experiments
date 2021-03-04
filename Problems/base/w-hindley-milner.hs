@@ -54,23 +54,24 @@ composeSubst :: Substitution -> Substitution -> Substitution
 composeSubst s1 s2 = Data.Map.union (apply s1 <$> s2) s1
 
 class Types a where
-	ftv :: a -> Set Int
+	free :: a -> Set Int
 	apply :: Substitution -> a -> a
 
 instance Types Monotype where
-	ftv (Parametric n) = Data.Set.singleton n
-	ftv (Grounded Integer') = mempty
-	ftv (Grounded Boolean') = mempty
-	ftv (Function st tt) = Data.Set.union (ftv st) (ftv tt)
+	free (Parametric n) = Data.Set.singleton n
+	free (Grounded Integer') = mempty
+	free (Grounded Boolean') = mempty
+	free (Function st tt) = Data.Set.union (free st) (free tt)
 	apply s (Function st tt) = Function (apply s st) (apply s tt)
 	apply _ t = t
 
 instance Types Polytype where
-	ftv (Polytype vars t) = Data.Set.difference (ftv t) $ Data.Set.fromList vars
+	free (Polytype vars t) = Data.Set.difference (free t) $ Data.Set.fromList vars
 	apply s (Polytype vars t) = Polytype vars $ apply (Prelude.foldr Data.Map.delete s vars) t
 
 instance Types a => Types [a] where
-	ftv l = Prelude.foldr Data.Set.union mempty $ ftv <$> l
+	free l = Prelude.foldr Data.Set.union mempty $ free <$> l
+	apply s x = apply s <$> x
 
 newtype Г = Г (Map String Polytype)
 
@@ -78,47 +79,45 @@ remove :: Г -> String -> Г
 remove (Г env) var = Г $ Data.Map.delete var env
 
 instance Types Г where
-	ftv (Г env) = ftv $ Data.Map.elems env
+	free (Г env) = free $ Data.Map.elems env
 	apply s (Г env) = Г $ apply s <$> env
 
 generalize :: Г -> Monotype -> Polytype
 generalize env t = Polytype vars t where
 
 	vars :: [Int]
-	vars = Data.Set.toList $ Data.Set.difference (ftv t) (ftv env)
+	vars = Data.Set.toList $ Data.Set.difference (free t) (free env)
 
-data TIEnv = TIEnv
+type Typechecker a = ErrorT String (StateT Int IO) a
 
-type TIState = Int
+tc :: Typechecker a -> IO (Either String a, Int)
+tc t = runStateT (runErrorT t) 0
 
-type TI a = ErrorT String (ReaderT TIEnv (StateT TIState IO)) a
-
-runTI :: TI a -> IO (Either String a, TIState)
-runTI t = runStateT (runReaderT (runErrorT t) TIEnv) 0
-
-newTyVar :: TI Monotype
+newTyVar :: Typechecker Monotype
 newTyVar = modify (+1) *> (Parametric <$> get)
 
-instantiate :: Polytype -> TI Monotype
+-- The instantiation function replaces all bound type variables in a polytype with fresh type variables.
+instantiate :: Polytype -> Typechecker Monotype
 instantiate (Polytype vars t) = flip apply t . Data.Map.fromList . zip vars <$> for vars (const newTyVar)
 
-mgu :: Monotype -> Monotype -> TI Substitution
-mgu (Function src tgt) (Function src' tgt') = do
-	arg <- mgu src src'
-	result <- mgu (apply arg tgt) (apply arg tgt')
+-- For two types t1 and t2, unification returns the most general unifier
+unification :: Monotype -> Monotype -> Typechecker Substitution
+unification (Function src tgt) (Function src' tgt') = do
+	arg <- unification src src'
+	result <- unification (apply arg tgt) (apply arg tgt')
 	pure $ composeSubst arg result
-mgu (Parametric u) t = varBind u t
-mgu t (Parametric u) = varBind u t
-mgu (Grounded Integer') (Grounded Integer') = pure mempty
-mgu (Grounded Boolean') (Grounded Boolean') = pure mempty
-mgu t t' = throwError $ "Monotypes do not unify: " ++ show t ++ " vs. " ++ show t'
+unification (Parametric u) t = varBind u t
+unification t (Parametric u) = varBind u t
+unification (Grounded Integer') (Grounded Integer') = pure mempty
+unification (Grounded Boolean') (Grounded Boolean') = pure mempty
+unification t t' = throwError $ "Monotypes do not unify: " ++ show t ++ " vs. " ++ show t'
 
-varBind :: Int -> Monotype -> TI Substitution
+varBind :: Int -> Monotype -> Typechecker Substitution
 varBind n t | t == Parametric n = pure mempty
-			| n `Data.Set.member` ftv t = throwError $ "occurs check fails: " ++ show n ++ " vs. " ++ show t
+			| n `Data.Set.member` free t = throwError $ "occurs check fails: " ++ show n ++ " vs. " ++ show t
 			| otherwise = pure $ Data.Map.singleton n t
 
-ti :: Г -> Expression -> TI (Substitution, Monotype)
+ti :: Г -> Expression -> Typechecker (Substitution, Monotype)
 ti (Г env) (Variable n) = case Data.Map.lookup n env of
 	Nothing -> throwError $ "Unbound variable: " ++ n
 	Just sigma -> (,) mempty <$> instantiate sigma
@@ -134,7 +133,7 @@ ti env exp@(Application e1 e2) = do
 	tv <- newTyVar
 	(s1, t1) <- ti env e1
 	(s2, t2) <- ti (apply s1 env) e2
-	s3 <- mgu (apply s2 t1) (Function t2 tv)
+	s3 <- unification (apply s2 t1) (Function t2 tv)
 	pure (s3 `composeSubst` s2 `composeSubst` s1, apply s3 tv)
 	`catchError` (\e -> throwError $ e ++ "\n in " ++ show exp)
 ti env (Let x e1 e2) = do
@@ -145,11 +144,11 @@ ti env (Let x e1 e2) = do
 	(s2, t2) <- ti (apply s1 env'') e2
 	pure (s1 `composeSubst` s2, t2)
 
-typeInference :: Map String Polytype -> Expression -> TI Monotype
+typeInference :: Map String Polytype -> Expression -> Typechecker Monotype
 typeInference env e = uncurry apply <$> ti (Г env) e
 
 test :: Expression -> IO ()
-test e = fst <$> runTI (typeInference mempty e) >>= \case
+test e = fst <$> tc (typeInference mempty e) >>= \case
 	Left err -> putStrLn $ show e ++ "\n " ++ err ++ "\n"
 	Right t -> putStrLn $ show e ++ " : " ++ show t ++ "\n"
 
