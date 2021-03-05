@@ -52,11 +52,11 @@ type Substitution = Map Int Monotype
 mergeSubstitutions :: Substitution -> Substitution -> Substitution
 mergeSubstitutions s1 s2 = Data.Map.union (apply s1 <$> s2) s1
 
-class Types a where
+class Substitutable a where
 	free :: a -> Set Int
 	apply :: Substitution -> a -> a
 
-instance Types Monotype where
+instance Substitutable Monotype where
 	free (Parametric n) = Data.Set.singleton n
 	free (Grounded Integer') = mempty
 	free (Grounded Boolean') = mempty
@@ -64,11 +64,11 @@ instance Types Monotype where
 	apply s (Function st tt) = Function (apply s st) (apply s tt)
 	apply _ t = t
 
-instance Types Polytype where
+instance Substitutable Polytype where
 	free (Polytype vars t) = Data.Set.difference (free t) $ Data.Set.fromList vars
 	apply s (Polytype vars t) = Polytype vars $ apply (Prelude.foldr Data.Map.delete s vars) t
 
-instance Types a => Types [a] where
+instance Substitutable a => Substitutable [a] where
 	free l = Prelude.foldr Data.Set.union mempty $ free <$> l
 	apply s x = apply s <$> x
 
@@ -77,7 +77,7 @@ newtype Г = Г (Map String Polytype)
 remove :: Г -> String -> Г
 remove (Г env) var = Г $ Data.Map.delete var env
 
-instance Types Г where
+instance Substitutable Г where
 	free (Г env) = free $ Data.Map.elems env
 	apply s (Г env) = Г $ apply s <$> env
 
@@ -104,16 +104,16 @@ tc t = runState (runExceptT t) 0
 newTyVar :: Typechecker Monotype
 newTyVar = modify (+1) *> (Parametric <$> get)
 
--- The instantiation function replaces all bound type variables in a polytype with fresh type variables.
+-- The instantiation function replaces all bound type variables in a polytype with fresh type variables
 instantiate :: Polytype -> Typechecker Monotype
 instantiate (Polytype vars t) = flip apply t . Data.Map.fromList . zip vars <$> for vars (const newTyVar)
 
 -- For two types t1 and t2, unification returns the most general unifier
 unification :: Monotype -> Monotype -> Typechecker Substitution
-unification (Function src tgt) (Function src' tgt') = do
-	arg <- unification src src'
-	result <- unification (apply arg tgt) (apply arg tgt')
-	pure $ mergeSubstitutions arg result
+unification (Function a b) (Function c d) = do
+	input <- unification a c
+	result <- unification (apply input b) (apply input d)
+	pure $ mergeSubstitutions input result
 unification (Parametric u) t = varBind u t
 unification t (Parametric u) = varBind u t
 unification (Grounded Integer') (Grounded Integer') = pure mempty
@@ -121,9 +121,9 @@ unification (Grounded Boolean') (Grounded Boolean') = pure mempty
 unification t t' = throwError $ DoNotUnify t t'
 
 varBind :: Int -> Monotype -> Typechecker Substitution
-varBind n t | t == Parametric n = pure mempty
-			| n `Data.Set.member` free t = throwError $ CheckFail n t
-			| otherwise = pure $ Data.Map.singleton n t
+varBind n ((== Parametric n) -> True) = pure mempty
+varBind n t@(Data.Set.member n . free -> True) = throwError $ CheckFail n t
+varBind n t = pure $ Data.Map.singleton n t
 
 ti :: Г -> Expression -> Typechecker (Substitution, Monotype)
 ti (Г env) (Variable n) = case Data.Map.lookup n env of
