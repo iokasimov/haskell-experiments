@@ -16,7 +16,7 @@ instance Covariant [] where
 
 instance Traversable [] where
 	[] ->> _ = point []
-	(x : xs) ->> f = (:) <$> f x <*> (xs ->> f)
+	(x : xs) ->> f = (:) <$> f x <*> xs ->> f
 
 deriving instance (Base.Show a, Base.Show b) => Base.Show (a :*: b)
 deriving instance Base.Show a => Base.Show (Maybe a)
