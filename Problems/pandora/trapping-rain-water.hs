@@ -20,7 +20,7 @@ trapped walls = volume <$> peak walls <*> walls <*> peak @(Reverse t) -=: walls 
 
 --------------------------------------------------------------------------------
 
-example :: Stack Int
+example :: List Int
 example = 2 += 5 += 1 += 2 += 3 += 4 += 7 += 7 += 6 += empty
 
 main = print . reduce @Int (+) 0 $ trapped example

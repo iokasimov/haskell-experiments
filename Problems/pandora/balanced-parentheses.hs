@@ -27,7 +27,7 @@ data Stumble
 	| Logjam Style Index -- Opened bracket without closed one
 	| Mismatch Style Index Style Index -- Closed bracket doesn't match opened one
 
-type Opened = Stack Open
+type Opened = List Open
 
 type Trace = Index :*: Opened
 
@@ -86,7 +86,7 @@ deriving instance Show Style
 deriving instance Show Symbol
 deriving instance Show Stumble
 
-example_ok, example_mismatch, example_deadend, example_logjam :: Stack Symbol
+example_ok, example_mismatch, example_deadend, example_logjam :: List Symbol
 example_ok = Bracket Curly Opened += Nevermind += Bracket Curly Closed += empty  -- {x}
 example_mismatch = Bracket Curly Opened += Bracket Square Closed += empty -- {]
 example_deadend = Bracket Round Closed += empty -- )

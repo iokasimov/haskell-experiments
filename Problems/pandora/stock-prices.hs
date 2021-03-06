@@ -21,18 +21,18 @@ instance (Chain a, Group a) => Supremum (Profit a) where
 		let cheaper = buy <=> buy' & order r l l
 		in sell - buy <=> sell' - buy' & order r cheaper l
 
-type Quotes = Nonempty Stack
+type Quotes = Nonempty List
 
-type Potential a = Stack :. Profit := a
+type Potential a = List :. Profit := a
 
 stonks :: forall a . (Chain a, Group a) => Quotes a -> Profit a
 stonks prices = top $ prices =>> potential where
 
-	potential :: Quotes a -> Stack := Profit a
+	potential :: Quotes a -> List := Profit a
 	potential remaining = let buy = extract remaining in
 		unite $ Profit buy <$$> deconstruct remaining
 
-	top :: Nonempty Stack (Potential a) -> Profit a
+	top :: Nonempty List (Potential a) -> Profit a
 	top = reduce (\/) zero . reduce @(Potential a) (+) empty
 
 --------------------------------------------------------------------------------

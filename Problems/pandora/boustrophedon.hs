@@ -17,8 +17,8 @@ example = Construct 1 $ Both
 
 main = void $ do
 	print "--------------------- Preorder -----------------------"
-	print $ into @(Preorder (Nonempty Stack)) example
+	print $ into @(Preorder (Nonempty List)) example
 	print "--------------------- Postorder -----------------------"
-	print $ into @(Postorder (Nonempty Stack)) example
+	print $ into @(Postorder (Nonempty List)) example
 	print "--------------------- Inorder -----------------------"
-	print $ into @(Inorder (Nonempty Stack)) example
+	print $ into @(Inorder (Nonempty List)) example

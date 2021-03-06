@@ -83,7 +83,7 @@ data Morse = Dot | Dash
 (.-) Dot x _ = x
 (.-) Dash _ y = y
 
-search :: Stack Morse -> Maybe Char
+search :: List Morse -> Maybe Char
 search code = extract . attached <$> run @(State Decoder :> Maybe) (code ->> decode) dictionary
 
 decode :: (Monad t, Optional t, Stateful Decoder t) => Morse -> t Decoder
@@ -92,7 +92,7 @@ decode x = zoom @Decoder (x .- sub @Left $ sub @Right) current
 
 --------------------------------------------------------------------------------
 
-digit4 :: Stack Morse
+digit4 :: List Morse
 digit4 = Dot += Dot += Dot += Dot += Dash += empty
 
 main = search digit4 & resolve @Char print (print "Not found...")

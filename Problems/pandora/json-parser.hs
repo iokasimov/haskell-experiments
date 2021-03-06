@@ -10,9 +10,9 @@ data Digit = D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9
 
 data Value = Null
 	| Bool Boolean
-	| String (Stack Char)
-	| Number (Nonempty Stack Digit) (Stack Digit) (Stack Digit)
-	| Array (Stack Value)
-	| Object (Stack (Stack Char :*: Value))
+	| String (List Char)
+	| Number (Nonempty List Digit) (List Digit) (List Digit)
+	| Array (List Value)
+	| Object (List (List Char :*: Value))
 
 main = print "typechecked"

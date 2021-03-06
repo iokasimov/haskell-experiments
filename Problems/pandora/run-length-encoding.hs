@@ -11,7 +11,7 @@ import Gears.Instances
 
 type Occurence = Int :*: Char
 
-type Counter = Stack Occurence
+type Counter = List Occurence
 
 proceed :: Char -> State Counter ()
 proceed next = zoom @Counter (focus @Head) (current @(Maybe Occurence)) >>= \case
@@ -22,7 +22,7 @@ proceed next = zoom @Counter (focus @Head) (current @(Maybe Occurence)) >>= \cas
 
 --------------------------------------------------------------------------------
 
-example :: Stack Char
+example :: List Char
 example = 'a' += 'a' += 'a' += 'a' += 'b' += 'b' += 'b' += 'c' += 'c' += 'a' += empty
 
 main = void $ do

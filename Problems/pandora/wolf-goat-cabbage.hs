@@ -27,17 +27,17 @@ survive Goat Cabbage = Nothing
 survive Cabbage Goat = Nothing
 survive _ _ = Just ()
 
-type River = Stack Character :*: Stack Character
+type River = List Character :*: List Character
 
 type Enumeration = Comprehension Maybe
 
 step :: Boolean -> State River :> Enumeration := Maybe Character
 step way = adapt bank >>= adapt . choice >>= adapt . (->> transport) where
 
-	bank :: State River := Stack Character
+	bank :: State River := List Character
 	bank = view source <$> current
 
-	choice :: Stack Character -> Enumeration :. Maybe := Character
+	choice :: List Character -> Enumeration :. Maybe := Character
 	choice xs = Comprehension $ filter (lunchtime >$< null) boats where
 
 		lunchtime :: Maybe Character -> Maybe :. Enumeration := ()
@@ -46,13 +46,13 @@ step way = adapt bank >>= adapt . choice >>= adapt . (->> transport) where
 		selection :: Maybe Character -> Enumeration Character
 		selection = Comprehension . resolve @Character (-= xs) xs
 
-		boats :: Stack :. Maybe := Character
+		boats :: List :. Maybe := Character
 		boats = Nothing += (Just <$> xs)
 
 	transport :: Character :=> State River
 	transport being = source ~<> (being -=) *> target ~<> (being +=) $> being
 
-	source, target :: River :-. Stack Character
+	source, target :: River :-. List Character
 	source = way ? focus @Right $ focus @Left
 	target = way ? focus @Left $ focus @Right
 
@@ -64,13 +64,13 @@ route = point . bool True False .-+ False
 start :: River
 start = characters :*: empty where
 
-	characters :: Stack Character
+	characters :: List Character
 	characters = Wolf += Goat += Cabbage += empty
 
-solution :: Stack [Maybe Character]
+solution :: List [Maybe Character]
 solution = extract <$> filter moved result where
 
-	result :: Stack (River :*: [Maybe Character])
+	result :: List (River :*: [Maybe Character])
 	result = run . run % start $ take_n_stream 7 route ->> step
 
 	moved :: Predicate (River :*: [Maybe Character])

@@ -9,11 +9,11 @@ import qualified Prelude as Base (Int, Semigroup ((<>)), Show (show), min, max, 
 
 import Gears.Instances ()
 
-stack_to_list :: [a] -> Stack a -> [a]
+stack_to_list :: [a] -> List a -> [a]
 stack_to_list r (TU (Just (Construct x next))) = stack_to_list (x : r) $ TU next
 stack_to_list r (TU Nothing) = r
 
-nonempty_stack_to_list :: [a] -> Nonempty Stack a -> [a]
+nonempty_stack_to_list :: [a] -> Nonempty List a -> [a]
 nonempty_stack_to_list r (Construct x Nothing) = x : r
 nonempty_stack_to_list r (Construct x (Just next)) = x : nonempty_stack_to_list r next
 

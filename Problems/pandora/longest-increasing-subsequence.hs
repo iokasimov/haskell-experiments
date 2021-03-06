@@ -12,16 +12,16 @@ import Gears.Utils (int, stack_to_list, nonempty_stack_to_list)
 
 -- join $ increase (extract seq) . extract <$> deconstruct seq
 
-try :: Nonempty Stack Int -> Nonempty Stack (Maybe (Nonempty Stack (Stack Int)))
+try :: Nonempty List Int -> Nonempty List (Maybe (Nonempty List (List Int)))
 try seq = seq =>> connect
 
-connect :: Nonempty Stack Int -> Maybe (Construction Maybe (Stack Int))
+connect :: Nonempty List Int -> Maybe (Construction Maybe (List Int))
 connect subseq = increase (extract subseq) <$$> deconstruct subseq where
 
-	increase :: Int -> Int -> Stack Int
+	increase :: Int -> Int -> List Int
 	increase x y = x < y ? (empty & (x +=) & (y +=)) $ unite Nothing
 
-example :: Nonempty Stack Int
+example :: Nonempty List Int
 example = 3 += 1 += 8 += 2 += point 5
 
 main = void $ print "WIP"

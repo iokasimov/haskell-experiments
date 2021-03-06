@@ -34,7 +34,7 @@ instance Base.Show a => Base.Show (Construction Maybe a) where
 	show (Construct x (Just xs)) = Base.show x Base.++ ", " Base.++ Base.show xs
 	show (Construct x Nothing) = Base.show x
 
-instance Base.Show a => Base.Show (Stack a) where
+instance Base.Show a => Base.Show (List a) where
 	show (TU (Just stack)) = Base.show stack
 	show (TU Nothing) = ""
 

@@ -9,7 +9,7 @@ import "base" System.IO (print)
 
 import Gears.Instances ()
 
--- jump :: Nonempty Stack Int -> _
+-- jump :: Nonempty List Int -> _
 -- jump capabilities = insert (extract capabilities) <$>
 
 -- possible 0 capabilities = empty
@@ -17,7 +17,7 @@ import Gears.Instances ()
 
 --------------------------------------------------------------------------------
 
-example :: Nonempty Stack Int
+example :: Nonempty List Int
 example = 6 += 2 += 4 += 0 += 5 += 1 += 1 += 4 += 2 += point 9
 
 main = void $ do
