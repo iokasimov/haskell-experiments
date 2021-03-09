@@ -17,13 +17,15 @@ proceed :: Char -> State Counter ()
 proceed next = zoom @Counter (focus @Head) (current @(Maybe Occurence)) >>= \case
 	Just (n :*: previous) -> next == previous
 		? void (zoom @Counter (focus @Head) (replace . Just $ n + 1 :*: previous))
-		$ void (modify @Counter ((1 :*: next) +=))
-	Nothing -> void $ modify @Counter ((1 :*: next) +=)
+		$ void (modify @Counter (item @Push $ 1 :*: next))
+	Nothing -> void $ modify @Counter (item @Push $ 1 :*: next)
 
 --------------------------------------------------------------------------------
 
 example :: List Char
-example = 'a' += 'a' += 'a' += 'a' += 'b' += 'b' += 'b' += 'c' += 'c' += 'a' += empty
+example = item @Push 'a' $ item @Push 'a' $ item @Push 'a'
+	$ item @Push 'a' $ item @Push 'b' $ item @Push 'b' $ item @Push 'b'
+	$ item @Push 'c' $ item @Push 'c' $ item @Push 'a' $ empty
 
 main = void $ do
 	print example

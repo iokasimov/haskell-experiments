@@ -19,7 +19,7 @@ type Path = List Directory
 data Link = Forward Directory | Previous | Current
 
 settle :: Link -> State Path ()
-settle (Forward dir) = void $ modify @Path (dir +=)
+settle (Forward dir) = void $ modify @Path $ item @Push dir
 settle Previous = void $ focus @Head @List @Directory =<> Nothing
 settle Current = point ()
 
@@ -29,13 +29,19 @@ solution unresolved = attached $ run (unresolved ->> settle) empty
 --------------------------------------------------------------------------------
 
 usr, bin, scripts :: Directory
-usr = 'u' += 's' += point 'r'
-bin = 'b' += 'i' += point 'n'
-scripts = 's' += 'c' += 'r' += 'i' += 'p' += 't' += point 's'
+usr = item @Push 'u' $ item @Push 's' $ point 'r'
+bin = item @Push 'b' $ item @Push 'i' $ point 'n'
+scripts = item @Push 's' $ item @Push 'c' $ item @Push 'r' $ item @Push 'i' $ item @Push 'p' $ item @Push 't' $ point 's'
 
 -- /usr/bin/../bin/./scripts/../
 example :: List Link
-example = Forward usr += Forward bin += Previous += Forward bin
-	+= Current += Forward scripts += Previous += empty
+example = item @Push (Forward usr)
+	$ item @Push (Forward bin)
+	$ item @Push Previous
+	$ item @Push (Forward bin)
+	$ item @Push Current
+	$ item @Push (Forward scripts)
+	$ item @Push Previous
+	$ empty
 
 main = void $ Reverse (solution example) ->> print

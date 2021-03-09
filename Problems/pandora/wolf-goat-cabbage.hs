@@ -47,10 +47,10 @@ step way = adapt bank >>= adapt . choice >>= adapt . (->> transport) where
 		selection = Comprehension . resolve @Character (-= xs) xs
 
 		boats :: List :. Maybe := Character
-		boats = Nothing += (Just <$> xs)
+		boats = item @Push Nothing $ Just <$> xs
 
 	transport :: Character :=> State River
-	transport being = source ~<> (being -=) *> target ~<> (being +=) $> being
+	transport being = source ~<> (being -=) *> target ~<> item @Push being $> being
 
 	source, target :: River :-. List Character
 	source = way ? focus @Right $ focus @Left
@@ -65,7 +65,7 @@ start :: River
 start = characters :*: empty where
 
 	characters :: List Character
-	characters = Wolf += Goat += Cabbage += empty
+	characters = item @Push Wolf $ item @Push Goat $ item @Push Cabbage $ empty
 
 solution :: List [Maybe Character]
 solution = extract <$> filter moved result where

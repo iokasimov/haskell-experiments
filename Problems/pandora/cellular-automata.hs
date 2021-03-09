@@ -55,7 +55,7 @@ purge = putStr "\ESC[2J"
 --------------------------------------------------------------------------------
 
 -- type II = Zipper Stream <:.> Zipper Stream
-type II = Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)
+type II = Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))
 
 instance Extendable II where
 	zz =>> f = f <$> TU (horizontal <$> vertical zz) where
@@ -67,31 +67,31 @@ instance Extendable II where
 		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
 
-instance Substructure Down (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
-	type Substructural Down (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Stream <:.> Zipper Stream
+instance Substructure Down (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
+	type Substructural Down (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Stream <:.> Zipper Stream
 	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) = Store $ TU d :*: lift . TU . Tap focused . T_U . (:*: u) . run
 
-instance Substructure Up (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
-	type Substructural Up (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Stream <:.> Zipper Stream
+instance Substructure Up (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
+	type Substructural Up (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Stream <:.> Zipper Stream
 	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) = Store $ TU u :*: lift . TU . Tap focused . T_U . (d :*:) . run
 
-instance Covariant t => Substructure Left ((:*:) <:.:> t) where
-	type Substructural Left ((:*:) <:.:> t) = t
+instance Covariant t => Substructure Left (t <:.:> t := (:*:)) where
+	type Substructural Left (t <:.:> t := (:*:)) = t
 	substructure (run . extract . run -> l :*: r) = Store $ l :*: lift . T_U . (:*: r)
 
-instance Covariant t => Substructure Right ((:*:) <:.:> t) where
-	type Substructural Right ((:*:) <:.:> t) = t
+instance Covariant t => Substructure Right (t <:.:> t := (:*:)) where
+	type Substructural Right (t <:.:> t := (:*:)) = t
 	substructure (run . extract . run -> l :*: r) = Store $ r :*: lift . T_U . (l :*:)
 
-instance Substructure Left (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
-	type Substructural Left (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Zipper Stream <:.> Stream
+instance Substructure Left (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
+	type Substructural Left (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Zipper Stream <:.> Stream
 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let left = sub @Tail |> sub @Left in
 		let target = TU . Tap (view left x) . T_U $ view left <$> d :*: view left <$> u in
 		let around lx = set left <$> view left lx <*> d :*: set left <$> view left lx <*> u in
 		Store $ target :*: \lx -> lift . TU . Tap (set left / extract (run lx) / x) . T_U $ around / run lx
 
-instance Substructure Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) where
-	type Substructural Right (Tap ((:*:) <:.:> Stream) <:.> Tap ((:*:) <:.:> Stream)) = Zipper Stream <:.> Stream
+instance Substructure Right (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
+	type Substructural Right (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Zipper Stream <:.> Stream
 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let right = sub @Tail |> sub @Right in
 		let target = TU . Tap (view right x) . T_U $ view right <$> d :*: view right <$> u in
 		let around rx = set right <$> view right rx <*> d :*: set right <$> view right rx <*> u in

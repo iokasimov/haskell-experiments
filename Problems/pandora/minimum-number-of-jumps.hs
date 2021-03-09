@@ -18,7 +18,8 @@ import Gears.Instances ()
 --------------------------------------------------------------------------------
 
 example :: Nonempty List Int
-example = 6 += 2 += 4 += 0 += 5 += 1 += 1 += 4 += 2 += point 9
+example = item @Push 6 $ item @Push 2 $ item @Push 4 $ item @Push 0 $ item @Push 5
+	$ item @Push 1 $ item @Push 1 $ item @Push 4 $ item @Push 2 $ point 9
 
 main = void $ do
 	print "WIP"

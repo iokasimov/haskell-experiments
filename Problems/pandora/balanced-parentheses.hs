@@ -45,7 +45,7 @@ decide (Bracket closed Closed) = latest (deadend closed) (juxtapose closed)
 decide Nevermind = skip
 
 remember :: Checking t => Style -> t ()
-remember style = void . adjust @Trace @Opened . (!) =<< (+=)
+remember style = void . adjust @Trace @Opened . (!) =<< item @Push
 	<$> ((:*:) style <$> magnify @Trace @Index)
 	<*> magnify @Trace @Opened
 
@@ -87,10 +87,10 @@ deriving instance Show Symbol
 deriving instance Show Stumble
 
 example_ok, example_mismatch, example_deadend, example_logjam :: List Symbol
-example_ok = Bracket Curly Opened += Nevermind += Bracket Curly Closed += empty  -- {x}
-example_mismatch = Bracket Curly Opened += Bracket Square Closed += empty -- {]
-example_deadend = Bracket Round Closed += empty -- )
-example_logjam = Bracket Angle Opened += empty -- <
+example_ok = item @Push (Bracket Curly Opened) $ item @Push Nevermind $ item @Push (Bracket Curly Closed) $ empty  -- {x}
+example_mismatch = item @Push (Bracket Curly Opened) $ item @Push (Bracket Square Closed) $ empty -- {]
+example_deadend = item @Push (Bracket Round Closed) $ empty -- )
+example_logjam = item @Push (Bracket Angle Opened) $ empty -- <
 
 main = do
 	interpret $ check example_ok

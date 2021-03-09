@@ -14,12 +14,12 @@ data Variable = A | B
 deriving instance Show Variable
 
 algae :: Variable -> Comprehension Maybe Variable
-algae A = Comprehension $ A += B += empty
-algae B = Comprehension $ A += empty
+algae A = Comprehension $ item @Push A $ item @Push B empty
+algae B = Comprehension $ item @Push A empty
 
 --------------------------------------------------------------------------------
 
 start :: Comprehension Maybe Variable
-start = Comprehension $ A += empty
+start = Comprehension $ item @Push A empty
 
 main = print . run $ start >>= algae >>= algae >>= algae >>= algae

@@ -40,7 +40,7 @@ stonks prices = top $ prices =>> potential where
 deriving instance Show a => Show (Profit a)
 
 example :: Quotes Int
-example = 9 += 11 += 8 += 5 += 7 += point 10
+example = item @Push 9 $ item @Push 1 $ item @Push 1 $ item @Push 8 $ item @Push 5 $ item @Push 7 $ point 10
 -- example = insert 10 $ insert 7 $ insert 5 $ insert 8 $ insert 11 $ point 9
 
 main = print $ stonks example

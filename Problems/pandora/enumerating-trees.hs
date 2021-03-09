@@ -19,7 +19,7 @@ zipper_to_binary_degenerated (Tap x (T_U (bs :*: fs))) = Construct x . into @Wye
 --------------------------------------------------------------------------------
 
 example :: Nonempty List Int
-example = 1 += 2 += point 3
+example = item @Push 1 $ item @Push 2 $ point 3
 
 example_zipper :: Zipper List Int
 example_zipper = Tap 1 . T_U $ empty :*: unite (deconstruct example)

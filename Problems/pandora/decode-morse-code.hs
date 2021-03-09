@@ -1,8 +1,12 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
+import "pandora-io" Pandora.IO
 
 import Prelude (Char, print)
+import Gears.Instances ()
 
 both :: a -> Nonempty Binary a -> Nonempty Binary a -> Nonempty Binary a
 both x l r = Construct x $ Both l r
@@ -93,6 +97,6 @@ decode x = zoom @Decoder (x .- sub @Left $ sub @Right) current
 --------------------------------------------------------------------------------
 
 digit4 :: List Morse
-digit4 = Dot += Dot += Dot += Dot += Dash += empty
+digit4 = item @Push Dot $ item @Push Dot $ item @Push Dot $ item @Push Dot $ item @Push Dash $ empty
 
 main = search digit4 & resolve @Char print (print "Not found...")
