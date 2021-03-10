@@ -38,19 +38,19 @@ step way = adapt bank >>= adapt . choice >>= adapt . (->> transport) where
 	bank = view source <$> current
 
 	choice :: List Character -> Enumeration :. Maybe := Character
-	choice xs = Comprehension $ filter (lunchtime >$< null) boats where
+	choice xs = Comprehension $ filter @All (lunchtime >$< null) boats where
 
 		lunchtime :: Maybe Character -> Maybe :. Enumeration := ()
 		lunchtime x = sequence $ survive <$> selection x <*> selection x
 
 		selection :: Maybe Character -> Enumeration Character
-		selection = Comprehension . resolve @Character (-= xs) xs
+		selection = Comprehension . resolve @Character (delete @First % xs) xs
 
 		boats :: List :. Maybe := Character
 		boats = item @Push Nothing $ Just <$> xs
 
 	transport :: Character :=> State River
-	transport being = source ~<> (being -=) *> target ~<> item @Push being $> being
+	transport being = source ~<> delete @First being *> target ~<> item @Push being $> being
 
 	source, target :: River :-. List Character
 	source = way ? focus @Right $ focus @Left
@@ -68,7 +68,7 @@ start = characters :*: empty where
 	characters = item @Push Wolf $ item @Push Goat $ item @Push Cabbage $ empty
 
 solution :: List [Maybe Character]
-solution = extract <$> filter moved result where
+solution = extract <$> filter @All moved result where
 
 	result :: List (River :*: [Maybe Character])
 	result = run . run % start $ take_n_stream 7 route ->> step
