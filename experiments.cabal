@@ -570,7 +570,7 @@ executable joint-wolf-goat-cabbage
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-balanced-parentheses
-  main-is: Problems/pandora/balanced-parentheses.hs
+  main-is: Problems/pandora/DONE/balanced-parentheses.hs
   build-depends: base, pandora
   default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
     InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
@@ -581,7 +581,7 @@ executable pandora-balanced-parentheses
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-boustrophedon
-  main-is: Problems/pandora/boustrophedon.hs
+  main-is: Problems/pandora/WIP/boustrophedon.hs
   build-depends: base, pandora, pandora-io
   default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
     InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
@@ -592,7 +592,7 @@ executable pandora-boustrophedon
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-cellular-automata
-  main-is: Problems/pandora/cellular-automata.hs
+  main-is: Problems/pandora/DONE/cellular-automata.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     ConstraintKinds,
@@ -620,7 +620,7 @@ executable pandora-cellular-automata
   ghc-options: -Wall -fno-warn-tabs -fno-strictness -fno-warn-orphans
 
 executable pandora-decode-morse-code
-  main-is: Problems/pandora/decode-morse-code.hs
+  main-is: Problems/pandora/DONE/decode-morse-code.hs
   build-depends: base, pandora, pandora-io
   default-extensions: DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints, InstanceSigs
     FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
@@ -632,7 +632,7 @@ executable pandora-decode-morse-code
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-enumerating-trees
-  main-is: Problems/pandora/enumerating-trees.hs
+  main-is: Problems/pandora/WIP/enumerating-trees.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     DataKinds,
@@ -656,7 +656,7 @@ executable pandora-enumerating-trees
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-json-parser
-  main-is: Problems/pandora/json-parser.hs
+  main-is: Problems/pandora/WIP/json-parser.hs
   build-depends: base, pandora
   default-extensions:
     DataKinds,
@@ -679,7 +679,7 @@ executable pandora-json-parser
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-lindenmayer-system
-  main-is: Problems/pandora/lindenmayer-system.hs
+  main-is: Problems/pandora/DONE/lindenmayer-system.hs
   build-depends: base, pandora, pandora-io
   default-extensions: DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints, InstanceSigs
     FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
@@ -690,7 +690,7 @@ executable pandora-lindenmayer-system
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-longest-increasing-subsequence
-  main-is: Problems/pandora/longest-increasing-subsequence.hs
+  main-is: Problems/pandora/WIP/longest-increasing-subsequence.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     DataKinds,
@@ -714,7 +714,7 @@ executable pandora-longest-increasing-subsequence
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-matrix-in-clockwise-spiral
-  main-is: Problems/pandora/matrix-in-clockwise-spiral.hs
+  main-is: Problems/pandora/WIP/matrix-in-clockwise-spiral.hs
   build-depends: base, pandora
   default-extensions:
     ConstraintKinds,
@@ -740,7 +740,7 @@ executable pandora-matrix-in-clockwise-spiral
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-minimum-number-of-jumps
-  main-is: Problems/pandora/minimum-number-of-jumps.hs
+  main-is: Problems/pandora/WIP/minimum-number-of-jumps.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     ConstraintKinds,
@@ -766,7 +766,7 @@ executable pandora-minimum-number-of-jumps
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-path-resolver
-  main-is: Problems/pandora/path-resolver.hs
+  main-is: Problems/pandora/DONE/path-resolver.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     ConstraintKinds,
@@ -792,7 +792,7 @@ executable pandora-path-resolver
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-probability
-  main-is: Problems/pandora/Probability.hs
+  main-is: Problems/pandora/WIP/Probability.hs
   build-depends: base, pandora
   default-extensions:
     DataKinds,
@@ -816,7 +816,7 @@ executable pandora-probability
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-roman-numbers
-  main-is: Problems/pandora/roman-numbers.hs
+  main-is: Problems/pandora/WIP/roman-numbers.hs
   build-depends: base, pandora
   default-extensions:
     DataKinds,
@@ -841,7 +841,7 @@ executable pandora-roman-numbers
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-run-length-encoding
-  main-is: Problems/pandora/run-length-encoding.hs
+  main-is: Problems/pandora/WIP/run-length-encoding.hs
   build-depends: base, pandora, pandora-io
   default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
     InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
@@ -852,7 +852,7 @@ executable pandora-run-length-encoding
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-stock-prices
-  main-is: Problems/pandora/stock-prices.hs
+  main-is: Problems/pandora/DONE/stock-prices.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     ConstraintKinds,
@@ -878,7 +878,7 @@ executable pandora-stock-prices
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-trapping-rain-water
-  main-is: Problems/pandora/trapping-rain-water.hs
+  main-is: Problems/pandora/DONE/trapping-rain-water.hs
   build-depends: base, pandora
   default-extensions:
     ConstraintKinds,
@@ -904,7 +904,7 @@ executable pandora-trapping-rain-water
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-wolf-goat-cabbage
-  main-is: Problems/pandora/wolf-goat-cabbage.hs
+  main-is: Problems/pandora/DONE/wolf-goat-cabbage.hs
   build-depends: base, pandora, pandora-io
   default-extensions:
     ConstraintKinds,

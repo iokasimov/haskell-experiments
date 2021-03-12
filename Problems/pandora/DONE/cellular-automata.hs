@@ -61,8 +61,8 @@ instance Extendable II where
 	zz =>> f = f <$> TU (horizontal <$> vertical zz) where
 
 		horizontal, vertical :: II a -> Zipper Stream (II a)
-		horizontal z = Tap z . T_U $ move ((morph @(Rotate Left) <$>) ||=) z :*: move ((morph @(Rotate Right) <$>) ||=) z
-		vertical z = Tap z . T_U $ move (morph @(Rotate Left) ||=) z :*: move (morph @(Rotate Right) ||=) z
+		horizontal z = Tap z $ twosome / move ((morph @(Rotate Left) <$>) ||=) z / move ((morph @(Rotate Right) <$>) ||=) z
+		vertical z = Tap z $ twosome / move (morph @(Rotate Left) ||=) z / move (morph @(Rotate Right) ||=) z
 
 		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
@@ -132,24 +132,24 @@ lifecycle act being = delay *> purge *> snapshot *> evolve where
 --------------------------------------------------------------------------------
 
 cube :: II Status
-cube = TU . Tap one . T_U $ only :*: only where
+cube = TU . Tap one $ twosome only only where
 
 	only :: Stream :. Zipper Stream := Status
 	only = Construct one . Identity $ repeat noone
 
 	one, noone :: Zipper Stream Status
-	one = Tap True . T_U $ alone :*: alone
-	noone = Tap False . T_U $ repeat False :*: repeat False
+	one = Tap True $ twosome alone alone
+	noone = Tap False $ twosome / repeat False / repeat False
 
 	alone :: Stream Status
 	alone = Construct True . Identity $ repeat False
 
 blinker :: II Status
-blinker = TU . Tap one . T_U $ repeat noone :*: repeat noone where
+blinker = TU . Tap one $ twosome / repeat noone / repeat noone where
 
 	one, noone :: Zipper Stream Status
-	one = Tap True . T_U $ alone :*: alone
-	noone = Tap False . T_U $ repeat False :*: repeat False
+	one = Tap True $ twosome alone alone
+	noone = Tap False $ twosome / repeat False / repeat False
 
 	alone :: Stream Status
 	alone = Construct True . Identity $ repeat False
