@@ -951,3 +951,14 @@ executable pandora-wolf-goat-cabbage
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
+
+executable pandora-shaping-pyramid
+  main-is: Problems/pandora/WIP/shaping-pyramid.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs

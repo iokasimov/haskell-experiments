@@ -38,6 +38,9 @@ instance Base.Show a => Base.Show (List a) where
 	show (TU (Just stack)) = Base.show stack
 	show (TU Nothing) = ""
 
+-- instance Base.Show a => Base.Show (Zipper List a) where
+	-- show (Tap x (T_U (bs :*: fs))) =
+
 -- instance Base.Show Numerator where
 -- 	show Zero = "0"
 -- 	show (Numerator n) = "1" Base.<> Base.show n
