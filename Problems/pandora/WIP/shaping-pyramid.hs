@@ -11,22 +11,44 @@ import Gears.Instances ()
 import Gears.Utils (show_zipper_list)
 
 validate :: Zipper List Int -> Maybe (Zipper List Int)
-validate z@(Tap x (T_U (bs :*: fs))) =
-	let side xs = run (Reverse xs ->> slide) 0 in
-	side (item @Push x bs) *> side (item @Push x fs) $> z
+validate zipper = (|- pyramid) $ side <-> side $ run $ lower zipper where
 
-slide :: Int -> State Int :> Maybe := Int
-slide now = now == 0 ? point 0 $ current @Int >>= \before ->
-	now - before == 1 ? replace @Int now $ nothing
+	pyramid :: Maybe (List Int) -> Maybe (List Int) -> Maybe (Zipper List Int)
+	pyramid ls rs = Tap (extract zipper) <$> (twosome <$> ls <*> rs)
 
-fix :: Zipper List Int -> Comprehension Maybe :. Zipper List :. Zipper List := Int
-fix z = duplicate z ->> (point . over (focus @Head) (\x -> x - 1))
+	side :: List Int -> Maybe (List Int)
+	side xs = extract <$> run (xs ->> slide) (extract zipper)
 
-focused :: (Maybe <:.> Zipper List := Int) -> Int
-focused = resolve @(Zipper List Int) extract 0 . run
+	slide :: Int -> State Int :> Maybe := Int
+	slide now = current @Int >>= \before ->
+		before - now == 1 ? replace @Int now $ nothing
 
-to_zipper :: Nonempty List ~> Zipper List
-to_zipper xs = Tap (extract xs) $ twosome / unite (deconstruct xs) / empty
+type Enumeration = Comprehension Maybe
+
+reshape :: Zipper List Int -> Enumeration :. Zipper List := Int
+reshape zipper = join . join $ Comprehension . sieve . (=>> validate)
+	<$$> Comprehension . zipper_list_to_list <$> chip where
+
+	chip :: Enumeration :. Zipper List :. Zipper List := Int
+	chip = duplicate zipper ->> point . over (focus @Head) decrement
+
+	sieve :: forall a t . Traversable t => t (Maybe a) -> List a
+	sieve possible = attached . run @(State _) % empty
+		$ possible ->> resolve @a (void . modify @(List a) . item @Push) (point ())
+
+decrement :: (Quasiring a, Group a) => a -> a
+decrement x = x - one
+
+-- attempt :: Zipper List Int -> Enumeration :. Zipper List := Int
+-- attempt bricks = let result = reshape bricks in result == empty ? join (reshape <$> result) $ result
+
+nonempty_list_to_zipper_list :: Nonempty List ~> Zipper List
+nonempty_list_to_zipper_list xs = Tap (extract xs) $ twosome / unite (deconstruct xs) / empty
+
+zipper_list_to_list :: Zipper List ~> List
+zipper_list_to_list (Tap x (T_U (bs :*: fs))) =
+	attached . run @(State _) % item @Push x bs
+		$ fs ->> modify @(List _) . item @Push
 
 wrong_example, valid_example :: Nonempty List Int
 wrong_example = item @Push 0 $ item @Push 1 $ item @Push 3
@@ -35,5 +57,8 @@ valid_example = item @Push 0 $ item @Push 1 $ item @Push 2
 	$ item @Push 3 $ item @Push 2 $ item @Push 1 $ point 0
 
 main = void $ do
-	let start = to_zipper valid_example
-	(start =>> validate) ->> print . (<$>) show
+	print wrong_example
+	let start = nonempty_list_to_zipper_list wrong_example
+	print "..................."
+	-- attempt start ->> print
+	reshape start ->> print . zipper_list_to_list
