@@ -45,7 +45,7 @@ extra-deps:
 - github: iokasimov/joint
   commit: 327c378f821e5c1bba9504a615166da6c0969764
 - github: iokasimov/pandora
-  commit: 48b064453f780965e7a5fa38793355065d13ec7a
+  commit: 3aac751d8083254c848bf30957d667cef6872df4
 - github: iokasimov/pandora-io
   commit: 627d30c369e53652a2b2bd50bc31e977f734569c
 
