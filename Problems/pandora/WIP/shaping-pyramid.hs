@@ -14,8 +14,8 @@ import Gears.Utils (show_zipper_list)
 
 import Debug.Trace (traceShow)
 
-validate' :: Zipper List Int -> Conclusion (Zipper List Int) (Zipper List Int)
-validate' zipper = resolve @(Zipper List Int) failure (point zipper) . (|- pyramid) . (side <-> side) . run $ lower zipper where
+validate :: Zipper List Int -> Conclusion (Zipper List Int) (Zipper List Int)
+validate zipper = resolve @(Zipper List Int) failure (point zipper) . (|- pyramid) . (side <-> side) . run $ lower zipper where
 
 	pyramid :: Maybe (List Int) -> Maybe (List Int) -> Maybe (Zipper List Int)
 	pyramid ls rs = Tap (extract zipper) <$> (twosome <$> ls <*> rs)
@@ -31,26 +31,17 @@ type Enumeration = Comprehension Maybe
 
 instance (forall a . Semigroup (t <:.> Construction t := a), Avoidable t, Monad t) => Monad (Comprehension t) where
 
-decrement :: (Quasiring a, Group a) => a -> a
-decrement x = x - one
-
 instance Nullable (Comprehension Maybe) where
 	null = Predicate $ \case { Comprehension (TU Nothing) -> True ; _ -> False }
 
-attempt' :: Zipper List Int -> Conclusion (Zipper List Int) :> Enumeration :. Zipper List := Int
-attempt' bricks = traceShow bricks $ variations' bricks >>= attempt'
+explore :: Zipper List Int -> Conclusion (Zipper List Int) :. Zipper List :. Zipper List := Int
+explore bricks = chipped <$> sequence (bricks =>> validate) where
 
-check :: Zipper List Int -> Conclusion (Zipper List Int) :. Zipper List := Zipper List Int
-check bricks = sequence $ bricks =>> validate'
+	chipped :: Zipper List (Zipper List Int) -> Zipper List (Zipper List Int)
+	chipped shifted = over (focus @Head) decrement <$> shifted
 
-variations :: Zipper List Int -> Conclusion (Zipper List Int) (Zipper List (Zipper List Int))
-variations bricks = over (focus @Head) decrement <$$> check bricks
-
-variations' :: Zipper List Int -> Conclusion (Zipper List Int) :> Enumeration :. Zipper List := Int
-variations' bricks = over (focus @Head) decrement <$> (adapt (check bricks) >>= adapt . Comprehension . zipper_list_to_list)
-
-chipped :: Zipper List (Zipper List Int) -> Zipper List (Zipper List Int)
-chipped shifted = over (focus @Head) decrement <$> shifted
+	decrement :: (Setoid a, Quasiring a, Group a) => a -> a
+	decrement x = x == zero ? zero $ x - one
 
 nonempty_list_to_zipper_list :: Nonempty List ~> Zipper List
 nonempty_list_to_zipper_list xs = Tap (extract xs) $ twosome / unite (deconstruct xs) / empty
@@ -69,7 +60,4 @@ valid_example = item @Push 0 $ item @Push 1 $ item @Push 2
 main = void $ do
 	print "..................."
 	let wrong = nonempty_list_to_zipper_list wrong_example
-	-- print $ (variations wrong >>= (->> variations) >>= (->>> variations))
-	-- print $ (variations wrong >>= (->> variations) >>= (->>> variations) >>= (->>>> variations) )
-	-- print $ sequence . run . run $ variations' wrong >>= variations' >>= variations' >>= variations'
-	print . sequence . run . run $ attempt' wrong
+	print $ (explore wrong >>= (->> explore) >>= (->>> explore) >>= (->>>> explore))
