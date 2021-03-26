@@ -953,7 +953,7 @@ executable pandora-wolf-goat-cabbage
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-shaping-pyramid
-  main-is: Problems/pandora/WIP/shaping-pyramid.hs
+  main-is: Problems/pandora/DONE/shaping-pyramid.hs
   build-depends: base, pandora, pandora-io
   default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
     InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies

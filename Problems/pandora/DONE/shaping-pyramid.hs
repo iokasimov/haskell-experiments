@@ -29,11 +29,6 @@ validate zipper = resolve @(Zipper List Int) failure (point zipper) . (|- pyrami
 
 type Enumeration = Comprehension Maybe
 
-instance (forall a . Semigroup (t <:.> Construction t := a), Avoidable t, Monad t) => Monad (Comprehension t) where
-
-instance Nullable (Comprehension Maybe) where
-	null = Predicate $ \case { Comprehension (TU Nothing) -> True ; _ -> False }
-
 explore :: Zipper List Int -> Conclusion (Zipper List Int) :. Zipper List :. Zipper List := Int
 explore bricks = chipped <$> sequence (bricks =>> validate) where
 
