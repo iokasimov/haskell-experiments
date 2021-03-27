@@ -16,7 +16,7 @@
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
 # resolver: lts-16.15
-resolver: nightly-2021-01-30
+resolver: nightly-2021-03-27
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -45,7 +45,7 @@ extra-deps:
 - github: iokasimov/joint
   commit: 327c378f821e5c1bba9504a615166da6c0969764
 - github: iokasimov/pandora
-  commit: c794c268c7d375c443dc9ff0a945b8f4c9f98e31
+  commit: 837054dd13406d97b5e02343688a059b7ac84a5c
 - github: iokasimov/pandora-io
   commit: 627d30c369e53652a2b2bd50bc31e977f734569c
 
