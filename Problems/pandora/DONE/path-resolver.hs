@@ -16,10 +16,10 @@ type Directory = Nonempty List Char
 
 type Path = List Directory
 
-data Link = Forward Directory | Previous | Current
+data Link = Ahead Directory | Previous | Current
 
 settle :: Link -> State Path ()
-settle (Forward dir) = void $ modify @Path $ item @Push dir
+settle (Ahead dir) = void $ modify @Path $ item @Push dir
 settle Previous = void $ focus @Head @List @Directory =<> Nothing
 settle Current = point ()
 
@@ -35,12 +35,12 @@ scripts = item @Push 's' $ item @Push 'c' $ item @Push 'r' $ item @Push 'i' $ it
 
 -- /usr/bin/../bin/./scripts/../
 example :: List Link
-example = item @Push (Forward usr)
-	$ item @Push (Forward bin)
+example = item @Push (Ahead usr)
+	$ item @Push (Ahead bin)
 	$ item @Push Previous
-	$ item @Push (Forward bin)
+	$ item @Push (Ahead bin)
 	$ item @Push Current
-	$ item @Push (Forward scripts)
+	$ item @Push (Ahead scripts)
 	$ item @Push Previous
 	$ empty
 

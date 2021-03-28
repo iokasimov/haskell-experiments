@@ -14,10 +14,10 @@ module Main where
 
 --------------------------------------------------------------------------------
 
-class Listify e r where
-	list :: r -> [e]
+class Listify element result where
+	list :: result -> [element]
 
-instance Listify e [e] where
+instance Listify element [element] where
 	list l = l
 
 -- instance Listify e r => Listify e (e -> r) where

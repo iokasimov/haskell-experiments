@@ -22,9 +22,9 @@ validate z = resolve @(Deviation a) failure (point z)
 	side :: List a -> Maybe (List a)
 	side xs = extract <$> run (xs ->> slide) (extract z)
 
-	slide :: forall a . Chippable a => a -> State a :> Maybe := a
-	slide now = current @a >>= \before ->
-		before - now == one ? replace @a now $ nothing
+	slide :: Chippable a => a -> State a :> Maybe := a
+	slide now = let decide before = before - now == one ? replace now $ nothing in
+		current >>= decide
 
 explore :: forall a . Chippable a => Deviation a
 	-> Conclusion (Deviation a) :. Deviation :. Deviation := a
