@@ -593,7 +593,7 @@ executable joint-wolf-goat-cabbage
 
 executable pandora-balanced-parentheses
   main-is: Problems/pandora/DONE/balanced-parentheses.hs
-  build-depends: base, pandora
+  build-depends: base, pandora, pandora-io
   default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
     InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
     MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns
