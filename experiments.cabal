@@ -861,7 +861,7 @@ executable pandora-probability
 
 executable pandora-roman-numbers
   main-is: Problems/pandora/WIP/roman-numbers.hs
-  build-depends: base, pandora
+  build-depends: base, pandora, pandora-io
   default-extensions:
     DataKinds,
     ExplicitNamespaces,

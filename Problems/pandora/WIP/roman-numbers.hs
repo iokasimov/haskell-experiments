@@ -5,28 +5,26 @@ import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
-import Prelude (Int, print)
+import "base" Data.Int (Int)
+import "base" System.IO (print)
+--
+data R (o :: Letter) (f :: Letter) (t :: Letter)
+	= R1 (Proxy o)
+	| R2 (Proxy o) (Proxy o)
+	| R3 (Proxy o) (Proxy o) (Proxy o)
+	| R4 (Proxy o) (Proxy f)
+	| R5 (Proxy f)
+	| R6 (Proxy f) (Proxy o)
+	| R7 (Proxy f) (Proxy o) (Proxy o)
+	| R8 (Proxy f) (Proxy o) (Proxy o) (Proxy o)
+	| R9 (Proxy o) (Proxy t)
+	| R10 (Proxy t)
 
--- data Symbol = I | V | X | L | C | D | M
---
--- type Place (d :: Symbol) = Tagged d ()
---
--- data Number (o :: Symbol) (f :: Symbol) (t :: Symbol)
--- 	= D1 (Place o)
--- 	| D2 (Place o) (Place o)
--- 	| D3 (Place o) (Place o) (Place o)
--- 	| D4 (Place o) (Place f)
--- 	| D5 (Place f)
--- 	| D6 (Place f) (Place o)
--- 	| D7 (Place f) (Place o) (Place o)
--- 	| D8 (Place f) (Place o) (Place o) (Place o)
--- 	| D9 (Place o) (Place t)
---
--- data family Decimal (o :: Symbol) (f :: Symbol) (t :: Symbol)
--- data instance Decimal I V X = Unit
--- data instance Decimal X L C = Ten
--- data instance Decimal C D M = Hundred
---
+type family Decimal (o :: Letter) (f :: Letter) (t :: Letter) a where
+	Decimal I V X a = ()
+	Decimal X L C (R I V X) = ()
+	Decimal C D M (R X L C) = ()
+
 -- class Numberify a where
 -- 	numberify :: a -> Int
 --
@@ -39,9 +37,10 @@ import Prelude (Int, print)
 -- 	numberify D = 500
 -- 	numberify M = 1000
 
--- type family (.) a b
-
--- X .. V .. I .
+type family Unit (l :: Letter) a where
+	Unit I a = a
+	Unit V a = a :*: a :*: a :*: a :*: a
+	Unit X a = a :*: a :*: a :*: a :*: a :*: a :*: a :*: a :*: a :*: a
 
 infixr 1 #=
 
@@ -71,6 +70,9 @@ vi = 0 :*: 0 :*: 0 :*: 0 :*: 0
 
 iv :: I =# (V #= Int)
 iv = 0 :*: 0 :*: 0 :*: 0
+
+example :: R I V X
+example = R5 (Proxy :: Proxy V)
 
 main = void $ do
 	print "typechecked"
