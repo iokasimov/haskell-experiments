@@ -200,6 +200,37 @@ instance Cycle Hand where
 	next XI_ = XII_
 	next XII_ = I_
 
+instance Semigroup Hand where
+	x + I_ = next x
+	x + II_ = next $ next x
+	x + III_ = next $ next $ next x
+	x + IV_ = next $ next $ next $ next x
+	x + V_ = next $ next $ next $ next $ next x
+	x + VI_ = next $ next $ next $ next $ next $ next x
+	x + VII_ = next $ next $ next $ next $ next $ next $ next x
+	x + VIII_ = previous $ previous $ previous $ previous x
+	x + IX_ = previous $ previous $ previous x
+	x + X_ = previous $ previous x
+	x + XI_ = previous x
+	x + XII_ = x
+
+instance Monoid Hand where
+	zero = XII_
+
+instance Group Hand where
+	invert I_ = XI_
+	invert II_ = X_
+	invert III_ = IX_
+	invert IV_ = VIII_
+	invert V_ = VII_
+	invert VI_ = VI_
+	invert VII_ = V_
+	invert VIII_ = IV_
+	invert IX_ = III_
+	invert X_ = II_
+	invert XI_ = I_
+	invert XII_ = XII_
+
 deriving instance Show Hand
 
 type Hour = Hand
