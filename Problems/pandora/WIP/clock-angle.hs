@@ -9,11 +9,10 @@ import "base" Data.Int (Int)
 import "base" System.IO (print)
 import "base" Text.Show (Show)
 
-data Hand = I_ | II_ | III_ | IV_ | V_ | VI_ | VII_ | VIII_ | IX_ | X_ | XI_ | XII_
+data Hour = I_ | II_ | III_ | IV_ | V_ | VI_
+	| VII_ | VIII_ | IX_ | X_ | XI_ | XII_
 
-data Section = S0 | S1 | S2 | S3 | S4
-
-instance Setoid Hand where
+instance Setoid Hour where
 	I_ == I_ = True
 	II_ == II_ = True
 	III_ == III_ = True
@@ -28,7 +27,7 @@ instance Setoid Hand where
 	XII_ == XII_ = True
 	_ == _ = False
 
-instance Chain Hand where
+instance Chain Hour where
 	I_ <=> I_ = Equal
 	I_ <=> II_ = Less
 	I_ <=> III_ = Less
@@ -174,7 +173,7 @@ instance Chain Hand where
 	XII_ <=> XI_ = Greater
 	XII_ <=> XII_ = Equal
 
-instance Cycle Hand where
+instance Cycle Hour where
 	previous I_ = XII_
 	previous II_ = I_
 	previous III_ = II_
@@ -200,7 +199,7 @@ instance Cycle Hand where
 	next XI_ = XII_
 	next XII_ = I_
 
-instance Semigroup Hand where
+instance Semigroup Hour where
 	x + I_ = next x
 	x + II_ = next $ next x
 	x + III_ = next $ next $ next x
@@ -214,10 +213,10 @@ instance Semigroup Hand where
 	x + XI_ = previous x
 	x + XII_ = x
 
-instance Monoid Hand where
+instance Monoid Hour where
 	zero = XII_
 
-instance Group Hand where
+instance Group Hour where
 	invert I_ = XI_
 	invert II_ = X_
 	invert III_ = IX_
@@ -231,14 +230,41 @@ instance Group Hand where
 	invert XI_ = I_
 	invert XII_ = XII_
 
-deriving instance Show Hand
+deriving instance Show Hour
 
-type Hour = Hand
+data Section = S1 | S2 | S3 | S4
 
-type Minute = Hand :*: Section
+instance Setoid Section where
+	S1 == S1 = True
+	S2 == S2 = True
+	S3 == S3 = True
+	S4 == S4 = True
+	_ == _ = False
 
-type Face = Hour :*: Minute
+instance Chain Section where
+	S1 <=> S1 = Equal
+	S1 <=> S2 = Less
+	S1 <=> S3 = Less
+	S1 <=> S4 = Less
+	S2 <=> S1 = Greater
+	S2 <=> S2 = Equal
+	S2 <=> S3 = Less
+	S2 <=> S4 = Less
+	S3 <=> S1 = Greater
+	S3 <=> S2 = Greater
+	S3 <=> S3 = Equal
+	S3 <=> S4 = Less
+	S4 <=> S1 = Greater
+	S4 <=> S2 = Greater
+	S4 <=> S3 = Greater
+	S4 <=> S4 = Equal
 
+data Minute = Minute Hour (Maybe Section)
 
+instance Setoid Minute where
+	Minute h s == Minute h' s' = (h == h') * (s == s')
+
+example_16_27 :: Hour :*: Minute
+example_16_27 = IV_ :*: Minute V_ (Just S2)
 
 main = print "typechecked"
