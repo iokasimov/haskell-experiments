@@ -259,12 +259,9 @@ instance Chain Section where
 	S4 <=> S3 = Greater
 	S4 <=> S4 = Equal
 
-data Minute = Minute Hour (Maybe Section)
-
-instance Setoid Minute where
-	Minute h s == Minute h' s' = (h == h') * (s == s')
+type Minute = Hour :*: Maybe Section
 
 example_16_27 :: Hour :*: Minute
-example_16_27 = IV_ :*: Minute V_ (Just S2)
+example_16_27 = IV_ :*: V_ :*: Just S2
 
 main = print "typechecked"
