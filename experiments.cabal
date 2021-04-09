@@ -157,6 +157,30 @@ executable base-conway-game-of-life
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable base-abt
+  main-is: Problems/base/abt.hs
+  build-depends: base, containers
+  default-extensions:
+    DataKinds,
+    DeriveFunctor,
+    DeriveFoldable,
+    ExplicitNamespaces,
+    FlexibleContexts,
+    FlexibleInstances,
+    GADTs,
+    LambdaCase,
+    OverloadedStrings,
+    PackageImports,
+    RankNTypes,
+    ScopedTypeVariables,
+    StandaloneDeriving,
+    TypeApplications,
+    TypeFamilies,
+    TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable base-datalog
   main-is: Problems/base/datalog.hs
   build-depends: base
