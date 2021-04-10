@@ -648,6 +648,17 @@ executable pandora-abstract-binding-tree
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable pandora-arithmetic
+  main-is: Problems/pandora/WIP/arithmetic.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions: DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints, InstanceSigs
+    FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns
+    ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable pandora-balanced-parentheses
   main-is: Problems/pandora/DONE/balanced-parentheses.hs
   build-depends: base, pandora, pandora-io
