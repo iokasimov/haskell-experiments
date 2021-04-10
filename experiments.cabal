@@ -637,6 +637,17 @@ executable joint-wolf-goat-cabbage
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable pandora-abstract-binding-tree
+  main-is: Problems/pandora/WIP/abstract-binding-tree.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions: DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints, InstanceSigs
+    FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns
+    ScopedTypeVariables, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable pandora-balanced-parentheses
   main-is: Problems/pandora/DONE/balanced-parentheses.hs
   build-depends: base, pandora, pandora-io
@@ -709,7 +720,6 @@ executable pandora-decode-morse-code
     ScopedTypeVariables, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
-  ghc-options: -Wall -fno-warn-tabs
   ghc-options: -Wall -fno-warn-tabs
 
 executable pandora-enumerating-trees
