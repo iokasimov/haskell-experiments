@@ -298,6 +298,17 @@ executable base-effectful-bft
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable base-heuristics
+  main-is: Problems/base/heuristics.hs
+  build-depends: base
+  default-extensions: DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints, InstanceSigs
+    FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 executable base-minimum-number-of-jumps
   main-is: Problems/base/minimum-number-of-jumps.hs
   build-depends: base
