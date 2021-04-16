@@ -33,14 +33,14 @@ evaluate (Int i) = i
 
 -- -1 + (2 + 3)
 -- symbols_example :: List ASCII
--- symbols_example = item @Push / Sign Minus
--- 	$ item @Push / Number N1
--- 	$ item @Push / Sign Plus
--- 	$ item @Push / Sign (Bracket Opened Round)
--- 	$ item @Push / Number N2
--- 	$ item @Push / Sign Plus
--- 	$ item @Push / Number N3
--- 	$ item @Push / Sign (Bracket Closed Round)
+-- symbols_example = item @Push # Sign Minus
+-- 	$ item @Push # Number N1
+-- 	$ item @Push # Sign Plus
+-- 	$ item @Push # Sign (Bracket Opened Round)
+-- 	$ item @Push # Number N2
+-- 	$ item @Push # Sign Plus
+-- 	$ item @Push # Number N3
+-- 	$ item @Push # Sign (Bracket Closed Round)
 -- 	$ empty
 
 -- -1 + (2 + 3)

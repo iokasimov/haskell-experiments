@@ -17,9 +17,6 @@ x >- r = Construct x $ Right r
 (-<) :: Nonempty Binary a -> a -> Nonempty Binary a
 l -< x = Construct x $ Left l
 
-leaf :: a -> Nonempty Binary a
-leaf x = Construct x End
-
 type Decoder = Nonempty Binary Char
 
 dictionary :: Decoder

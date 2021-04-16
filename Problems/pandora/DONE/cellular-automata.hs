@@ -60,8 +60,8 @@ instance Extendable II where
 	zz =>> f = f <$> TU (horizontal <$> vertical zz) where
 
 		horizontal, vertical :: II a -> Zipper Stream (II a)
-		horizontal z = Tap z $ twosome / move ((rotate @Left <$>) ||=) z / move ((rotate @Right <$>) ||=) z
-		vertical z = Tap z $ twosome / move (rotate @Left ||=) z / move (rotate @Right ||=) z
+		horizontal z = Tap z $ twosome # move ((rotate @Left <$>) ||=) z # move ((rotate @Right <$>) ||=) z
+		vertical z = Tap z $ twosome # move (rotate @Left ||=) z # move (rotate @Right ||=) z
 
 		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
@@ -85,16 +85,16 @@ instance Covariant t => Substructure Right (t <:.:> t := (:*:)) where
 instance Substructure Left (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
 	type Substructural Left (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Zipper Stream <:.> Stream
 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let left = sub @Tail |> sub @Left in
-		let target = TU $ Tap / view left x $ twosome / view left <$> d / view left <$> u in
-		let around lx = twosome / set left <$> view left lx <*> d / set left <$> view left lx <*> u in
-		Store $ target :*: \lx -> lift . TU . Tap (set left / extract (run lx) / x) $ around / run lx
+		let target = TU $ Tap # view left x $ twosome # view left <$> d # view left <$> u in
+		let around lx = twosome # set left <$> view left lx <*> d # set left <$> view left lx <*> u in
+		Store $ target :*: \lx -> lift . TU . Tap (set left # extract (run lx) # x) $ around # run lx
 
 instance Substructure Right (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
 	type Substructural Right (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Zipper Stream <:.> Stream
 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let right = sub @Tail |> sub @Right in
-		let target = TU . Tap (view right x) $ twosome / view right <$> d / view right <$> u in
-		let around rx = twosome /set right <$> view right rx <*> d / set right <$> view right rx <*> u in
-		Store $ target :*: \rx -> lift . TU . Tap (set right / extract (run rx) / x) $ around / run rx
+		let target = TU . Tap (view right x) $ twosome # view right <$> d # view right <$> u in
+		let around rx = twosome # set right <$> view right rx <*> d # set right <$> view right rx <*> u in
+		Store $ target :*: \rx -> lift . TU . Tap (set right # extract (run rx) # x) $ around # run rx
 
 type Around = Status -- current
 	:*: Status :*: Status -- horizontal
@@ -138,19 +138,19 @@ cube = TU . Tap one $ twosome only only where
 
 	one, noone :: Zipper Stream Status
 	one = Tap True $ twosome alone alone
-	noone = Tap False $ twosome / repeat False / repeat False
+	noone = Tap False $ twosome # repeat False # repeat False
 
 	alone :: Stream Status
 	alone = Construct True . Identity $ repeat False
 
 blinker :: II Status
-blinker = TU . Tap one $ twosome / repeat noone / repeat noone where
+blinker = TU . Tap one $ twosome # repeat noone # repeat noone where
 
 	one, noone :: Zipper Stream Status
 	one = Tap True $ twosome alone alone
-	noone = Tap False $ twosome / repeat False / repeat False
+	noone = Tap False $ twosome # repeat False # repeat False
 
 	alone :: Stream Status
 	alone = Construct True . Identity $ repeat False
 
-main = lifecycle / conway . around / cube
+main = lifecycle # conway . around # cube

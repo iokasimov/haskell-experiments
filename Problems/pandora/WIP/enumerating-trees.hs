@@ -10,7 +10,7 @@ import Gears.Utils (int)
 
 zipper_to_binary_degenerated :: Zipper List ~> Nonempty Binary
 zipper_to_binary_degenerated (Tap x (T_U (bs :*: fs))) = Construct x . into @Wye
-	$ twosome / hoist (branch Left) <$> run bs / hoist (branch Right) <$> run fs where
+	$ twosome # hoist (branch Left) <$> run bs # hoist (branch Right) <$> run fs where
 
 	branch :: a :=> Wye -> Maybe a -> Wye a
 	branch f (Just x) = f x
@@ -22,7 +22,7 @@ example :: Nonempty List Int
 example = item @Push 1 $ item @Push 2 $ point 3
 
 example_zipper :: Zipper List Int
-example_zipper = Tap 1 $ twosome / empty / unite (deconstruct example)
+example_zipper = Tap 1 $ twosome # empty # unite (deconstruct example)
 
 -- main = void . print . extract $ example_zipper =>> int . cardinality
 

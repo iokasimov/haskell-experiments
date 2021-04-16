@@ -11,7 +11,7 @@ data Profit a = Profit a a
 
 instance Semigroup a => Semigroup (Profit a) where
 	Profit buy sell + Profit buy' sell' =
-		Profit / buy + buy' / sell + sell'
+		Profit # buy + buy' # sell + sell'
 
 instance Monoid a => Monoid (Profit a) where
 	zero = Profit zero zero
