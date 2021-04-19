@@ -835,6 +835,7 @@ executable pandora-matrix-in-clockwise-spiral
     ExplicitNamespaces,
     FlexibleContexts,
     FlexibleInstances,
+    FunctionalDependencies,
     GADTs,
     LambdaCase,
     MultiParamTypeClasses,
@@ -846,6 +847,7 @@ executable pandora-matrix-in-clockwise-spiral
     StandaloneDeriving,
     TypeApplications,
     TypeFamilies,
+    TypeFamilyDependencies,
     TypeOperators,
     QuantifiedConstraints
   other-modules:

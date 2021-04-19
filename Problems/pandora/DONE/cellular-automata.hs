@@ -68,7 +68,7 @@ instance Extendable II where
 
 instance Substructure Down (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
 	type Substructural Down (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Stream <:.> Zipper Stream
-	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) = Store $ TU d :*: lift . TU . Tap focused . twosome % u . run
+	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) = Store $ TU d :*: lift . TU . Tap focused . (twosome % u) . run
 
 instance Substructure Up (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
 	type Substructural Up (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Stream <:.> Zipper Stream
