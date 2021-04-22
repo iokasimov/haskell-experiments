@@ -456,22 +456,10 @@ executable base-reversing-a-list-with-continuations
 executable base-trapping-rain-water
   main-is: Problems/base/trapping-rain-water.hs
   build-depends: base, transformers
-  default-extensions:
-    DataKinds,
-    DeriveFunctor,
-    DeriveFoldable,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -479,23 +467,10 @@ executable base-trapping-rain-water
 executable base-w-hindley-milner
   main-is: Problems/base/w-hindley-milner.hs
   build-depends: base, containers, mtl, pretty
-  default-extensions:
-    DataKinds,
-    DeriveFunctor,
-    DeriveFoldable,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    ViewPatterns
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -503,23 +478,10 @@ executable base-w-hindley-milner
 executable base-wolf-goat-cabbage
   main-is: Problems/base/wolf-goat-cabbage.hs
   build-depends: base
-  default-extensions:
-    DataKinds,
-    DeriveFunctor,
-    DeriveFoldable,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    ViewPatterns
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -527,21 +489,10 @@ executable base-wolf-goat-cabbage
 executable joint-adjunctions
   main-is: Problems/joint/adjunctions.hs
   build-depends: base, comonad, joint
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    InstanceSigs,
-    LambdaCase,
-    LiberalTypeSynonyms,
-    MultiParamTypeClasses,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -549,19 +500,10 @@ executable joint-adjunctions
 executable joint-balanced-parentheses
   main-is: Problems/joint/balanced-parentheses.hs
   build-depends: base, joint, lens
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -569,21 +511,10 @@ executable joint-balanced-parentheses
 executable joint-cellular-automata
   main-is: Problems/joint/cellular-automata.hs
   build-depends: base, joint, comonad, free, lens
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    LiberalTypeSynonyms,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -591,18 +522,10 @@ executable joint-cellular-automata
 executable joint-stock-prices
   main-is: Problems/joint/stock-prices.hs
   build-depends: base, joint, lens
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -610,18 +533,10 @@ executable joint-stock-prices
 executable joint-trapping-rain-water
   main-is: Problems/joint/trapping-rain-water.hs
   build-depends: base, joint, transformers
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -629,21 +544,10 @@ executable joint-trapping-rain-water
 executable joint-wolf-goat-cabbage
   main-is: Problems/joint/wolf-goat-cabbage.hs
   build-depends: base, joint, lens, transformers, distributive
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -708,27 +612,10 @@ executable pandora-clock-angle
 executable pandora-cellular-automata
   main-is: Problems/pandora/DONE/cellular-automata.hs
   build-depends: base, pandora, pandora-io
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    LiberalTypeSynonyms,
-    MultiParamTypeClasses,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    PolyKinds,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances,
-    ViewPatterns
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs -fno-strictness -fno-warn-orphans
@@ -747,23 +634,10 @@ executable pandora-decode-morse-code
 executable pandora-enumerating-trees
   main-is: Problems/pandora/WIP/enumerating-trees.hs
   build-depends: base, pandora, pandora-io
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -771,22 +645,10 @@ executable pandora-enumerating-trees
 executable pandora-json-parser
   main-is: Problems/pandora/WIP/json-parser.hs
   build-depends: base, pandora
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -805,23 +667,10 @@ executable pandora-lindenmayer-system
 executable pandora-longest-increasing-subsequence
   main-is: Problems/pandora/WIP/longest-increasing-subsequence.hs
   build-depends: base, pandora, pandora-io
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -829,27 +678,10 @@ executable pandora-longest-increasing-subsequence
 executable pandora-matrix-in-clockwise-spiral
   main-is: Problems/pandora/WIP/matrix-in-clockwise-spiral.hs
   build-depends: base, pandora
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    FunctionalDependencies,
-    GADTs,
-    LambdaCase,
-    MultiParamTypeClasses,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeFamilyDependencies,
-    TypeOperators,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -857,25 +689,10 @@ executable pandora-matrix-in-clockwise-spiral
 executable pandora-minimum-number-of-jumps
   main-is: Problems/pandora/WIP/minimum-number-of-jumps.hs
   build-depends: base, pandora, pandora-io
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    GADTs,
-    LambdaCase,
-    MultiParamTypeClasses,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -883,25 +700,10 @@ executable pandora-minimum-number-of-jumps
 executable pandora-path-resolver
   main-is: Problems/pandora/DONE/path-resolver.hs
   build-depends: base, pandora, pandora-io
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    GADTs,
-    LambdaCase,
-    MultiParamTypeClasses,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -909,23 +711,10 @@ executable pandora-path-resolver
 executable pandora-probability
   main-is: Problems/pandora/WIP/Probability.hs
   build-depends: base, pandora
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    MultiParamTypeClasses,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -933,24 +722,10 @@ executable pandora-probability
 executable pandora-roman-numbers
   main-is: Problems/pandora/WIP/roman-numbers.hs
   build-depends: base, pandora, pandora-io
-  default-extensions:
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    GADTs,
-    LambdaCase,
-    MultiParamTypeClasses,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -969,25 +744,10 @@ executable pandora-run-length-encoding
 executable pandora-stock-prices
   main-is: Problems/pandora/DONE/stock-prices.hs
   build-depends: base, pandora, pandora-io
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    LiberalTypeSynonyms,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -995,25 +755,10 @@ executable pandora-stock-prices
 executable pandora-trapping-rain-water
   main-is: Problems/pandora/DONE/trapping-rain-water.hs
   build-depends: base, pandora
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    LambdaCase,
-    LiberalTypeSynonyms,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    TypeSynonymInstances,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
@@ -1021,26 +766,10 @@ executable pandora-trapping-rain-water
 executable pandora-wolf-goat-cabbage
   main-is: Problems/pandora/DONE/wolf-goat-cabbage.hs
   build-depends: base, pandora, pandora-io
-  default-extensions:
-    ConstraintKinds,
-    DataKinds,
-    ExplicitNamespaces,
-    FlexibleContexts,
-    FlexibleInstances,
-    GADTs,
-    LambdaCase,
-    LiberalTypeSynonyms,
-    MultiParamTypeClasses,
-    NoImplicitPrelude,
-    OverloadedStrings,
-    PackageImports,
-    RankNTypes,
-    ScopedTypeVariables,
-    StandaloneDeriving,
-    TypeApplications,
-    TypeFamilies,
-    TypeOperators,
-    QuantifiedConstraints
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   other-modules:
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs

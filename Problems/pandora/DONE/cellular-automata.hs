@@ -1,4 +1,6 @@
--- {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE PolyKinds #-}
+-- {-# LANGUAGE IncoherentInstances #-}
 
 import "base" Control.Concurrent (threadDelay)
 import "base" Data.List (take)
@@ -53,8 +55,12 @@ purge = putStr "\ESC[2J"
 
 --------------------------------------------------------------------------------
 
--- type II = Zipper Stream <:.> Zipper Stream
-type II = Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))
+type II = Tap Sides <:.> Tap Sides
+
+type Sides = Stream <:.:> Stream := (:*:)
+
+type Horizontally = Zipper Stream <:.> Stream
+type Vertically = Stream <:.> Zipper Stream
 
 instance Extendable II where
 	zz =>> f = f <$> TU (horizontal <$> vertical zz) where
@@ -66,13 +72,15 @@ instance Extendable II where
 		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
 
-instance Substructure Down (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
-	type Substructural Down (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Stream <:.> Zipper Stream
-	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) = Store $ TU d :*: lift . TU . Tap focused . (twosome % u) . run
+instance Substructure Down II where
+	type Substructural Down II = Vertically
+	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) =
+		Store $ TU d :*: lift . TU . Tap focused . (twosome % u) . run
 
-instance Substructure Up (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
-	type Substructural Up (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Stream <:.> Zipper Stream
-	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) = Store $ TU u :*: lift . TU . Tap focused . twosome d . run
+instance Substructure Up II where
+	type Substructural Up II = Vertically
+	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) =
+		Store $ TU u :*: lift . TU . Tap focused . twosome d . run
 
 instance Covariant t => Substructure Left (t <:.:> t := (:*:)) where
 	type Substructural Left (t <:.:> t := (:*:)) = t
@@ -82,15 +90,15 @@ instance Covariant t => Substructure Right (t <:.:> t := (:*:)) where
 	type Substructural Right (t <:.:> t := (:*:)) = t
 	substructure (run . extract . run -> l :*: r) = Store $ r :*: lift . twosome l
 
-instance Substructure Left (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
-	type Substructural Left (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Zipper Stream <:.> Stream
+instance Substructure Left II where
+	type Substructural Left II = Horizontally
 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let left = sub @Tail |> sub @Left in
 		let target = TU $ Tap # view left x $ twosome # view left <$> d # view left <$> u in
 		let around lx = twosome # set left <$> view left lx <*> d # set left <$> view left lx <*> u in
 		Store $ target :*: \lx -> lift . TU . Tap (set left # extract (run lx) # x) $ around # run lx
 
-instance Substructure Right (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) where
-	type Substructural Right (Tap (Stream <:.:> Stream := (:*:)) <:.> Tap (Stream <:.:> Stream := (:*:))) = Zipper Stream <:.> Stream
+instance Substructure Right II where
+	type Substructural Right II = Horizontally
 	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let right = sub @Tail |> sub @Right in
 		let target = TU . Tap (view right x) $ twosome # view right <$> d # view right <$> u in
 		let around rx = twosome # set right <$> view right rx <*> d # set right <$> view right rx <*> u in
@@ -103,15 +111,14 @@ type Around = Status -- current
 	:*: Status :*: Status -- minor diagonal
 
 around :: II Status -> Around
-around z = extract z :*: plane (sub @Left) :*: plane (sub @Right) :*: plane (sub @Up) :*: plane (sub @Down)
-	:*: slant (sub @Down) (sub @Tail |> sub @Left) :*: slant (sub @Up) (sub @Tail |> sub @Right)
-	:*: slant (sub @Up) (sub @Tail |> sub @Left) :*: slant (sub @Down) (sub @Tail |> sub @Right) where
+around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @Down
+	:*: slant @Down @Tail @Left :*: slant @Up @Tail @Right :*: slant @Up @Tail @Left :*: slant @Down @Tail @Right where
 
-	plane :: (Extractable t, Extractable u) => II :~. (t <:.> u) -> Status
-	plane lens = extract . extract . run . view lens $ z
+	plane :: forall i t u . (Substructured i II (t <:.> u), Extractable t, Extractable u) => Status
+	plane = extract . extract . run . view (sub @i) $ z
 
-	slant :: II :~. (Stream <:.> Zipper Stream) -> (Zipper Stream :~. Stream) -> Status
-	slant vl hl = extract . view hl . extract . run . view vl $ z
+	slant :: forall v q h . (Substructured v II Vertically, Substructured q (Zipper Stream) Sides, Substructured h Sides Stream) => Status
+	slant = extract . view (sub @q |> sub @h) . extract . run . view (sub @v) $ z
 
 conway :: Around -> Status
 conway (focused :*: neighbors) = let count status acc = status ? acc + one $ acc
@@ -154,3 +161,4 @@ blinker = TU . Tap one $ twosome # repeat noone # repeat noone where
 	alone = Construct True . Identity $ repeat False
 
 main = lifecycle # conway . around # cube
+-- main = print $ view (sub @(Right |> Right)) $ True :*: False :*: True
