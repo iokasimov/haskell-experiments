@@ -1,13 +1,12 @@
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE PolyKinds #-}
--- {-# LANGUAGE IncoherentInstances #-}
 
-import "base" Control.Concurrent (threadDelay)
-import "base" Data.List (take)
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
+
+import "base" Control.Concurrent (threadDelay)
+import "base" Data.List (take)
 
 import Gears.Instances ()
 import Gears.Utils (stream_to_list)
@@ -34,7 +33,8 @@ rule90 (False :*: False :*: True) = True
 rule90 (False :*: False :*: False) = False
 
 neighbourhood :: Zipper Stream Status -> Neighbours
-neighbourhood z = extract (view (focus @Left) . run $ lower z) :*: extract z :*: extract (view (focus @Right) . run $ lower z)
+neighbourhood z = extract (view # focus @Left $ run # lower z)
+	:*: extract z :*: extract (view # focus @Right $ run # lower z)
 
 display :: Int -> Zipper Stream a -> [a]
 display n (Tap x (T_U (bs :*: fs))) = reverse (take n $ stream_to_list bs) <> [x] <> take n (stream_to_list fs)
@@ -121,11 +121,12 @@ around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @D
 	slant = extract . view (sub @q |> sub @h) . extract . run . view (sub @v) $ z
 
 conway :: Around -> Status
-conway (focused :*: neighbors) = let count status acc = status ? acc + one $ acc
-	in case reduce count Zero neighbors of
-		Numerator (Denumerator One) -> focused
-		Numerator (Denumerator (Denumerator One)) -> True
-		_ -> False
+conway (focused :*: neighbors) = alive == one + one ? focused
+	$ alive == one + one + one ? True $ False where
+
+	alive :: Int
+	alive = let count status acc = status ? acc + one $ acc in
+		reduce count zero neighbors
 
 lifecycle :: (II Status -> Status) -> II Status -> IO ()
 lifecycle act being = delay *> purge *> snapshot *> evolve where
@@ -161,4 +162,3 @@ blinker = TU . Tap one $ twosome # repeat noone # repeat noone where
 	alone = Construct True . Identity $ repeat False
 
 main = lifecycle # conway . around # cube
--- main = print $ view (sub @(Right |> Right)) $ True :*: False :*: True
