@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveFunctor #-}
+
 module Main where
 
 -- Source: https://gist.github.com/pchiusano/e51c4aec00ceb9e83393

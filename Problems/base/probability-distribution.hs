@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Main where
 
 -- Source: http://www.randomhacks.net.s3-website-us-east-1.amazonaws.com/2007/02/21/refactoring-probability-distributions/
