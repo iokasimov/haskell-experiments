@@ -40,7 +40,7 @@ instance Base.Show a => Base.Show (List a) where
 	show (TU Nothing) = ""
 
 instance Base.Show a => Base.Show (Tap (T_U Covariant Covariant (:*:) List List) a) where
-	show (Tap x (T_U (bs :*: fs))) = Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs
+	show (Tap x (T_U (bs :*: fs))) = "| " Base.<> Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs Base.<> " |"
 
 -- instance Base.Show Numerator where
 -- 	show Zero = "0"
