@@ -1,17 +1,15 @@
+{-# LANGUAGE UndecidableInstances #-}
+
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
 import "pandora-io" Pandora.IO
 
-import Prelude (IO, Int, Show (show), print)
-import Gears.Instances ()
+import "base" Data.Int (Int)
+import "base" System.IO (IO, print)
+import "base" Text.Show (Show)
 
-instance Setoid Bracket where
-	Round == Round = True
-	Square == Square = True
-	Angle == Angle = True
-	Curly == Curly = True
-	_ == _ = False
+import Gears.Instances ()
 
 type Index = Int
 
@@ -36,7 +34,7 @@ indexate = adjust @Trace @Index (+ one)
 
 decide :: Checking t => Sign -> t ()
 decide (Bracket Opened opened) = remember opened
-decide (Bracket Closed closed) = latest (deadend closed) (juxtapose closed)
+decide (Bracket Closed closed) = latest # deadend closed # juxtapose closed
 decide _ = skip
 
 remember :: Checking t => Bracket -> t ()
@@ -46,7 +44,7 @@ remember style = void . adjust @Trace @Opened . (!) =<< item @Push
 
 -- TODO: it looks too complicated
 latest :: Checking t => t r -> (Index -> Bracket -> t r) -> t ()
-latest on_empty f = void $ zoom @Trace (focus @Right |> focus @Head) current
+latest on_empty f = void $ zoom @Trace (focus @Head . focus @Right) current
 	>>= resolve @Open @(Maybe Open) (|- f) on_empty
 
 juxtapose :: Checking t => Bracket -> Index -> Bracket -> t ()
@@ -74,7 +72,7 @@ check :: Traversable s => s Sign -> Checker ()
 check code = code ->> inspect *> latest skip logjam
 
 interpret :: Checker () -> IO ()
-interpret result = result & run % (1 :*: empty) & conclusion print ((print "OK") !)
+interpret result = result & run % (1 :*: empty) & conclusion print (print "OK" !)
 
 deriving instance Show Bracket
 deriving instance Show Sign

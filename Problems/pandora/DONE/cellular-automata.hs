@@ -74,35 +74,37 @@ instance Extendable II where
 
 instance Substructure Down II where
 	type Substructural Down II = Vertically
-	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) =
-		Store $ TU d :*: lift . TU . Tap focused . (twosome % u) . run
+	substructure = PQ_ $ \ii -> case run . extract . run # ii of
+		Tap focused (T_U (d :*: u)) -> Store $ TU d :*: lift . TU . Tap focused . (twosome % u) . run
 
 instance Substructure Up II where
 	type Substructural Up II = Vertically
-	substructure (run . extract . run -> Tap focused (T_U (d :*: u))) =
-		Store $ TU u :*: lift . TU . Tap focused . twosome d . run
+	substructure = PQ_ $ \x -> case run . extract . run # x of
+		Tap focused (T_U (d :*: u)) -> Store $ TU u :*: lift . TU . Tap focused . twosome d . run
 
 instance Covariant t => Substructure Left (t <:.:> t := (:*:)) where
 	type Substructural Left (t <:.:> t := (:*:)) = t
-	substructure (run . extract . run -> l :*: r) = Store $ l :*: lift . twosome % r
+	substructure = PQ_ (Store . (lift .#.. (twosome %) <$>) . run . extract . run)
 
 instance Covariant t => Substructure Right (t <:.:> t := (:*:)) where
 	type Substructural Right (t <:.:> t := (:*:)) = t
-	substructure (run . extract . run -> l :*: r) = Store $ r :*: lift . twosome l
+	substructure = PQ_ (Store . (lift .#.. twosome <$>) . swap . run . extract . run)
 
 instance Substructure Left II where
 	type Substructural Left II = Horizontally
-	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let left = sub @Tail |> sub @Left in
-		let target = TU $ Tap # view left x $ twosome # view left <$> d # view left <$> u in
-		let around lx = twosome # set left <$> view left lx <*> d # set left <$> view left lx <*> u in
-		Store $ target :*: \lx -> lift . TU . Tap (set left # extract (run lx) # x) $ around # run lx
+	substructure = PQ_ $ \x -> case run . extract . run # x of
+		Tap x (T_U (d :*: u)) -> let left = sub @Left . sub @Tail in
+			let target = TU $ Tap # view left x $ twosome # view left <$> d # view left <$> u in
+			let around lx = twosome # set left <$> view left lx <*> d # set left <$> view left lx <*> u in
+			Store $ target :*: \lx -> lift . TU . Tap (set left # extract (run lx) # x) $ around # run lx
 
 instance Substructure Right II where
 	type Substructural Right II = Horizontally
-	substructure (run . extract . run -> Tap x (T_U (d :*: u))) = let right = sub @Tail |> sub @Right in
-		let target = TU . Tap (view right x) $ twosome # view right <$> d # view right <$> u in
-		let around rx = twosome # set right <$> view right rx <*> d # set right <$> view right rx <*> u in
-		Store $ target :*: \rx -> lift . TU . Tap (set right # extract (run rx) # x) $ around # run rx
+	substructure = PQ_ $ \x -> case run . extract . run # x of
+		Tap x (T_U (d :*: u)) -> let right = sub @Right . sub @Tail in
+			let target = TU . Tap (view right x) $ twosome # view right <$> d # view right <$> u in
+			let around rx = twosome # set right <$> view right rx <*> d # set right <$> view right rx <*> u in
+			Store $ target :*: \rx -> lift . TU . Tap (set right # extract (run rx) # x) $ around # run rx
 
 type Around = Status -- current
 	:*: Status :*: Status -- horizontal
@@ -118,7 +120,7 @@ around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @D
 	plane = extract . extract . run . view (sub @i) $ z
 
 	slant :: forall v q h . (Substructured v II Vertically, Substructured q (Zipper Stream) Sides, Substructured h Sides Stream) => Status
-	slant = extract . view (sub @q |> sub @h) . extract . run . view (sub @v) $ z
+	slant = extract . view (sub @h . sub @q) . extract . run . view (sub @v) $ z
 
 conway :: Around -> Status
 conway (focused :*: neighbors) = alive == one + one ? focused

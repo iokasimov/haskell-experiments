@@ -74,6 +74,6 @@ solution = extract <$> filter @All moved result where
 	result = run . run % start $ take_n_stream 7 route ->> step
 
 	moved :: Predicate (River :*: [Maybe Character])
-	moved = null >&< view (focus @Left |> focus @Left)
+	moved = null >&< view (focus @Left . focus @Left)
 
 main = solution ->> print
