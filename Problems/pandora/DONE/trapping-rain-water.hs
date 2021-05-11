@@ -1,8 +1,10 @@
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
+import "pandora-io" Pandora.IO
 
-import Prelude (Int, print)
+import Data.Int (Int)
+import System.IO (print)
 
 import Gears.Instances
 

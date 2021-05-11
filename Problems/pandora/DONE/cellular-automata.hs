@@ -117,10 +117,10 @@ around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @D
 	:*: slant @Down @Tail @Left :*: slant @Up @Tail @Right :*: slant @Up @Tail @Left :*: slant @Down @Tail @Right where
 
 	plane :: forall i t u . (Substructured i II (t <:.> u), Extractable t, Extractable u) => Status
-	plane = extract . extract . run . view (sub @i) $ z
+	plane = extract . extract . run $ view # sub @i # z
 
 	slant :: forall v q h . (Substructured v II Vertically, Substructured q (Zipper Stream) Sides, Substructured h Sides Stream) => Status
-	slant = extract . view (sub @h . sub @q) . extract . run . view (sub @v) $ z
+	slant = extract . view (sub @h . sub @q) . extract . run $ view # sub @v # z
 
 conway :: Around -> Status
 conway (focused :*: neighbors) = alive == one + one ? focused
