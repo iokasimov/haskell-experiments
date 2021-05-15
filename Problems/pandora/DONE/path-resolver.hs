@@ -20,7 +20,7 @@ data Link = Ahead Directory | Previous | Current
 
 settle :: Link -> State Path ()
 settle (Ahead dir) = void $ modify @Path $ item @Push dir
-settle Previous = void $ focus @Head @List @Directory =<> Nothing
+settle Previous = void $ sub @Root @List @Directory =<> Nothing
 settle Current = point ()
 
 solution :: List Link  -> Path

@@ -32,7 +32,7 @@ explore bricks = chipped <$> sequence (bricks =>> validate) where
 
 	-- Remove a brick from focused column
 	chipped :: Phase a -> Phase a
-	chipped shifted = over (focus @Head) decrement <$> shifted
+	chipped shifted = over (sub @Root) (decrement <$>) <$> shifted
 
 	decrement :: a -> a
 	decrement x = x == zero ? zero $ x - one

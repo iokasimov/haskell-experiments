@@ -53,8 +53,8 @@ step way = adapt bank >>= adapt . choice >>= adapt . (->> transport) where
 	transport being = source ~<> delete @First being *> target ~<> item @Push being $> being
 
 	source, target :: River :-. List Character
-	source = way ? focus @Right $ focus @Left
-	target = way ? focus @Left $ focus @Right
+	source = way ? sub @Right $ sub @Left
+	target = way ? sub @Left $ sub @Right
 
 route :: Stream Boolean
 route = point . bool True False .-+ False
@@ -74,6 +74,6 @@ solution = extract <$> filter @All moved result where
 	result = run . run % start $ take_n_stream 7 route ->> step
 
 	moved :: Predicate (River :*: [Maybe Character])
-	moved = null >&< view (focus @Left . focus @Left)
+	moved = null >&< view (sub @Left . sub @Left)
 
 main = solution ->> print
