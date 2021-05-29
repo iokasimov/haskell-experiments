@@ -14,9 +14,9 @@ type Occurence = Int :*: Char
 type Counter = List Occurence
 
 proceed :: Char -> State Counter ()
-proceed next = zoom @Counter (focus @Head) (current @(Maybe Occurence)) >>= \case
+proceed next = zoom @Counter (sub @Root) (current @(Maybe Occurence)) >>= \case
 	Just (n :*: previous) -> next == previous
-		? void (zoom @Counter (focus @Head) (replace . Just $ n + 1 :*: previous))
+		? void (zoom @Counter (sub @Root) (replace . Just $ n + 1 :*: previous))
 		$ void (modify @Counter (item @Push $ 1 :*: next))
 	Nothing -> void $ modify @Counter (item @Push $ 1 :*: next)
 

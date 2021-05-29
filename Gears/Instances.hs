@@ -33,11 +33,11 @@ instance Base.Show Boolean where
 
 instance Base.Show a => Base.Show (Construction Maybe a) where
 	show (Construct x (Just xs)) = Base.show x Base.++ ", " Base.++ Base.show xs
-	show (Construct x Nothing) = Base.show x
+	show (Construct x Nothing) = Base.show x Base.++ "]"
 
 instance Base.Show a => Base.Show (List a) where
-	show (TU (Just stack)) = Base.show stack
-	show (TU Nothing) = ""
+	show (TU (Just stack)) = "[" Base.++ Base.show stack
+	show (TU Nothing) = "..."
 
 instance Base.Show a => Base.Show (Tap (T_U Covariant Covariant (:*:) List List) a) where
 	show (Tap x (T_U (bs :*: fs))) = "| " Base.<> Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs Base.<> " |"

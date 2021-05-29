@@ -20,10 +20,10 @@ nonempty_stack_to_list r (Construct x (Just next)) = x : nonempty_stack_to_list 
 stream_to_list :: Stream ~> []
 stream_to_list (Construct x (Identity next)) = x : stream_to_list next
 
-zipper_list_to_list :: Zipper List a -> [a]
+zipper_list_to_list :: Zipper List (Left ::: Right) a -> [a]
 zipper_list_to_list (Tap x (T_U (bs :*: fs))) = Base.reverse (stack_to_list [] bs) Base.<> [x] Base.<> stack_to_list [] fs
 
-show_zipper_list :: Base.Show a => Zipper List a -> Base.String
+show_zipper_list :: Base.Show a => Zipper List (Left ::: Right) a -> Base.String
 show_zipper_list (Tap x (T_U (bs :*: fs))) = Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs
 
 -- nat :: Base.Int -> Numerator
