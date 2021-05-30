@@ -81,6 +81,8 @@ dictionary = both ' '
 
 data Morse = Dot | Dash
 
+infixr 1 .-
+
 (.-) Dot x _ = x
 (.-) Dash _ y = y
 
@@ -88,8 +90,7 @@ search :: List Morse -> Maybe Char
 search code = extract . attached <$> run @(State Decoder :> Maybe) (code ->> decode) dictionary
 
 decode :: (Monad t, Optional t, Stateful Decoder t) => Morse -> t Decoder
-decode x = zoom @Decoder (x .- sub @Left $ sub @Right) current
-	>>= adapt . run @Binary >>= replace @Decoder
+decode l = current @Decoder >>= adapt . (l .- view # sub @Left $ view # sub @Right) >>= replace
 
 --------------------------------------------------------------------------------
 
