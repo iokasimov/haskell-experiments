@@ -71,6 +71,10 @@ instance Extendable II where
 		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
 
+-- Add to Pandora Applicative (Tap (t <:.:> t := (:*:))) instance
+instance {-# OVERLAPS #-} Applicative (Tap (Construction Identity <:.:> Construction Identity := (:*:))) where
+	Tap f (T_U (lfs :*: rfs)) <*> Tap x (T_U (ls :*: rs)) = Tap # f x # T_U (lfs <*> ls :*: rfs <*> rs)
+
 instance Substructure Down II where
 	type Available Down II = Identity
 	type Substance Down II = Vertically
@@ -98,20 +102,18 @@ instance Covariant t => Substructure Right (t <:.:> t := (:*:)) where
 instance Substructure Left II where
 	type Available Left II = Identity
 	type Substance Left II = Horizontally
-	substructure = P_Q_T $ \x -> case run # lower x of
-		Tap focused (T_U (ds :*: us)) ->
-			let target = TU $ Tap # (extract $ view (sub @Left) focused) $ twosome # extract . view (sub @Left) <$> ds # extract . view (sub @Left) <$> us in
-			let around lx = twosome # (set (sub @Left) . Identity <$> (extract $ view (sub @Left) lx) <*> ds) # (set (sub @Left) . Identity <$> (extract $ view (sub @Left) lx) <*> us) in
-			Store $ Identity target :*: \lx -> lift . TU . Tap (set (sub @Left) # Identity (extract (run (extract lx))) # focused) $ around # run (extract lx)
+	substructure = P_Q_T $ \ii ->
+		let target = (extract . view (sub @Left) <$>) ||= lower ii in
+		let updated new = set (sub @Left) . Identity <$> new <*> run (lower ii) in
+		Store $ Identity target :*: lift . (updated ||=) . extract
 
 instance Substructure Right II where
 	type Available Right II = Identity
 	type Substance Right II = Horizontally
-	substructure = P_Q_T $ \x -> case run # lower x of
-		Tap focused (T_U (ds :*: us)) ->
-			let target = TU . Tap (extract $ view (sub @Right) focused) $ twosome # extract . view (sub @Right) <$> ds # extract . view (sub @Right) <$> us in
-			let around rx = twosome # set (sub @Right) . Identity <$> (extract $ view (sub @Right) rx) <*> ds # set (sub @Right) . Identity <$> (extract $ view (sub @Right) rx) <*> us in
-			Store $ Identity target :*: \rx -> lift . TU . Tap (set (sub @Right) # Identity (extract (run (extract rx))) # focused) $ around # run (extract rx)
+	substructure = P_Q_T $ \ii ->
+		let target = (extract . view (sub @Right) <$>) ||= lower ii in
+		let updated new = set (sub @Right) . Identity <$> new <*> run (lower ii) in
+		Store $ Identity target :*: lift . (updated ||=) . extract
 
 type Around = Status -- current
 	:*: Status :*: Status -- horizontal
