@@ -72,7 +72,7 @@ instance Extendable II where
 		move f x = extract . deconstruct $ point . f .-+ x
 
 -- Add to Pandora Applicative (Tap (t <:.:> t := (:*:))) instance
-instance {-# OVERLAPS #-} Applicative (Tap (Construction Identity <:.:> Construction Identity := (:*:))) where
+instance {-# OVERLAPS #-} Applicative t => Applicative (Tap (t <:.:> t := (:*:))) where
 	Tap f (T_U (lfs :*: rfs)) <*> Tap x (T_U (ls :*: rs)) = Tap # f x # T_U (lfs <*> ls :*: rfs <*> rs)
 
 instance Substructure Down II where
@@ -97,7 +97,7 @@ instance Covariant t => Substructure Right (t <:.:> t := (:*:)) where
 	type Available Right (t <:.:> t := (:*:)) = Identity
 	type Substance Right (t <:.:> t := (:*:)) = t
 	substructure = P_Q_T $ \x -> case run # lower x of
-		ls :*: rs -> Store $ Identity rs :*: lift . (twosome ls) . extract
+		ls :*: rs -> Store $ Identity rs :*: lift . twosome ls . extract
 
 instance Substructure Left II where
 	type Available Left II = Identity
@@ -123,13 +123,13 @@ type Around = Status -- current
 
 around :: II Status -> Around
 around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @Down
-	:*: slant @Down @Tail @Left :*: slant @Up @Tail @Right :*: slant @Up @Tail @Left :*: slant @Down @Tail @Right where
+	:*: slant @Down @Left :*: slant @Up @Right :*: slant @Up @Left :*: slant @Down @Right where
 
 	plane :: forall i t u . (Substructured i II Identity (t <:.> u), Extractable t, Extractable u) => Status
 	plane = extract . lower . extract $ view # sub @i # z
 
-	slant :: forall v q h . (Substructured v II Identity Vertically, Substructured q (Zipper Stream (Left ::: Right)) Identity Sides, Substructured h Sides Identity Stream) => Status
-	slant = extract . extract . view (sub @h . sub @q) . lower . extract $ view # sub @v # z
+	slant :: forall v h . (Substructured v II Identity Vertically, Substructured h (Zipper Stream (Left ::: Right)) Identity Stream) => Status
+	slant = extract . extract . view (sub @h) . lower . extract $ view # sub @v # z
 
 conway :: Around -> Status
 conway (focused :*: neighbors) = alive == one + one ? focused
