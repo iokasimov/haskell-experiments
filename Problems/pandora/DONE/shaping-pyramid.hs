@@ -9,7 +9,7 @@ import Gears.Instances ()
 
 type Chippable a = (Setoid a, Quasiring a, Group a)
 
-type Shape = Zipper List
+type Shape = Zipper List (Left ::: Right)
 
 type Phase a = Shape :. Shape := a
 
@@ -32,7 +32,7 @@ explore bricks = chipped <$> sequence (bricks =>> validate) where
 
 	-- Remove a brick from focused column
 	chipped :: Phase a -> Phase a
-	chipped shifted = over (sub @Root) (decrement <$>) <$> shifted
+	chipped shifted = over (sub @Root) (decrement <$$>) <$> shifted
 
 	decrement :: a -> a
 	decrement x = x == zero ? zero $ x - one
@@ -47,5 +47,5 @@ valid_example = item @Push 0 $ item @Push 1 $ item @Push 2
 	$ item @Push 3 $ item @Push 2 $ item @Push 1 $ point 0
 
 main = void $ do
-	let not_valid = into @(Zipper List) not_valid_example
+	let not_valid = into @(Zipper List (Left ::: Right)) not_valid_example
 	print $ explore not_valid >>= (->> explore) >>= (->>> explore)
