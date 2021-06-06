@@ -87,18 +87,6 @@ instance Substructure Up II where
 	substructure = P_Q_T $ \x -> case run . extract . run # x of
 		Tap focused (T_U (d :*: u)) -> Store $ Identity (TU u) :*: lift . TU . Tap focused . twosome d . run . extract
 
-instance Covariant t => Substructure Left (t <:.:> t := (:*:)) where
-	type Available Left (t <:.:> t := (:*:)) = Identity
-	type Substance Left (t <:.:> t := (:*:)) = t
-	substructure = P_Q_T $ \x -> case run # lower x of
-		ls :*: rs -> Store $ Identity ls :*: lift . (twosome % rs) . extract
-
-instance Covariant t => Substructure Right (t <:.:> t := (:*:)) where
-	type Available Right (t <:.:> t := (:*:)) = Identity
-	type Substance Right (t <:.:> t := (:*:)) = t
-	substructure = P_Q_T $ \x -> case run # lower x of
-		ls :*: rs -> Store $ Identity rs :*: lift . twosome ls . extract
-
 instance Substructure Left II where
 	type Available Left II = Identity
 	type Substance Left II = Horizontally
