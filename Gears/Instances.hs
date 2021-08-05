@@ -10,13 +10,13 @@ import "pandora" Pandora.Pattern
 import qualified GHC.Int as Base -- (eqInt)
 import qualified Prelude as Base -- (Int, Semigroup ((<>)), Show (show), min, max, (+), (-), (*))
 
-instance Covariant [] where
-	f <$> [] = []
-	f <$> (x : xs) = (f x) : (f <$> xs)
+instance Covariant [] (->) (->) where
+	f -<$>- [] = []
+	f -<$>- (x : xs) = (f x) : (f -<$>- xs)
 
-instance Traversable [] where
-	[] ->> _ = point []
-	(x : xs) ->> f = (:) <$> f x <*> xs ->> f
+instance Traversable [] (->) (->) where
+	_ <<- [] = point []
+	f <<- (x : xs) = (:) -<$>- f x -<*>- f <<- xs
 
 deriving instance (Base.Show a, Base.Show b) => Base.Show (a :*: b)
 deriving instance Base.Show a => Base.Show (Maybe a)

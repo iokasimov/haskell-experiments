@@ -7,6 +7,8 @@ import "pandora-io" Pandora.IO
 
 import Gears.Utils (take_n_stream)
 
+import Debug.Trace (traceShow)
+
 data Character = Wolf | Goat | Cabbage
 
 instance Setoid Character where
@@ -27,18 +29,18 @@ survive Goat Cabbage = Nothing
 survive Cabbage Goat = Nothing
 survive _ _ = Just ()
 
-type River = List Character :*: List Character
+type River = List <:.:> List := (:*:)
 
 type Enumeration = Comprehension Maybe
 
-step :: Boolean -> State River :> Enumeration := Maybe Character
+step :: Boolean -> State (River Character) :> Enumeration := Maybe Character
 step way = adapt bank >>= adapt . choice >>= adapt . (->> transport) where
 
-	bank :: State River := List Character
-	bank = view source <$> current
+	bank :: State (River Character) := List Character
+	bank = extract . view source <$> current
 
 	choice :: List Character -> Enumeration :. Maybe := Character
-	choice xs = Comprehension $ filter @All (lunchtime >$< null) boats where
+	choice xs = (\r -> traceShow (run r) r) $ Comprehension $ filter @All (lunchtime >$< null) boats where
 
 		lunchtime :: Maybe Character -> Maybe :. Enumeration := ()
 		lunchtime x = sequence $ survive <$> selection x <*> selection x
@@ -49,10 +51,11 @@ step way = adapt bank >>= adapt . choice >>= adapt . (->> transport) where
 		boats :: List :. Maybe := Character
 		boats = item @Push Nothing $ Just <$> xs
 
-	transport :: Character :=> State River
-	transport being = source ~<> delete @First being *> target ~<> item @Push being $> being
+	transport :: Character :=> State (River Character)
+	transport being = source ~<> (delete @First being <$>) *>
+		target ~<> (item @Push being <$>) $> being
 
-	source, target :: River :-. List Character
+	source, target :: Convex Lens (River Character) (List Character)
 	source = way ? sub @Right $ sub @Left
 	target = way ? sub @Left $ sub @Right
 
@@ -61,8 +64,8 @@ route = point . bool True False .-+ False
 
 --------------------------------------------------------------------------------
 
-start :: River
-start = characters :*: empty where
+start :: River Character
+start = unite $ characters :*: empty where
 
 	characters :: List Character
 	characters = item @Push Wolf $ item @Push Goat $ item @Push Cabbage $ empty
@@ -70,10 +73,10 @@ start = characters :*: empty where
 solution :: List [Maybe Character]
 solution = extract <$> filter @All moved result where
 
-	result :: List (River :*: [Maybe Character])
-	result = run . run % start $ take_n_stream 7 route ->> step
+	result :: List (River Character :*: [Maybe Character])
+	result = run . run % start $ take_n_stream 7 route ->> step . (\r -> traceShow r r)
 
-	moved :: Predicate (River :*: [Maybe Character])
-	moved = null >&< view (sub @Left . sub @Left)
+	moved :: Predicate (River Character :*: [Maybe Character])
+	moved = null >&< (extract . view (sub @Left . access @(River Character)))
 
 main = solution ->> print
