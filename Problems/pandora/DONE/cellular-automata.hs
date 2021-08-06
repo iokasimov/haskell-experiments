@@ -40,10 +40,10 @@ display :: Int -> Zipper Stream (Left ::: Right) a -> [a]
 display n (Tap x (T_U (bs :*: fs))) = reverse (take n $ stream_to_list bs) <> [x] <> take n (stream_to_list fs)
 
 record :: (Zipper Stream (Left ::: Right) Status -> Status) -> Zipper Stream (Left ::: Right) Status -> IO ()
-record act being = delay *> snapshot *> evolve where
+record act being = delay *>- snapshot *>- evolve where
 
 	evolve, snapshot :: IO ()
-	evolve = record act $ being =>> act
+	evolve = record act $ act <<= being
 	snapshot = print $ display 25 being
 
 delay, purge :: IO ()
@@ -61,19 +61,15 @@ type Horizontally = Zipper Stream (Left ::: Right) <:.> Stream
 -- TODO: There we should use Up :: Down instead of Left ::: Right, but let's change it later
 type Vertically = Stream <:.> Zipper Stream (Left ::: Right)
 
-instance Extendable II where
-	zz =>> f = f <$> TU (horizontal <$> vertical zz) where
+instance Extendable II (->) where
+	f <<= zz = f -<$>- TU (horizontal -<$>- vertical zz) where
 
 		horizontal, vertical :: II a -> Zipper Stream (Left ::: Right) (II a)
-		horizontal z = Tap z $ twosome # move ((rotate @Left <$>) ||=) z # move ((rotate @Right <$>) ||=) z
+		horizontal z = Tap z $ twosome # move ((rotate @Left -<$>-) ||=) z # move ((rotate @Right -<$>-) ||=) z
 		vertical z = Tap z $ twosome # move (rotate @Left ||=) z # move (rotate @Right ||=) z
 
-		move :: (Extractable t, Pointable t) => (a -> a) -> a -> Construction t a
+		move :: (Extractable t (->), Pointable t (->)) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
-
--- Add to Pandora Applicative (Tap (t <:.:> t := (:*:))) instance
-instance {-# OVERLAPS #-} Applicative t => Applicative (Tap (t <:.:> t := (:*:))) where
-	Tap f (T_U (lfs :*: rfs)) <*> Tap x (T_U (ls :*: rs)) = Tap # f x # T_U (lfs <*> ls :*: rfs <*> rs)
 
 instance Substructure Down II where
 	type Available Down II = Identity
@@ -91,16 +87,16 @@ instance Substructure Left II where
 	type Available Left II = Identity
 	type Substance Left II = Horizontally
 	substructure = P_Q_T $ \ii ->
-		let target = (extract . view (sub @Left) <$>) ||= lower ii in
-		let updated new = set (sub @Left) . Identity <$> new <*> run (lower ii) in
+		let target = (extract . view (sub @Left) -<$>-) ||= lower ii in
+		let updated new = set (sub @Left) . Identity -<$>- new -<*>- run (lower ii) in
 		Store $ Identity target :*: lift . (updated ||=) . extract
 
 instance Substructure Right II where
 	type Available Right II = Identity
 	type Substance Right II = Horizontally
 	substructure = P_Q_T $ \ii ->
-		let target = (extract . view (sub @Right) <$>) ||= lower ii in
-		let updated new = set (sub @Right) . Identity <$> new <*> run (lower ii) in
+		let target = (extract . view (sub @Right) -<$>-) ||= lower ii in
+		let updated new = set (sub @Right) . Identity -<$>- new -<*>- run (lower ii) in
 		Store $ Identity target :*: lift . (updated ||=) . extract
 
 type Around = Status -- current
@@ -113,7 +109,7 @@ around :: II Status -> Around
 around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @Down
 	:*: slant @Down @Left :*: slant @Up @Right :*: slant @Up @Left :*: slant @Down @Right where
 
-	plane :: forall i t u . (Substructured i II Identity (t <:.> u), Extractable t, Extractable u) => Status
+	plane :: forall i t u . (Substructured i II Identity (t <:.> u), Extractable t (->), Extractable u (->)) => Status
 	plane = extract . lower . extract $ view # sub @i # z
 
 	slant :: forall v h . (Substructured v II Identity Vertically, Substructured h (Zipper Stream (Left ::: Right)) Identity Stream) => Status
@@ -128,12 +124,12 @@ conway (focused :*: neighbors) = alive == one + one ? focused
 		reduce count zero neighbors
 
 lifecycle :: (II Status -> Status) -> II Status -> IO ()
-lifecycle act being = delay *> purge *> snapshot *> evolve where
+lifecycle act being = delay *>- purge *>- snapshot *>- evolve where
 
 	evolve, snapshot :: IO ()
-	evolve = lifecycle act $ being =>> act
+	evolve = lifecycle act $ act <<= being 
 	snapshot = void $ let screen = display 5
-		in screen (screen <$> run being) ->> print
+		in print <<- screen (screen -<$>- run being) 
 
 --------------------------------------------------------------------------------
 
