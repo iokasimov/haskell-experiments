@@ -397,10 +397,10 @@ executable pandora-cellular-automata
 --   ghc-options: -Wall -fno-warn-tabs -fno-strictness -fno-warn-orphans
 
 --executable pandora-decode-morse-code
-  --main-is: Problems/pandora/DONE/decode-morse-code.hs
+ -- main-is: Problems/pandora/DONE/decode-morse-code.hs
   --build-depends: base, pandora, pandora-io
   --default-extensions: DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints, InstanceSigs
-    --FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+   -- FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
     --MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns
     --ScopedTypeVariables, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
   --other-modules:

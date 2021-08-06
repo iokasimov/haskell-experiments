@@ -82,15 +82,15 @@ dictionary = both ' '
 data Morse = Dot | Dash
 
 search :: List Morse -> Maybe Char
-search code = extract . attached <$> run @(State Decoder :> Maybe) (code ->> decode) dictionary
+search code = extract . attached -<$>- run @(State Decoder :> Maybe) (decode <<- code :: _) dictionary
 
-decode :: (Bindable t, Optional t, Stateful Decoder t) => Morse -> t Decoder
+decode :: (Bindable t (->), Optional t, Stateful Decoder t) => Morse -> t Decoder
 decode Dot = reconcile $ view # sub @Left
 decode Dash = reconcile $ view # sub @Right
 
 --------------------------------------------------------------------------------
 
 digit4 :: List Morse
-digit4 = item @Push Dot $ item @Push Dot $ item @Push Dot $ item @Push Dot $ item @Push Dash $ empty
+digit4 = item @Push Dot $ item @Push Dot $ item @Push Dot $ item @Push Dot $ item @Push Dash $ TU Nothing
 
 main = search digit4 & resolve @Char print (print "Not found...")
