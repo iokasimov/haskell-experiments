@@ -35,7 +35,7 @@ int Zero = 0
 
 denum_int :: Denumerator -> Base.Int
 denum_int (Denumerator n) = 1 + denum_int n
-denum_int One = 1
+denum_int Single = 1
 
 take_n_stream :: Base.Int -> Stream ~> []
 take_n_stream n = Base.take n . stream_to_list

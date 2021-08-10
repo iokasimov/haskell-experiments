@@ -429,16 +429,16 @@ executable pandora-cellular-automata
 --   default-language: Haskell2010
 --   ghc-options: -Wall -fno-warn-tabs
 
---executable pandora-lindenmayer-system
- -- main-is: Problems/pandora/DONE/lindenmayer-system.hs
-  --build-depends: base, pandora, pandora-io
-  --default-extensions: DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints, InstanceSigs
-    --FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
-    --MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns
-    --ScopedTypeVariables, StandaloneDeriving, TupleSections, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
-  --other-modules:
-  --default-language: Haskell2010
-  --ghc-options: -Wall -fno-warn-tabs
+executable pandora-lindenmayer-system
+  main-is: Problems/pandora/DONE/lindenmayer-system.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions: DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints, InstanceSigs
+    FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns
+    ScopedTypeVariables, StandaloneDeriving, TupleSections, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
 
 -- executable pandora-longest-increasing-subsequence
 --   main-is: Problems/pandora/WIP/longest-increasing-subsequence.hs

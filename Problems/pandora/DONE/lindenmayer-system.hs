@@ -22,4 +22,4 @@ algae B' = item @Push A' empty
 start :: Comprehension Maybe Variable
 start = item @Push A' empty
 
-main = print . run $ start >>= algae >>= algae >>= algae >>= algae
+main = print . run $ algae =<< algae =<< algae =<< algae =<< start
