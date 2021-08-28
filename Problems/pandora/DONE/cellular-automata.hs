@@ -61,14 +61,14 @@ type Horizontally = Zipper Stream (Left ::: Right) <:.> Stream
 -- TODO: There we should use Up :: Down instead of Left ::: Right, but let's change it later
 type Vertically = Stream <:.> Zipper Stream (Left ::: Right)
 
-instance Extendable II (->) where
+instance Extendable (->) II where
 	f <<= zz = f -<$>- TU (horizontal -<$>- vertical zz) where
 
 		horizontal, vertical :: II a -> Zipper Stream (Left ::: Right) (II a)
 		horizontal z = Tap z $ twosome # move ((rotate @Left -<$>-) ||=) z # move ((rotate @Right -<$>-) ||=) z
 		vertical z = Tap z $ twosome # move (rotate @Left ||=) z # move (rotate @Right ||=) z
 
-		move :: (Extractable t (->), Pointable t (->)) => (a -> a) -> a -> Construction t a
+		move :: (Extractable_ t, Covariant (->) (->) t, Monoidal (->) (->) (:*:) (:*:) t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
 
 instance Substructure Down II where
@@ -109,7 +109,7 @@ around :: II Status -> Around
 around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @Down
 	:*: slant @Down @Left :*: slant @Up @Right :*: slant @Up @Left :*: slant @Down @Right where
 
-	plane :: forall i t u . (Substructured i II Identity (t <:.> u), Extractable t (->), Extractable u (->)) => Status
+	plane :: forall i t u . (Substructured i II Identity (t <:.> u), Extractable_ t, Covariant (->) (->) u, Extractable_ u) => Status
 	plane = extract . lower . extract $ view # sub @i # z
 
 	slant :: forall v h . (Substructured v II Identity Vertically, Substructured h (Zipper Stream (Left ::: Right)) Identity Stream) => Status
