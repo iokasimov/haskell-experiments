@@ -8,14 +8,14 @@ import System.IO (print)
 
 import Gears.Instances
 
-trapped :: forall a t . (Applicative_ t, Traversable (->) (->) t, Group a, Infimum a, Supremum a) => t a -> t a
-trapped walls = volume -<$>- peak walls -<*>- walls -<*>- peak @(Reverse t) -=: walls where
+trapped :: forall a t . (Applicative t, Traversable (->) (->) t, Group a, Infimum a, Supremum a) => t a -> t a
+trapped walls = volume <$> peak walls -<*>- walls -<*>- peak @(Reverse t) -=: walls where
 
 	volume :: a -> a -> a -> a
 	volume ls x rs = (ls /\ rs) - x
 
 	peak :: Traversable (->) (->) v => v a -> v a
-	peak columns = extract . run % zero $ compare <<- columns 
+	peak columns = extract . run % zero $ compare <<- columns
 
 	compare :: a :=> State a
 	compare x = modify (x \/)

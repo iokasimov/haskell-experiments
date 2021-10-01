@@ -62,13 +62,13 @@ type Horizontally = Zipper Stream (Left ::: Right) <:.> Stream
 type Vertically = Stream <:.> Zipper Stream (Left ::: Right)
 
 instance Extendable (->) II where
-	f <<= zz = f -<$>- TU (horizontal -<$>- vertical zz) where
+	f <<= zz = f <$> TU (horizontal <$> vertical zz) where
 
 		horizontal, vertical :: II a -> Zipper Stream (Left ::: Right) (II a)
-		horizontal z = Tap z $ twosome # move ((rotate @Left -<$>-) ||=) z # move ((rotate @Right -<$>-) ||=) z
+		horizontal z = Tap z $ twosome # move ((rotate @Left <$>) ||=) z # move ((rotate @Right <$>) ||=) z
 		vertical z = Tap z $ twosome # move (rotate @Left ||=) z # move (rotate @Right ||=) z
 
-		move :: (Extractable_ t, Covariant (->) (->) t, Monoidal (->) (->) (:*:) (:*:) t) => (a -> a) -> a -> Construction t a
+		move :: (Extractable t, Covariant (->) (->) t, Monoidal (->) (->) (:*:) (:*:) t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
 
 instance Substructure Down II where
@@ -87,16 +87,16 @@ instance Substructure Left II where
 	type Available Left II = Identity
 	type Substance Left II = Horizontally
 	substructure = P_Q_T $ \ii ->
-		let target = (extract . view (sub @Left) -<$>-) ||= lower ii in
-		let updated new = set (sub @Left) . Identity -<$>- new -<*>- run (lower ii) in
+		let target = (extract . view (sub @Left) <$>) ||= lower ii in
+		let updated new = set (sub @Left) . Identity <$> new -<*>- run (lower ii) in
 		Store $ Identity target :*: lift . (updated ||=) . extract
 
 instance Substructure Right II where
 	type Available Right II = Identity
 	type Substance Right II = Horizontally
 	substructure = P_Q_T $ \ii ->
-		let target = (extract . view (sub @Right) -<$>-) ||= lower ii in
-		let updated new = set (sub @Right) . Identity -<$>- new -<*>- run (lower ii) in
+		let target = (extract . view (sub @Right) <$>) ||= lower ii in
+		let updated new = set (sub @Right) . Identity <$> new -<*>- run (lower ii) in
 		Store $ Identity target :*: lift . (updated ||=) . extract
 
 type Around = Status -- current
@@ -109,7 +109,7 @@ around :: II Status -> Around
 around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @Down
 	:*: slant @Down @Left :*: slant @Up @Right :*: slant @Up @Left :*: slant @Down @Right where
 
-	plane :: forall i t u . (Substructured i II Identity (t <:.> u), Extractable_ t, Covariant (->) (->) u, Extractable_ u) => Status
+	plane :: forall i t u . (Substructured i II Identity (t <:.> u), Extractable t, Covariant (->) (->) u, Extractable u) => Status
 	plane = extract . lower . extract $ view # sub @i # z
 
 	slant :: forall v h . (Substructured v II Identity Vertically, Substructured h (Zipper Stream (Left ::: Right)) Identity Stream) => Status
@@ -127,9 +127,9 @@ lifecycle :: (II Status -> Status) -> II Status -> IO ()
 lifecycle act being = delay *>- purge *>- snapshot *>- evolve where
 
 	evolve, snapshot :: IO ()
-	evolve = lifecycle act $ act <<= being 
+	evolve = lifecycle act $ act <<= being
 	snapshot = void $ let screen = display 5
-		in print <<- screen (screen -<$>- run being) 
+		in print <<- screen (screen <$> run being)
 
 --------------------------------------------------------------------------------
 
