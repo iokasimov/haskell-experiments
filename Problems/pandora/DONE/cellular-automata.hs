@@ -68,7 +68,7 @@ instance Extendable (->) II where
 		horizontal z = Tap z $ twosome # move ((rotate @Left <$>) ||=) z # move ((rotate @Right <$>) ||=) z
 		vertical z = Tap z $ twosome # move (rotate @Left ||=) z # move (rotate @Right ||=) z
 
-		move :: (Extractable t, Covariant (->) (->) t, Monoidal (->) (->) (:*:) (:*:) t) => (a -> a) -> a -> Construction t a
+		move :: (Extractable t, Covariant (->) (->) t, Monoidal (-->) (->) (:*:) (:*:) t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
 
 instance Substructure Down II where
@@ -88,7 +88,7 @@ instance Substructure Left II where
 	type Substance Left II = Horizontally
 	substructure = P_Q_T $ \ii ->
 		let target = (extract . view (sub @Left) <$>) ||= lower ii in
-		let updated new = set (sub @Left) . Identity <$> new -<*>- run (lower ii) in
+		let updated new = set (sub @Left) . Identity <$> new <-*- run (lower ii) in
 		Store $ Identity target :*: lift . (updated ||=) . extract
 
 instance Substructure Right II where
@@ -96,7 +96,7 @@ instance Substructure Right II where
 	type Substance Right II = Horizontally
 	substructure = P_Q_T $ \ii ->
 		let target = (extract . view (sub @Right) <$>) ||= lower ii in
-		let updated new = set (sub @Right) . Identity <$> new -<*>- run (lower ii) in
+		let updated new = set (sub @Right) . Identity <$> new <-*- run (lower ii) in
 		Store $ Identity target :*: lift . (updated ||=) . extract
 
 type Around = Status -- current

@@ -9,7 +9,7 @@ import System.IO (print)
 import Gears.Instances
 
 trapped :: forall a t . (Applicative t, Traversable (->) (->) t, Group a, Infimum a, Supremum a) => t a -> t a
-trapped walls = volume <$> peak walls -<*>- walls -<*>- peak @(Reverse t) -=: walls where
+trapped walls = volume <$> peak walls <-*- walls <-*- peak @(Reverse t) -=: walls where
 
 	volume :: a -> a -> a -> a
 	volume ls x rs = (ls /\ rs) - x

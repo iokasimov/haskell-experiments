@@ -45,9 +45,9 @@ extra-deps:
 - github: iokasimov/joint
   commit: 327c378f821e5c1bba9504a615166da6c0969764
 - github: iokasimov/pandora
-  commit: daac973521c6243f172c321e9e3c0cd606ae7451
+  commit: c4f0e943f09fbb2c89f16a56b43d5be3677817f6
 - github: iokasimov/pandora-io
-  commit: 3a6b6a3160ada44e20c5f3bba4c3c2ff087e622d
+  commit: d2c2085e52414fe20afc413757c5058ea00470f2
 
 - ghc-prim-0.6.1@sha256:4707f24d1d435d00a0a771114cebe760348f60a653bc6b33dca4cff74ad107c6,2371
 # Override default flag values for local packages and extra-deps
