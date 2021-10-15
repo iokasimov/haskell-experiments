@@ -539,6 +539,17 @@ executable pandora-trapping-rain-water
   default-language: Haskell2010
   ghc-options: -Wall -fno-warn-tabs
 
+executable pandora-biggest-rectangle
+  main-is: Problems/pandora/WIP/biggest-rectangle.hs
+  build-depends: base, pandora, pandora-io
+  default-extensions: AllowAmbiguousTypes, DataKinds, ConstraintKinds, ExistentialQuantification, GADTs, QuantifiedConstraints
+    InstanceSigs, FlexibleContexts, FlexibleInstances, KindSignatures, LiberalTypeSynonyms, LambdaCase, FunctionalDependencies
+    MultiParamTypeClasses, NoImplicitPrelude, PackageImports, PolyKinds, RankNTypes, ViewPatterns, ScopedTypeVariables,
+    StandaloneDeriving, TupleSections, TypeApplications, TypeFamilies, TypeFamilyDependencies, TypeOperators
+  other-modules:
+  default-language: Haskell2010
+  ghc-options: -Wall -fno-warn-tabs
+
 --executable pandora-wolf-goat-cabbage
   --main-is: Problems/pandora/DONE/wolf-goat-cabbage.hs
   --build-depends: base, pandora, pandora-io
