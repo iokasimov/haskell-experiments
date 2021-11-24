@@ -11,12 +11,12 @@ import qualified GHC.Int as Base -- (eqInt)
 import qualified Prelude as Base -- (Int, Semigroup ((<>)), Show (show), min, max, (+), (-), (*))
 
 instance Covariant (->) (->) [] where
-	f <$> [] = []
-	f <$> (x : xs) = (f x) : (f <$> xs)
+	f <-|- [] = []
+	f <-|- (x : xs) = (f x) : (f <$> xs)
 
 instance Traversable (->) (->) [] where
 	_ <<- [] = point []
-	f <<- (x : xs) = (:) <$> f x <-*- f <<- xs
+	f <<- (x : xs) = (:) <-|- f x <-*- f <<- xs
 
 deriving instance (Base.Show a, Base.Show b) => Base.Show (a :*: b)
 deriving instance Base.Show a => Base.Show (Maybe a)
@@ -39,8 +39,8 @@ instance Base.Show a => Base.Show (List a) where
 	show (TU (Just stack)) = "[" Base.++ Base.show stack
 	show (TU Nothing) = "..."
 
-instance Base.Show a => Base.Show (Tap (T_U Covariant Covariant (:*:) List List) a) where
-	show (Tap x (T_U (bs :*: fs))) = "| " Base.<> Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs Base.<> " |"
+instance Base.Show a => Base.Show ((Identity <:.:> (List <:.:> List := (:*:)) := (:*:)) := a) where
+	show (T_U (Identity x :*: T_U (bs :*: fs))) = "| " Base.<> Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs Base.<> " |"
 
 -- instance Base.Show Numerator where
 -- 	show Zero = "0"
