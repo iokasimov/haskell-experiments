@@ -52,53 +52,23 @@ purge = putStr "\ESC[2J"
 
 --------------------------------------------------------------------------------
 
-type Cursor t = Identity <:.:> (t <:.:> t := (:*:)) := (:*:)
-
-type II = Cursor Stream <:.> Cursor Stream
+type II = Tape Stream <:.> Tape Stream
 
 type Sides = Stream <:.:> Stream := (:*:)
 
-type Horizontally = Cursor Stream <:.> Stream
+type Horizontally = Tape Stream <:.> Stream
 
-type Vertically = Stream <:.> Cursor Stream
+type Vertically = Stream <:.> Tape Stream
 
 instance Extendable (->) II where
-	f <<= zz = f <$> TU (horizontal <$> vertical zz) where
+	f <<= zz = f <-|- TU (horizontal <-|- vertical zz) where
 
-		horizontal, vertical :: II a -> Cursor Stream (II a)
-		horizontal z = twosome # Identity z $ twosome # move ((rotate @Left <$>) ||=) z # move ((rotate @Right <$>) ||=) z
+		horizontal, vertical :: II a -> Tape Stream (II a)
+		horizontal z = twosome # Identity z $ twosome # move ((rotate @Left <-|-) ||=) z # move ((rotate @Right <-|-) ||=) z
 		vertical z = twosome # Identity z $ twosome # move (rotate @Left ||=) z # move (rotate @Right ||=) z
 
 		move :: (Extractable t, Covariant (->) (->) t, Monoidal (-->) (-->) (:*:) (:*:) t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct $ point . f .-+ x
-
-instance Substructure Down II where
-	type Available Down II = Identity
-	type Substance Down II = Vertically
-	substructure = P_Q_T $ \ii -> case run . run . extract . run # ii of
-		Identity focused :*: T_U (d :*: u) -> Store $ Identity (TU d) :*: lift . TU . twosome (Identity focused) . (twosome % u) . run . extract
-
-instance Substructure Up II where
-	type Available Up II = Identity
-	type Substance Up II = Vertically
-	substructure = P_Q_T $ \x -> case run . run . extract . run # x of
-		Identity focused :*: T_U (d :*: u) -> Store $ Identity (TU u) :*: lift . TU . twosome (Identity focused) . twosome d . run . extract
-
-instance Substructure Left II where
-	type Available Left II = Identity
-	type Substance Left II = Horizontally
-	substructure = P_Q_T $ \ii ->
-		let target = (extract . view (sub @Left) <$>) ||= (extract # run ii) in
-		let updated new = set (sub @Left) . Identity <-|- new <-*- run (extract # run ii) in
-		Store $ Identity target :*: lift . (updated ||=) . extract
-
-instance Substructure Right II where
-	type Available Right II = Identity
-	type Substance Right II = Horizontally
-	substructure = P_Q_T $ \ii ->
-		let target = (extract . view (sub @Right) <$>) ||= lower ii in
-		let updated new = set (sub @Right) . Identity <$> new <-*- run (lower ii) in
-		Store $ Identity target :*: lift . (updated ||=) . extract
 
 type Around = Status -- current
 	:*: Status :*: Status -- horizontal
@@ -113,7 +83,7 @@ around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @D
 	plane :: forall i t u . (Substructured i II Identity (t <:.> u), Extractable t, Covariant (->) (->) u, Extractable u) => Status
 	plane = extract . extract . run . extract $ view # sub @i # z
 
-	slant :: forall v h . (Substructured v II Identity Vertically, Substructured h (Cursor Stream) Identity Stream) => Status
+	slant :: forall v h . (Substructured v II Identity Vertically, Substructured h (Tape Stream) Identity Stream) => Status
 	slant = extract . extract . view (sub @h) . extract . run . extract $ view # sub @v # z
 
 conway :: Around -> Status
@@ -130,7 +100,7 @@ lifecycle act being = delay *>- purge *>- snapshot *>- evolve where
 	evolve, snapshot :: IO ()
 	evolve = lifecycle act $ act <<= being
 	snapshot = void $ let screen = display 5
-		in print <<- screen (screen <$> run being)
+		in print <<- screen (screen <-|- run being)
 
 --------------------------------------------------------------------------------
 
