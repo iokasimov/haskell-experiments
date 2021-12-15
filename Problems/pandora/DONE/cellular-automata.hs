@@ -40,7 +40,7 @@ display :: Int -> Zipper Stream a -> [a]
 display n (T_U (Identity x :*: (T_U (bs :*: fs)))) = reverse (take n $ stream_to_list bs) <> [x] <> take n (stream_to_list fs)
 
 record :: (Zipper Stream Status -> Status) -> Zipper Stream Status -> IO ()
-record act being = delay *>- snapshot *>- evolve where
+record act being = evolve -*- snapshot -*- delay where
 
 	evolve, snapshot :: IO ()
 	evolve = record act $ act <<= being
@@ -95,7 +95,7 @@ conway (focused :*: neighbors) = alive == one + one ? focused
 		reduce count zero neighbors
 
 lifecycle :: (II Status -> Status) -> II Status -> IO ()
-lifecycle act being = delay *>- purge *>- snapshot *>- evolve where
+lifecycle act being = evolve -*- snapshot -*- purge -*- delay where
 
 	evolve, snapshot :: IO ()
 	evolve = lifecycle act $ act <<= being

@@ -9,6 +9,10 @@ import qualified Prelude as Base (Int, String, Semigroup ((<>)), Show (show), mi
 
 import Gears.Instances ()
 
+-- TODO: keep it until we use TT scheme for structures
+empty_list :: List a
+empty_list = TU Nothing
+
 stack_to_list :: [a] -> List a -> [a]
 stack_to_list r (TU (Just (Construct x next))) = stack_to_list (x : r) $ TU next
 stack_to_list r (TU Nothing) = r

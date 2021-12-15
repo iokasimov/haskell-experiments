@@ -10,6 +10,7 @@ import "base" System.IO (IO, print)
 import "base" Text.Show (Show)
 
 import Gears.Instances ()
+import Gears.Utils (empty_list)
 
 type Index = Int
 
@@ -24,55 +25,55 @@ type Opened = List Open
 
 type Trace = Index :*: Opened
 
-type Checking t = (Applicative t, Monad t, Stateful Trace t, Failable Stumble t)
+type Checking t = (Covariant (->) (->) t, Applicative t, Monad (->) t, Stateful Trace t, Failable Stumble t)
 
 inspect :: Checking t => Sign -> t ()
-inspect s = indexate *> decide s
+inspect s = (decide s !.) =<< indexate
 
 indexate :: Checking t => t Index
-indexate = adjust @Trace @Index (+ one)
+indexate = extract @Identity <-|- (zoom @Trace # access @Index # overlook (modify @Index (+ one)))
 
 decide :: Checking t => Sign -> t ()
-decide (Bracket Opened opened) = remember opened
+decide (Bracket Opened opened) = void # remember opened
 decide (Bracket Closed closed) = latest # deadend closed # juxtapose closed
-decide _ = skip
+decide _ = pass
 
-remember :: Checking t => Bracket -> t ()
-remember style = void . adjust @Trace @Opened . (!) =<< item @Push
-	<$> ((:*:) style <$> magnify @Trace @Index)
-	<*> magnify @Trace @Opened
+--remember :: Checking t => Bracket -> t ()
+--remember style = void . zoom @Trace (access @Opened) . overlook . replace =<< (item @Push
+	-- <-|- ((:*:) style . extract <-|- zoom @Trace (access @Index) (overlook (current @Index)))
+	-- <-*- zoom @Trace # access @Opened # overlook current :: _)
+
+remember :: Checking t => Bracket -> t (Identity Opened)
+remember style = zoom @Trace (access @Opened) . overlook . modify . item @Push
+	=<< (:*:) style . extract <-|- zoom @Trace (access @Index) (overlook (current @Index))
 
 -- TODO: it looks too complicated
 latest :: Checking t => t r -> (Index -> Bracket -> t r) -> t ()
-latest on_empty f = void $ zoom @Trace (focus @Head . focus @Right) current
-	>>= resolve @Open @(Maybe Open) (|- f) on_empty
+latest on_empty f = void $ resolve @Open @(Maybe Open) (f |-) on_empty . extract @Identity
+	=<< (zoom @Trace (access @Opened) $ overlook (extract @Identity <-|-|- zoom @Opened (sub @Root) current))
 
 juxtapose :: Checking t => Bracket -> Index -> Bracket -> t ()
 juxtapose closed oi opened = closed != opened ? mismatch closed opened oi
-	$ void . adjust @Trace @Opened $ view # sub @Tail
-
-skip :: Pointable t => t ()
-skip = point ()
+	$ void $ zoom @Trace # access @Opened # overlook (modify @Opened (extract . (view # sub @Tail)))
 
 mismatch :: Checking t => Bracket -> Bracket -> Index -> t ()
-mismatch closed opened oi = magnify @Trace @Index
-	>>= failure . Mismatch opened oi closed
+mismatch closed opened oi = failure . Mismatch opened oi closed . extract @Identity =<< zoom @Trace # access @Index # current
 
 logjam :: Checking t => Index -> Bracket -> t ()
 logjam i = failure . Logjam % i
 
 deadend :: Checking t => Bracket -> t ()
-deadend closed = magnify @Trace @Index >>= failure . Deadend closed
+deadend closed = failure . Deadend closed . extract @Identity =<< zoom @Trace # access @Index # current
 
 --------------------------------------------------------------------------------
 
 type Checker = State (Index :*: Opened) :> Conclusion Stumble
 
-check :: Traversable s => s Sign -> Checker ()
-check code = code ->> inspect *> latest skip logjam
+check :: Traversable (->) (->) s => s Sign -> Checker ()
+check code = latest pass logjam -*- inspect <<- code
 
 interpret :: Checker () -> IO ()
-interpret result = result & run % (1 :*: empty) & conclusion print (print "OK" !)
+interpret result = result & run % (1 :*: empty_list) & conclusion print (print "OK" !.)
 
 deriving instance Show Bracket
 deriving instance Show Sign
@@ -82,10 +83,10 @@ deriving instance Show Slash
 deriving instance Show Position
 
 example_ok, example_mismatch, example_deadend, example_logjam :: List Sign
-example_ok = item @Push (Bracket Opened Curly) $ item @Push Underscore $ item @Push (Bracket Closed Curly) $ empty  -- {_}
-example_mismatch = item @Push (Bracket Opened Curly) $ item @Push (Bracket Closed Square) $ empty -- {]
-example_deadend = item @Push (Bracket Closed Round) $ empty -- )
-example_logjam = item @Push (Bracket Opened Angle) $ empty -- <
+example_ok = item @Push (Bracket Opened Curly) $ item @Push Underscore $ item @Push (Bracket Closed Curly) $ empty_list  -- {_}
+example_mismatch = item @Push (Bracket Opened Curly) $ item @Push (Bracket Closed Square) $ empty_list -- {]
+example_deadend = item @Push (Bracket Closed Round) $ empty_list -- )
+example_logjam = item @Push (Bracket Opened Angle) $ empty_list -- <
 
 main = do
 	interpret $ check example_ok
