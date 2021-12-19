@@ -52,16 +52,16 @@ purge = putStr "\ESC[2J"
 
 --------------------------------------------------------------------------------
 
-type II = Tape Stream <:.> Tape Stream
+type II = Tape Stream <::> Tape Stream
 
 type Sides = Stream <:.:> Stream := (:*:)
 
-type Horizontally = Tape Stream <:.> Stream
+type Horizontally = Tape Stream <::> Stream
 
-type Vertically = Stream <:.> Tape Stream
+type Vertically = Stream <::> Tape Stream
 
 instance Extendable (->) II where
-	f <<= zz = f <-|- TU (horizontal <-|- vertical zz) where
+	f <<= zz = f <-|- TT (horizontal <-|- vertical zz) where
 
 		horizontal, vertical :: II a -> Tape Stream (II a)
 		horizontal z = twosome # Identity z $ twosome # move ((rotate @Left <-|-) ||=) z # move ((rotate @Right <-|-) ||=) z
@@ -80,7 +80,7 @@ around :: II Status -> Around
 around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @Down
 	:*: slant @Down @Left :*: slant @Up @Right :*: slant @Up @Left :*: slant @Down @Right where
 
-	plane :: forall i t u . (Substructured i II Identity (t <:.> u), Extractable t, Covariant (->) (->) u, Extractable u) => Status
+	plane :: forall i t u . (Substructured i II Identity (t <::> u), Extractable t, Covariant (->) (->) u, Extractable u) => Status
 	plane = extract . extract . run . extract $ view # sub @i # z
 
 	slant :: forall v h . (Substructured v II Identity Vertically, Substructured h (Tape Stream) Identity Stream) => Status
@@ -105,7 +105,7 @@ lifecycle act being = evolve -*- snapshot -*- purge -*- delay where
 --------------------------------------------------------------------------------
 
 cube :: II Status
-cube = TU . T_U $ Identity one :*: twosome only only where
+cube = TT . T_U $ Identity one :*: twosome only only where
 
 	only :: Stream :. Zipper Stream := Status
 	only = Construct one . Identity $ repeat noone
@@ -118,7 +118,7 @@ cube = TU . T_U $ Identity one :*: twosome only only where
 	alone = Construct True . Identity $ repeat False
 
 blinker :: II Status
-blinker = TU . T_U $ Identity one :*: twosome # repeat noone # repeat noone where
+blinker = TT . T_U $ Identity one :*: twosome # repeat noone # repeat noone where
 
 	one, noone :: Zipper Stream Status
 	one = T_U $ Identity True :*: twosome alone alone

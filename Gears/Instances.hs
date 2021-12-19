@@ -6,9 +6,16 @@ module Gears.Instances where
 import "pandora" Pandora.Core
 import "pandora" Pandora.Paradigm
 import "pandora" Pandora.Pattern
+import "pandora-io" Pandora.IO
 
 import qualified GHC.Int as Base -- (eqInt)
 import qualified Prelude as Base -- (Int, Semigroup ((<>)), Show (show), min, max, (+), (-), (*))
+
+deriving instance Base.Show Bracket
+deriving instance Base.Show Sign
+deriving instance Base.Show Quote
+deriving instance Base.Show Slash
+deriving instance Base.Show Position
 
 instance Covariant (->) (->) [] where
 	f <-|- [] = []
@@ -36,8 +43,8 @@ instance Base.Show a => Base.Show (Construction Maybe a) where
 	show (Construct x Nothing) = Base.show x Base.++ "]"
 
 instance Base.Show a => Base.Show (List a) where
-	show (TU (Just stack)) = "[" Base.++ Base.show stack
-	show (TU Nothing) = "..."
+	show (TT (Just stack)) = "[" Base.++ Base.show stack
+	show (TT Nothing) = "..."
 
 instance Base.Show a => Base.Show ((Identity <:.:> (List <:.:> List := (:*:)) := (:*:)) := a) where
 	show (T_U (Identity x :*: T_U (bs :*: fs))) = "| " Base.<> Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs Base.<> " |"

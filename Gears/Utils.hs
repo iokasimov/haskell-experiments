@@ -11,11 +11,11 @@ import Gears.Instances ()
 
 -- TODO: keep it until we use TT scheme for structures
 empty_list :: List a
-empty_list = TU Nothing
+empty_list = TT Nothing
 
 stack_to_list :: [a] -> List a -> [a]
-stack_to_list r (TU (Just (Construct x next))) = stack_to_list (x : r) $ TU next
-stack_to_list r (TU Nothing) = r
+stack_to_list r (TT (Just (Construct x next))) = stack_to_list (x : r) $ TT next
+stack_to_list r (TT Nothing) = r
 
 nonempty_stack_to_list :: [a] -> Nonempty List a -> [a]
 nonempty_stack_to_list r (Construct x Nothing) = x : r
