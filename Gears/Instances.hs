@@ -19,7 +19,7 @@ deriving instance Base.Show Position
 
 instance Covariant (->) (->) [] where
 	f <-|- [] = []
-	f <-|- (x : xs) = (f x) : (f <$> xs)
+	f <-|- (x : xs) = (f x) : (f <-|- xs)
 
 instance Traversable (->) (->) [] where
 	_ <<- [] = point []
