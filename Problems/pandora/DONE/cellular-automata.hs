@@ -18,7 +18,7 @@ type Field = Zipper Stream Status
 type Neighbours = Status :*: Status :*: Status
 
 start :: Zipper Stream Status
-start = let desert = repeat False in T_U ! Identity True :*: twosome desert desert
+start = let desert = repeat False in T_U ! Identity True :*: twosome (Reverse desert) desert
 
 rule90 :: Neighbours -> Status
 rule90 (True :*: True :*: True) = False
@@ -35,7 +35,7 @@ neighbourhood z = extract (attached . run . extract # run  z)
 	:*: extract (attached # run z) :*: extract (extract . run . extract # run z)
 
 display :: Int -> Zipper Stream a -> [a]
-display n (T_U (Identity x :*: (T_U (bs :*: fs)))) = reverse (take n ! stream_to_list bs) <> [x] <> take n (stream_to_list fs)
+display n (T_U (Identity x :*: (T_U (Reverse bs :*: fs)))) = reverse (take n ! stream_to_list bs) <> [x] <> take n (stream_to_list fs)
 
 record :: (Zipper Stream Status -> Status) -> Zipper Stream Status -> IO ()
 record act being = evolve .-*- snapshot .-*- delay where
@@ -51,19 +51,15 @@ purge = putStr "\ESC[2J"
 --------------------------------------------------------------------------------
 
 type II = Tape Stream <::> Tape Stream
-
-type Sides = Stream <:.:> Stream := (:*:)
-
 type Horizontally = Tape Stream <::> Stream
-
 type Vertically = Stream <::> Tape Stream
 
 instance Extendable (->) II where
 	f <<= zz = f <-|- TT (horizontal <-|- vertical zz) where
 
 		horizontal, vertical :: II a -> Tape Stream (II a)
-		horizontal z = twosome # Identity z ! twosome # move ((rotate @Left <-|-) ||=) z # move ((rotate @Right <-|-) ||=) z
-		vertical z = twosome # Identity z ! twosome # move (rotate @Left ||=) z # move (rotate @Right ||=) z
+		horizontal z = twosome # Identity z ! twosome # Reverse (move ((rotate @Left <-|-) ||=) z) # move ((rotate @Right <-|-) ||=) z
+		vertical z = twosome # Identity z ! twosome # Reverse (move (rotate @Left ||=) z) # move (rotate @Right ||=) z
 
 		move :: (Extractable t, Covariant (->) (->) t, Monoidal (-->) (-->) (:*:) (:*:) t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct ! point . f .-+ x
@@ -81,7 +77,7 @@ around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @D
 	plane :: forall i t u . (Substructured i II Identity (t <::> u), Extractable t, Covariant (->) (->) u, Extractable u) => Status
 	plane = extract . extract . run . extract ! view # sub @i # z
 
-	slant :: forall v h . (Substructured v II Identity Vertically, Substructured h (Tape Stream) Identity Stream) => Status
+	slant :: forall v h t u . (Substructured v II Identity (t <::> Tape Stream), Extractable t, Substructured h (Tape Stream) Identity u, Extractable u) => Status
 	slant = extract . extract . view (sub @h) . extract . run . extract ! view # sub @v # z
 
 conway :: Around -> Status
@@ -102,24 +98,24 @@ lifecycle act being = evolve .-*- snapshot .-*- purge .-*- delay where
 --------------------------------------------------------------------------------
 
 cube :: II Status
-cube = TT . T_U ! Identity one :*: twosome only only where
+cube = TT . T_U ! Identity one :*: twosome (Reverse only) only where
 
 	only :: Stream :. Zipper Stream := Status
 	only = Construct one . Identity ! repeat noone
 
 	one, noone :: Zipper Stream Status
-	one = T_U ! Identity True :*: twosome alone alone
-	noone = T_U ! Identity False :*: twosome # repeat False # repeat False
+	one = T_U ! Identity True :*: twosome # Reverse alone # alone
+	noone = T_U ! Identity False :*: twosome # Reverse (repeat False) # repeat False
 
 	alone :: Stream Status
 	alone = Construct True . Identity ! repeat False
 
 blinker :: II Status
-blinker = TT . T_U ! Identity one :*: twosome # repeat noone # repeat noone where
+blinker = TT . T_U ! Identity one :*: twosome # Reverse (repeat noone) # repeat noone where
 
 	one, noone :: Zipper Stream Status
-	one = T_U ! Identity True :*: twosome alone alone
-	noone = T_U ! Identity False :*: twosome # repeat False # repeat False
+	one = T_U ! Identity True :*: twosome (Reverse alone) alone
+	noone = T_U ! Identity False :*: twosome # Reverse (repeat False) # repeat False
 
 	alone :: Stream Status
 	alone = Construct True . Identity ! repeat False

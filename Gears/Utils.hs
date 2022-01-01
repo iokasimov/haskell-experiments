@@ -25,10 +25,10 @@ stream_to_list :: Stream ~> []
 stream_to_list (Construct x (Identity next)) = x : stream_to_list next
 
 zipper_list_to_list :: Zipper List a -> [a]
-zipper_list_to_list (T_U (Identity x :*: T_U (bs :*: fs))) = Base.reverse (stack_to_list [] bs) Base.<> [x] Base.<> stack_to_list [] fs
+zipper_list_to_list (T_U (Identity x :*: T_U (Reverse bs :*: fs))) = Base.reverse (stack_to_list [] bs) Base.<> [x] Base.<> stack_to_list [] fs
 
 show_zipper_list :: Base.Show a => Zipper List a -> Base.String
-show_zipper_list (T_U (Identity x :*: T_U (bs :*: fs))) = Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs
+show_zipper_list (T_U (Identity x :*: T_U (Reverse bs :*: fs))) = Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs
 
 -- nat :: Base.Int -> Numerator
 -- nat n = n == 0 ? Zero $ Numerator . nat $ n Base.- 1
