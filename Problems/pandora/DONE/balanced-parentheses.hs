@@ -10,19 +10,10 @@ import "base" Text.Show (Show)
 import Gears.Instances ()
 
 type Index = Int
+type Token = Bracket :*: Index
+type Trace = Index :*: List Token
 
-type Opened = Bracket :*: Index
-
-data Stumble
-	= Deadend Bracket Index -- Closed bracket without opened one
-	| Logjam Bracket Index -- Opened bracket without closed one
-	| Mismatch Bracket Index Bracket Index -- Closed bracket doesn't match opened one
-
-deriving instance Show Stumble
-
-type Trace = Index :*: List Opened
-
-type Checking t = (Covariant (->) (->) t, Applicative t, Monad (->) t, Stateful Trace t, Failable Stumble t)
+type Checking t = (Covariant (->) (->) t, Applicative t, Monad (->) t, Stateful Trace t, Failable (Wye Token) t)
 
 inspect :: Checking t => Sign -> t ()
 inspect s = decide s .-*- (zoom @Trace # access @Index # overlook (modify @Index (+ one)))
@@ -33,29 +24,29 @@ decide (Bracket Closed closed) = latest # deadend closed # juxtapose closed
 decide _ = pass
 
 remember :: Checking t => Bracket -> t ()
-remember style = void . zoom @Trace (access @(List Opened)) . overlook . modify . item @Push @List
+remember style = void . zoom @Trace (access @(List Token)) . overlook . modify . item @Push @List
 	=<< (:*:) style . extract <-|- zoom @Trace (access @Index) (overlook (current @Index))
 
 latest :: Checking t => t r -> (Index -> Bracket -> t r) -> t ()
-latest on_empty f = void ! resolve @Opened @(Maybe Opened) (f |-) on_empty
-	=<< (zoom @Trace # access @(List Opened) >>> sub @Root >>> access @Opened # overlook current)
+latest on_empty f = void ! resolve @Token @(Maybe Token) (f |-) on_empty
+	=<< (zoom @Trace # access @(List Token) >>> sub @Root >>> access @Token # current)
 
 juxtapose :: forall t . Checking t => Bracket -> Index -> Bracket -> t ()
 juxtapose closed oi opened = closed != opened ? mismatch closed opened oi ! forget where
 
 	forget :: t ()
-	forget = void ! zoom @Trace # access @(List Opened) # overlook (modify @(List Opened) (extract . (view # sub @Tail)))
+	forget = void ! zoom @Trace # access @(List Token) # overlook (modify @(List Token) (extract . (view # sub @Tail)))
 
 mismatch :: Checking t => Bracket -> Bracket -> Index -> t ()
-mismatch closed opened oi = failure . Mismatch opened oi closed . extract @Identity =<< zoom @Trace # access @Index # current
+mismatch closed opened oi = failure . Both (opened :*: oi) . (closed :*:) . extract @Identity =<< zoom @Trace # access @Index # current
 
 deadend :: Checking t => Bracket -> t ()
-deadend closed = failure . Deadend closed . extract @Identity =<< zoom @Trace # access @Index # current
+deadend closed = failure @(Wye Token) . Right . (closed :*:) . extract @Identity =<< zoom @Trace # access @Index # current
 
 logjam :: Checking t => Index -> Bracket -> t ()
-logjam i = failure . Logjam % i
+logjam i b = failure # Left (b :*: i)
 
-type Checker = State (Index :*: List Opened) :> Conclusion Stumble
+type Checker = State (Index :*: List Token) :> Conclusion (Wye Token)
 
 check :: Traversable (->) (->) s => s Sign -> Checker ()
 check code = latest pass logjam .-*- inspect <<- code
