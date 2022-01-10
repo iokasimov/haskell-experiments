@@ -75,17 +75,19 @@ around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @D
 	:*: slant @Down @Left :*: slant @Up @Right :*: slant @Up @Left :*: slant @Down @Right where
 
 	plane :: forall i t u . (Substructured i II Identity (t <::> u), Extractable t, Covariant (->) (->) u, Extractable u) => Status
-	plane = extract . extract . run . extract ! view # sub @i # z
+	plane = extract . extract . run ! get @(Convex Lens) # sub @i # z
 
 	slant :: forall v h t u . (Substructured v II Identity (t <::> Tape Stream), Extractable t, Substructured h (Tape Stream) Identity u, Extractable u) => Status
-	slant = extract . extract . view (sub @h) . extract . run . extract ! view # sub @v # z
+	slant = extract . get @(Convex Lens) (sub @h) . extract . run ! get @(Convex Lens) # sub @v # z
 
 conway :: Around -> Status
 conway (focused :*: neighbors) = alive == one + one ? focused ! (alive == one + one + one ? True ! False) where
 
 	alive :: Int
-	alive = let count status acc = status ? acc + one ! acc in
-		reduce count zero neighbors
+	alive = reduce count zero neighbors
+	
+	count :: Boolean -> Int -> Int
+	count status acc = status ? acc + one ! acc
 
 lifecycle :: (II Status -> Status) -> II Status -> IO ()
 lifecycle act being = evolve .-*- snapshot .-*- purge .-*- delay where

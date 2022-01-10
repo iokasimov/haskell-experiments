@@ -16,7 +16,7 @@ type Trace = Index :*: List Token
 type Checking t = (Covariant (->) (->) t, Applicative t, Monad (->) t, Stateful Trace t, Failable (Wye Token) t)
 
 inspect :: Checking t => Sign -> t ()
-inspect s = decide s .-*- (zoom @Trace # access @Index # overlook (modify @Index (+ one)))
+inspect s = decide s .-*- (zoom @Trace # access @Index # overlook (modify @State @Index (+ one)))
 
 decide :: Checking t => Sign -> t ()
 decide (Bracket Opened opened) = remember opened
@@ -24,24 +24,24 @@ decide (Bracket Closed closed) = latest # deadend closed # juxtapose closed
 decide _ = pass
 
 remember :: Checking t => Bracket -> t ()
-remember style = void . zoom @Trace (access @(List Token)) . overlook . modify . item @Push @List
-	=<< (:*:) style . extract <-|- zoom @Trace (access @Index) (overlook (current @Index))
+remember style = void . zoom @Trace (access @(List Token)) . overlook . modify @State . item @Push @List
+	=<< (:*:) style . extract <-|- zoom @Trace (access @Index) (overlook (get @State @Index))
 
 latest :: Checking t => t r -> (Index -> Bracket -> t r) -> t ()
 latest on_empty f = void ! resolve @Token @(Maybe Token) (f |-) on_empty
-	=<< (zoom @Trace # access @(List Token) >>> sub @Root >>> access @Token # current)
+	=<< (zoom @Trace # access @(List Token) >>> sub @Root >>> access @Token # get @State)
 
 juxtapose :: forall t . Checking t => Bracket -> Index -> Bracket -> t ()
 juxtapose closed oi opened = closed != opened ? mismatch closed opened oi ! forget where
 
 	forget :: t ()
-	forget = void ! zoom @Trace # access @(List Token) # overlook (modify @(List Token) (extract . (view # sub @Tail)))
+	forget = void ! zoom @Trace # access @(List Token) # overlook (modify @State (get @(Convex Lens) # sub @Tail))
 
 mismatch :: Checking t => Bracket -> Bracket -> Index -> t ()
-mismatch closed opened oi = failure . Both (opened :*: oi) . (closed :*:) . extract @Identity =<< zoom @Trace # access @Index # current
+mismatch closed opened oi = failure . Both (opened :*: oi) . (closed :*:) . extract @Identity =<< zoom @Trace # access @Index # get @State
 
 deadend :: Checking t => Bracket -> t ()
-deadend closed = failure @(Wye Token) . Right . (closed :*:) . extract @Identity =<< zoom @Trace # access @Index # current
+deadend closed = failure @(Wye Token) . Right . (closed :*:) . extract @Identity =<< zoom @Trace # access @Index # get @State
 
 logjam :: Checking t => Index -> Bracket -> t ()
 logjam i b = failure # Left (b :*: i)
