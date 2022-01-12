@@ -11,7 +11,8 @@ import Gears.Instances ()
 
 type Index = Int
 type Token = Bracket :*: Index
-type Trace = Index :*: List Token
+type Tokens = List Token
+type Trace = Index :*: Tokens
 
 type Checking t = (Covariant (->) (->) t, Applicative t, Monad (->) t, Stateful Trace t, Failable (Wye Token) t)
 
@@ -24,21 +25,23 @@ decide (Bracket Closed closed) = latest # deadend closed # juxtapose closed
 decide _ = pass
 
 remember :: Checking t => Bracket -> t ()
-remember style = void . zoom @Trace (access @(List Token)) . overlook . modify @State . item @Push @List
-	=<< (:*:) style . extract <-|- zoom @Trace (access @Index) (overlook (get @State @Index))
+remember style = void . zoom @Trace (access @Tokens) . overlook . push @List
+	=<< (:*:) style . extract <-|- zoom @Trace (access @Index) (overlook (get @State))
 
 latest :: Checking t => t r -> (Index -> Bracket -> t r) -> t ()
-latest on_empty f = void ! resolve @Token @(Maybe Token) (f |-) on_empty
-	=<< (zoom @Trace # access @(List Token) >>> sub @Root >>> access @Token # get @State)
+latest on_empty f = void ! resolve @Token (f |-) on_empty
+	=<< (zoom @Trace # access @Tokens >>> top @List # get @State)
 
 juxtapose :: forall t . Checking t => Bracket -> Index -> Bracket -> t ()
-juxtapose closed oi opened = closed != opened ? mismatch closed opened oi ! forget where
+juxtapose closed oi opened = closed != opened ? mismatch oi ! forget where
+
+	mismatch :: Checking t => Index -> t ()
+	mismatch oi = failure . Both (opened :*: oi) . (closed :*:) . extract @Identity
+		=<< zoom @Trace # access @Index # get @State
 
 	forget :: t ()
-	forget = void ! zoom @Trace # access @(List Token) # overlook (modify @State (get @(Convex Lens) # sub @Tail))
-
-mismatch :: Checking t => Bracket -> Bracket -> Index -> t ()
-mismatch closed opened oi = failure . Both (opened :*: oi) . (closed :*:) . extract @Identity =<< zoom @Trace # access @Index # get @State
+	forget = void ! zoom @Trace # access @Tokens
+		# overlook (modify @State ! unite . retrieve . pop @List)
 
 deadend :: Checking t => Bracket -> t ()
 deadend closed = failure @(Wye Token) . Right . (closed :*:) . extract @Identity =<< zoom @Trace # access @Index # get @State
