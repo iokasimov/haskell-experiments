@@ -3,4 +3,4 @@ packages: *
 source-repository-package
  type: git
  location: git://github.com/iokasimov/pandora.git
- tag: 2b27b3c4cedb54b75cf036231ad61a06f0297bf9
+ tag: f0929596a8b144a866bdd60f14e7c45d26a668e8

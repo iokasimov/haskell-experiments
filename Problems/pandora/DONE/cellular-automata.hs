@@ -13,12 +13,10 @@ import Prelude (IO, Char, Int, putStr, print, reverse, (-), (<>))
 
 type Status = Boolean
 
-type Field = Zipper Stream Status
-
 type Neighbours = Status :*: Status :*: Status
 
 start :: Zipper Stream Status
-start = let desert = repeat False in T_U ! Identity True :*: twosome (Reverse desert) desert
+start = let desert = repeat False in T_U ! Exactly True :*: twosome (Reverse desert) desert
 
 rule90 :: Neighbours -> Status
 rule90 (True :*: True :*: True) = False
@@ -31,11 +29,11 @@ rule90 (False :*: False :*: True) = True
 rule90 (False :*: False :*: False) = False
 
 neighbourhood :: Zipper Stream Status -> Neighbours
-neighbourhood z = extract (attached . run . extract # run  z)
+neighbourhood z = extract (attached . run . extract # run z)
 	:*: extract (attached # run z) :*: extract (extract . run . extract # run z)
 
 display :: Int -> Zipper Stream a -> [a]
-display n (T_U (Identity x :*: (T_U (Reverse bs :*: fs)))) = reverse (take n ! stream_to_list bs) <> [x] <> take n (stream_to_list fs)
+display n (T_U (Exactly x :*: (T_U (Reverse bs :*: fs)))) = reverse (take n ! stream_to_list bs) <> [x] <> take n (stream_to_list fs)
 
 record :: (Zipper Stream Status -> Status) -> Zipper Stream Status -> IO ()
 record act being = evolve .-*- snapshot .-*- delay where
@@ -48,8 +46,6 @@ delay, purge :: IO ()
 delay = threadDelay 1000000
 purge = putStr "\ESC[2J"
 
---------------------------------------------------------------------------------
-
 type II = Tape Stream <::> Tape Stream
 type Horizontally = Tape Stream <::> Stream
 type Vertically = Stream <::> Tape Stream
@@ -58,8 +54,8 @@ instance Extendable (->) II where
 	f <<= zz = f <-|- TT (horizontal <-|- vertical zz) where
 
 		horizontal, vertical :: II a -> Tape Stream (II a)
-		horizontal z = twosome # Identity z ! twosome # Reverse (move ((rotate @Left <-|-) ||=) z) # move ((rotate @Right <-|-) ||=) z
-		vertical z = twosome # Identity z ! twosome # Reverse (move (rotate @Left ||=) z) # move (rotate @Right ||=) z
+		horizontal z = twosome # Exactly z ! twosome # Reverse (move ((rotate @Left <-|-) ||=) z) # move ((rotate @Right <-|-) ||=) z
+		vertical z = twosome # Exactly z ! twosome # Reverse (move (rotate @Left ||=) z) # move (rotate @Right ||=) z
 
 		move :: (Extractable t, Covariant (->) (->) t, Monoidal (-->) (-->) (:*:) (:*:) t) => (a -> a) -> a -> Construction t a
 		move f x = extract . deconstruct ! point . f .-+ x
@@ -74,11 +70,11 @@ around :: II Status -> Around
 around z = extract z :*: plane @Left :*: plane @Right :*: plane @Up :*: plane @Down
 	:*: slant @Down @Left :*: slant @Up @Right :*: slant @Up @Left :*: slant @Down @Right where
 
-	plane :: forall i t u . (Substructured i II Identity (t <::> u), Extractable t, Covariant (->) (->) u, Extractable u) => Status
-	plane = extract . extract . run ! get @(Convex Lens) # sub @i # z
+	plane :: forall i t u . (Substructured i II Exactly (t <::> u), Extractable t, Covariant (->) (->) u, Extractable u) => Status
+	plane = extract . extract . run ! get @(Convex Lens) <-- sub @i <-- z
 
-	slant :: forall v h t u . (Substructured v II Identity (t <::> Tape Stream), Extractable t, Substructured h (Tape Stream) Identity u, Extractable u) => Status
-	slant = extract . get @(Convex Lens) (sub @h) . extract . run ! get @(Convex Lens) # sub @v # z
+	slant :: forall v h t u . (Substructured v II Exactly (t <::> Tape Stream), Extractable t, Substructured h (Tape Stream) Exactly u, Extractable u) => Status
+	slant = extract . get @(Convex Lens) (sub @h) . extract . run ! get @(Convex Lens) <-- sub @v <-- z
 
 conway :: Around -> Status
 conway (focused :*: neighbors) = alive == one + one ? focused ! (alive == one + one + one ? True ! False) where
@@ -97,29 +93,20 @@ lifecycle act being = evolve .-*- snapshot .-*- purge .-*- delay where
 	snapshot = void ! let screen = display 5
 		in print <<- screen (screen <-|- run being)
 
---------------------------------------------------------------------------------
-
 cube :: II Status
-cube = TT . T_U ! Identity one :*: twosome (Reverse only) only where
+cube = TT ---> imply @(Tape Stream _) <-- thrice <-- only <-- only where
 
 	only :: Stream :. Zipper Stream := Status
-	only = Construct one . Identity ! repeat noone
-
-	one, noone :: Zipper Stream Status
-	one = T_U ! Identity True :*: twosome # Reverse alone # alone
-	noone = T_U ! Identity False :*: twosome # Reverse (repeat False) # repeat False
-
-	alone :: Stream Status
-	alone = Construct True . Identity ! repeat False
+	only = Construct thrice . Exactly ! repeat noone
 
 blinker :: II Status
-blinker = TT . T_U ! Identity one :*: twosome # Reverse (repeat noone) # repeat noone where
+blinker = TT ---> imply @(Tape Stream _) <-- thrice <-- repeat noone <-- repeat noone
 
-	one, noone :: Zipper Stream Status
-	one = T_U ! Identity True :*: twosome (Reverse alone) alone
-	noone = T_U ! Identity False :*: twosome # Reverse (repeat False) # repeat False
+thrice, noone :: Zipper Stream Status
+thrice = imply @(Tape Stream _) <-- True <-- alone <-- alone
+noone = imply @(Tape Stream _) <-- False <-- repeat False <-- repeat False
 
-	alone :: Stream Status
-	alone = Construct True . Identity ! repeat False
+alone :: Stream Status
+alone = Construct True . Exactly ! repeat False
 
 main = lifecycle # conway . around # cube
