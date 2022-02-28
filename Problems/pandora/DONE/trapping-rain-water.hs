@@ -16,7 +16,7 @@ trapped walls = volume <-|- peak walls <-*- walls <-*- peak @(Reverse t) -=: wal
 	volume ls x rs = (ls /\ rs) - x
 
 	peak :: Traversable (->) (->) v => v a -> v a
-	peak columns = extract . run % zero ! compare <<- columns
+	peak columns = extract . (run % zero) ! compare <<- columns
 
 	compare :: a :=> State a
 	compare x = modify @State (x \/)

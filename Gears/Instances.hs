@@ -46,8 +46,8 @@ instance Base.Show a => Base.Show (List a) where
 	show (TT (Just stack)) = "[" Base.++ Base.show stack
 	show (TT Nothing) = "..."
 
-instance Base.Show a => Base.Show ((Exactly <:.:> (List <:.:> List := (:*:)) := (:*:)) := a) where
-	show (T_U (Exactly x :*: T_U (bs :*: fs))) = "| " Base.<> Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " := " Base.<> Base.show fs Base.<> " |"
+instance Base.Show a => Base.Show ((Exactly <:.:> (List <:.:> List > (:*:)) > (:*:)) > a) where
+	show (T_U (Exactly x :*: T_U (bs :*: fs))) = "| " Base.<> Base.show bs Base.<> " =: " Base.<> Base.show x Base.<> " > " Base.<> Base.show fs Base.<> " |"
 
 -- instance Base.Show Numerator where
 -- 	show Zero = "0"
