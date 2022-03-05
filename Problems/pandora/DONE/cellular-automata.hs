@@ -20,14 +20,7 @@ start = let desert = repeat False in
 	imply @(Tape Stream _) <-- True <-- desert <-- desert
 
 sierpinski :: Neighbours -> Status
-sierpinski (True :*: True :*: True) = False
-sierpinski (True :*: True :*: False) = True
-sierpinski (True :*: False :*: True) = False
-sierpinski (True :*: False :*: False) = True
-sierpinski (False :*: True :*: True) = True
-sierpinski (False :*: True :*: False) = False
-sierpinski (False :*: False :*: True) = True
-sierpinski (False :*: False :*: False) = False
+sierpinski (l :*: _ :*: r) = (l == r) != True
 
 neighbourhood :: Zipper Stream Status -> Neighbours
 neighbourhood z = cell @Left z :*: cell @Root z :*: cell @Right z
@@ -82,19 +75,19 @@ around z = extract z :*: plane @(All Left) :*: plane @(All Right) :*: plane @Up 
 	slant = extract . view (sub @h) . lower <--- view <-- sub @v <-- z
 
 conway :: Around -> Status
-conway (focused :*: neighbors) = iff @True
-	<------ alive == one + one 
+conway (focused :*: neighbors) = (alive == one + one) ?== True
 	<------ focused 
-	<------ iff @True 
-		<----- alive == one + one + one 
-		<----- True 
+		<------ (alive == one + one + one) ?== True
+		<----- True
 		<----- False where
 
 	alive :: Int
 	alive = reduce count zero neighbors
 	
 	count :: Boolean -> Int -> Int
-	count status acc = iff @True <----- status <----- acc + one <----- acc
+	count status acc = status ?== True
+		<----- acc + one
+		<----- acc
 
 lifecycle :: (II Status -> Status) -> II Status -> IO ()
 lifecycle act being = evolve .-*- snapshot .-*- purge .-*- delay where
@@ -119,5 +112,5 @@ noone = imply @(Tape Stream _) <-- False <-- repeat False <-- repeat False
 alone :: Stream Status
 alone = Construct True . Exactly <-- repeat False
 
-main = lifecycle <-- conway . around <-- cube
---main = record <-- sierpinski . neighbourhood <-- start
+--main = lifecycle <-- conway . around <-- cube
+main = record <-- sierpinski . neighbourhood <-- start
