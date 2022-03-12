@@ -27,18 +27,17 @@ decide _ = pass
 
 remember :: Checking t => Bracket -> t ()
 remember style = void <---- zoom (access @Tokens @Trace) . push @List . (:*:) style
-	===<< zoom <-- access @Index @Trace <-- get @State
+	==<< zoom <-- access @Index @Trace <-- get @State
 
 latest :: Checking t => t r -> (Index -> Bracket -> t r) -> t ()
-latest on_empty on_remaining = void <--- resolve @Token (on_remaining |-) on_empty
+latest on_empty on_remaining = void <---- resolve @Token (on_remaining |-) on_empty
 	==<< zoom (access @Tokens @Trace >>> top @List) (get @State)
 
 juxtapose :: Checking t => Bracket -> Index -> Bracket -> t ()
-juxtapose closed oi opened = iff @True
-	<----- closed != opened
-	<----- failure . Both (opened :*: oi) . (closed :*:)
-		===<< zoom <-- access @Index @Trace <-- get @State
-	<----- zoom <-- access @Tokens @Trace <-- void (pop @List)
+juxtapose closed oi opened = closed ?= opened
+	<---- zoom <--- access @Tokens @Trace <--- void <-- pop @List
+	<---- failure . Both (opened :*: oi) . (closed :*:)
+		==<< zoom <-- access @Index @Trace <-- get @State
 
 deadend :: Checking t => Bracket -> t ()
 deadend closed = failure . Right . (closed :*:)
